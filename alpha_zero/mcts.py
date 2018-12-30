@@ -9,9 +9,11 @@ class MCTS():
     """
 
     def __init__(self, game, nnet, args):
+        """args: num_mcts_sims, cpuct(as defined in the paper)
+        """
         self.game = game
         self.nnet = nnet
-        self.args = args    # args: numMCTSSims, cpuct(see the paper)
+        self.args = args
         self.Qsa = {}       # stores Q values for s,a (as defined in the paper)
         self.Nsa = {}       # stores #times edge s,a was visited
         self.Ns = {}        # stores #times board s was visited
@@ -20,28 +22,28 @@ class MCTS():
         self.Es = {}        # cache game ended for board s
         self.Vs = {}        # cache valid moves for board s
 
-    def get_action_prob(self, canonical_board, temp=1):
+    def get_action_prob(self, canonical_board, gamma):
         """
-        This function performs numMCTSSims simulations of MCTS starting from
+        This function performs num_mcts_sims simulations of MCTS starting from
         canonicalBoard.
 
         Returns:
             probs: a policy vector where the probability of the ith action is
-                   proportional to Nsa[(s,a)]**(1./temp)
+                   proportional to Nsa[(s,a)]**(1./gamma)
         """
-        for i in range(self.args.numMCTSSims):
+        for i in range(self.args.num_mcts_sims):
             self.search(canonical_board)
 
         s = self.game.string_representation(canonical_board)
         counts = [self.Nsa[(s, a)] if (s, a) in self.Nsa else 0 for a in range(self.game.get_action_size())]
 
-        if temp == 0:
+        if gamma == 0:
             bestA = np.argmax(counts)
             probs = [0] * len(counts)
             probs[bestA] = 1
             return probs
 
-        counts = [x ** (1. / temp) for x in counts]
+        counts = [x ** (1. / gamma) for x in counts]
         probs = [x / float(sum(counts)) for x in counts]
         return probs
 
@@ -105,7 +107,8 @@ class MCTS():
         for a in range(self.game.get_action_size()):
             if valids[a]:
                 if (s, a) in self.Qsa:
-                    u = self.Qsa[(s, a)] + self.args.cpuct * self.Ps[s][a] * math.sqrt (self.Ns[s]) / (1 + self.Nsa[(s, a)])
+                    u = self.Qsa[(s, a)] + self.args.cpuct * self.Ps[s][a] * \
+                        math.sqrt(self.Ns[s]) / (1 + self.Nsa[(s, a)])
                 else:
                     u = self.args.cpuct * self.Ps[s][a] * math.sqrt(self.Ns[s] + EPS)     # Q = 0 ?
 
