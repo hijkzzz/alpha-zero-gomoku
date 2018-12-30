@@ -4,7 +4,7 @@ Date: Jan 17, 2018.
 Board class.
 Board data:
   1=white, -1=black, 0=empty
-  first dim is column , 2nd is row:
+  first dim is row , 2nd is column:
      pieces[1][7] is the square in column 2,
      at the opposite end of the board in row 8.
 Squares are stored and manipulated as (x,y) tuples.
@@ -30,8 +30,8 @@ class Board():
         moves = set()  # stores the legal moves.
 
         # Get all empty locations.
-        for y in range(self.n):
-            for x in range(self.n):
+        for x in range(self.n):
+            for y in range(self.n):
                 if self[x][y] == 0:
                     moves.add((x, y))
         return list(moves)
@@ -40,8 +40,8 @@ class Board():
         """Returns True if has legal move else False
         """
         # Get all empty locations.
-        for y in range(self.n):
-            for x in range(self.n):
+        for x in range(self.n):
+            for y in range(self.n):
                 if self[x][y] == 0:
                     return True
         return False
@@ -53,4 +53,7 @@ class Board():
         (x,y) = move
         assert self[x][y] == 0
         self[x][y] = color
+
+    def get_n(self):
+        return self.n
 

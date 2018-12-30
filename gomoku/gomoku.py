@@ -1,5 +1,6 @@
 import sys
 from board import Board
+from board_gui import BoardGUI
 import numpy as np
 
 
@@ -8,47 +9,46 @@ class Gomoku():
         self.n = n
         self.n_in_row = nir
 
-    def getInitBoard(self):
+    def get_init_board(self):
         # return initial board (numpy board)
         b = Board(self.n)
         return np.array(b.pieces)
 
-    def getBoardSize(self):
+    def get_board_size(self):
         # (a,b) tuple
         return (self.n, self.n)
 
-    def getActionSize(self):
+    def get_action_size(self):
         # return number of actions
-        return self.n * self.n + 1
+        return self.n * self.n
 
-    def getNextState(self, board, player, action):
+    def get_next_state(self, board, player, action):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
         if action == self.n * self.n:
             return (board, -player)
+
         b = Board(self.n)
         b.pieces = np.copy(board)
         move = (int(action / self.n), action % self.n)
         b.execute_move(move, player)
         return (b.pieces, -player)
 
-    # modified
-    def getValidMoves(self, board, player):
+    def get_valid_moves(self, board, player):
         # return a fixed size binary vector
-        valids = [0] * self.getActionSize()
+        valids = [0] * self.get_action_size()
         b = Board(self.n)
         b.pieces = np.copy(board)
-        legalMoves = b.get_legal_moves(player)
-        if len(legalMoves) == 0:
-            valids[-1] = 1
-            return np.array(valids)
-        for x, y in legalMoves:
+        legal_moves = b.get_legal_moves(player)
+
+        if len(legal_moves) == 0:
+            return None
+        for x, y in legal_moves:
             valids[self.n * x + y] = 1
         return np.array(valids)
 
-    # modified
-    def getGameEnded(self, board, player):
-        # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
+    def get_game_ended(self, board, player):
+        # return 2 if not ended, 1 if player 1 won, -1 if player 1 lost, 0 if tied
         # player = 1
         b = Board(self.n)
         b.pieces = np.copy(board)
@@ -69,15 +69,15 @@ class Gomoku():
                         len(set(board[w + l][h - l] for l in range(n))) == 1):
                     return board[w][h]
         if b.has_legal_moves():
-            return 0
-        return 1e-4
+            return 2
+        return 0
 
-    def getCanonicalForm(self, board, player):
+    def get_canonical_form(self, board, player):
         # return state if player==1, else return -state if player==-1
         return player * board
 
     # modified
-    def getSymmetries(self, board, pi):
+    def get_symmetries(self, board, pi):
         # mirror, rotational
         assert(len(pi) == self.n**2 + 1)  # 1 for pass
         pi_board = np.reshape(pi[:-1], (self.n, self.n))
@@ -90,7 +90,7 @@ class Gomoku():
                 if j:
                     newB = np.fliplr(newB)
                     newPi = np.fliplr(newPi)
-                l += [(newB, list(newPi.ravel()) + [pi[-1]])]
+                l += [(newB, list(newPi.ravel()))]
         return l
 
     def stringRepresentation(self, board):
@@ -98,26 +98,8 @@ class Gomoku():
         return board.tostring()
 
 
-def display(board):
-    n = board.shape[0]
-
-    for y in range(n):
-        print(y, "|", end="")
-    print("")
-    print(" -----------------------")
-    for y in range(n):
-        print(y, "|", end="")    # print the row #
-        for x in range(n):
-            piece = board[y][x]    # get the piece to print
-            if piece == -1:
-                print("b ", end="")
-            elif piece == 1:
-                print("W ", end="")
-            else:
-                if x == n:
-                    print("-", end="")
-                else:
-                    print("- ", end="")
-        print("|")
-
-    print("   -----------------------")
+if __name__ == "__main__":
+    board = Board(15)
+    board_gui = BoardGUI(board, True)
+    board_gui.loop()
+    
