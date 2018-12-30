@@ -94,7 +94,9 @@ class NeuralNetWorkWrapper():
 
                 # forward + backward + optimize
                 output_vs, output_pis = self.neural_network(boards)
-                loss = torch.nn.MSELoss(output_vs, vs) + torch.nn.CrossEntropyLoss(output_pis, pis)
+                value_loss = torch.nn.MSELoss(output_vs, vs)
+                policy_loss = torch.nn.CrossEntropyLoss(output_pis, pis)
+                loss = sum([l for l in value_loss] + [l for l in policy_loss])
                 loss.backward()
 
                 self.optim.step()
