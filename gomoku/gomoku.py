@@ -93,7 +93,7 @@ class Gomoku():
                 l += [(newB, list(newPi.ravel()))]
         return l
 
-    def stringRepresentation(self, board):
+    def string_representation(self, board):
         # 8x8 numpy array (canonical board)
         return board.tostring()
 
