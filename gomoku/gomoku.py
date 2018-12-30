@@ -5,9 +5,9 @@ import numpy as np
 
 
 class Gomoku():
-    def __init__(self, n=15, nir=5):
-        self.n = n
-        self.n_in_row = nir
+    def __init__(self, args):
+        self.n = args.n
+        self.n_in_row = args.nir
 
     def get_init_board(self):
         # return initial board (numpy board)

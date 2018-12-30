@@ -4,7 +4,7 @@ import os
 
 
 class BoardGUI():
-    def __init__(self, board, human=False, fps=60):
+    def __init__(self, board=None, human=False, fps=60):
 
         # color
         self.WHITE = (255, 255, 255)
@@ -14,9 +14,11 @@ class BoardGUI():
         # resolution
         self.WIDTH = 600
         self.HEIGHT = 600
-        self.board = board
-        self.n = board.get_n()
-        self.GRID_WIDTH = self.WIDTH / (self.n + 3)
+
+        if self.board
+            self.board = board
+            self.n = board.get_n()
+            self.GRID_WIDTH = self.WIDTH / (self.n + 3)
 
         # init
         pygame.init()

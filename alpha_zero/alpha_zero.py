@@ -10,7 +10,7 @@ from arena import Arena
 class AlphaZero():
     def __init__(self, game, args, board_gui=None):
         """args: num_mcts_sims, cpuct(mcts)
-                 lr, l2, batch_size, dropout,(neural network)
+                 lr, l2, batch_size, dropout, num_channels, epochs(neural network)
                  n, nir(gomoku)
                  num_iters, num_eps, temp_examples_max_len, train_examples_max_len, greedy_num, area_num, update_threshold(self play)
         """
