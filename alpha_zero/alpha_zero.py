@@ -12,7 +12,7 @@ class AlphaZero():
         """args: num_mcts_sims, cpuct(mcts)
                  lr, l2, batch_size, dropout, num_channels, epochs(neural network)
                  n, nir(gomoku)
-                 num_iters, num_eps, temp_examples_max_len, train_examples_max_len, greedy_num, area_num, update_threshold(self play)
+                 num_iters, num_eps, temp_examples_max_len, train_examples_max_len, explore_num, area_num, update_threshold(self play)
         """
 
         self.args = args
@@ -99,7 +99,7 @@ class AlphaZero():
         while True:
             episode_step += 1
             canonical_board = self.game.get_canonical_form(board,self.cur_player)
-            gamma = int(episode_step < self.args.greedy_num)
+            gamma = int(episode_step < self.args.explore_num)
 
             pi = mcts.get_action_prob(canonical_board, gamma=gamma)
             sym = self.game.get_symmetries(canonical_board, pi)

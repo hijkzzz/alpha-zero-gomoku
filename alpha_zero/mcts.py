@@ -41,6 +41,7 @@ class MCTS():
             bestA = np.argmax(counts)
             probs = [0] * len(counts)
             probs[bestA] = 1
+
             return probs
 
         counts = [x ** (1. / gamma) for x in counts]

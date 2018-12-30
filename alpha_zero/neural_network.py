@@ -106,14 +106,13 @@ class NeuralNetWorkWrapper():
         self.neural_network.eval()
 
         boards = torch.Tensor(board).unsqueeze(0).unsqueeze(1)
-        print(board)
 
         if self.cuda:
             boards = boards.cuda()
 
         output_vs, output_pis = self.neural_network(boards)
 
-        return [output_pis[0], output_vs[0]]
+        return [output_pis[0].cpu().detach().numpy(), output_vs[0].cpu().detach().numpy()]
 
     def load_model(self, filename="checkpoint", folder="models"):
         """load model to file
