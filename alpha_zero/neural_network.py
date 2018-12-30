@@ -19,18 +19,18 @@ class NeuralNetWork(nn.Module):
         super(NeuralNetWork, self).__init__()
         # n
         self.conv1 = nn.Sequential(
-            nn.Conv2d(1, args.num_channel, kernel_size=3, padding=2), nn.BatchNorm2d(args.num_channel), nn.ReLU())
+            nn.Conv2d(1, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
         # n
         self.conv2 = nn.Sequential(
-            nn.Conv2d(args.num_channel, args.num_channel, kernel_size=3, padding=2), nn.BatchNorm2d(args.num_channel), nn.ReLU())
+            nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
         # n
         self.conv3 = nn.Sequential(
-            nn.Conv2d(args.num_channel, args.num_channel, kernel_size=3, padding=0), nn.BatchNorm2d(args.num_channel), nn.ReLU())
+            nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=0), nn.BatchNorm2d(args.num_channels), nn.ReLU())
         # n - 2
         self.conv4 = nn.Sequential(
-            nn.Conv2d(args.num_channel, args.num_channel, kernel_size=3, padding=0), nn.BatchNorm2d(args.num_channel), nn.ReLU())
+            nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=0), nn.BatchNorm2d(args.num_channels), nn.ReLU())
         # n - 4
-        self.fc1 = nn.Sequential(nn.Linear(args.num_channel * (args.n - 4) ** 2, 1024),
+        self.fc1 = nn.Sequential(nn.Linear(args.num_channels * (args.n - 4) ** 2, 1024),
                                  nn.ReLU(), nn.Dropout(p=args.dropout))
         self.fc2 = nn.Sequential(nn.Linear(1024, 512), nn.ReLU(), nn.Dropout(p=args.dropout))
 
@@ -82,7 +82,10 @@ class NeuralNetWorkWrapper():
             while batch_idx < int(len(examples) / self.args.batch_size):
                 sample_ids = np.random.randint(len(examples), size=self.args.batch_size)
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
-                boards, pis, vs = Variable(boards).unsqueeze(1), Variable(pis), Variable(vs)
+                boards, pis, vs = torch.Tensor(boards).unsqueeze(1), \
+                                torch.Tensor(pis).unsqueeze(1), \
+                                torch.Tensor(vs).unsqueeze(1)
+
                 if self.cuda:
                     boards, pis, vs = boards.cuda(), pis.cuda(), vs.cuda()
 
@@ -96,19 +99,21 @@ class NeuralNetWorkWrapper():
 
                 self.optim.step()
 
-    def infer(self, boards):
+    def infer(self, board):
         """predict v and pi
         """
 
         self.neural_network.eval()
 
-        boards = Variable(boards).unsqueeze(1)
-        if self.cuda():
+        boards = torch.Tensor(board).unsqueeze(0).unsqueeze(1)
+        print(board)
+
+        if self.cuda:
             boards = boards.cuda()
 
         output_vs, output_pis = self.neural_network(boards)
 
-        return [output_vs, output_pis]
+        return [output_pis[0], output_vs[0]]
 
     def load_model(self, filename="checkpoint", folder="models"):
         """load model to file

@@ -1,8 +1,8 @@
 import sys
-from board import Board
-from board_gui import BoardGUI
 import numpy as np
 
+from .board import Board
+from .board_gui import BoardGUI
 
 class Gomoku():
     def __init__(self, args):
