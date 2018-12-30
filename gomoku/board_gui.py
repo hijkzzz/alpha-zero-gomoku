@@ -4,7 +4,7 @@ import os
 
 
 class BoardGUI():
-    def __init__(self, board, human=False, fps=30):
+    def __init__(self, board, human=False, fps=60):
 
         # color
         self.WHITE = (255, 255, 255)
@@ -33,9 +33,11 @@ class BoardGUI():
         self.background_img = pygame.image.load(
             os.path.join(base_folder, 'back.png')).convert()
 
+        # close window
+        self.running = True
+
     def loop(self):
-        running = True
-        while running:
+        while self.running:
             # timer
             self.clock.tick(self.FPS)
 
@@ -62,7 +64,6 @@ class BoardGUI():
             # refresh
             pygame.display.flip()
 
-    # 画出棋盘
     def draw_background(self):
         # load background
         self.screen.blit(self.background_img, (0, 0))
@@ -102,6 +103,16 @@ class BoardGUI():
                     color = self.WHITE if self.board[i][j] == 1 else self.BALCK
                     pygame.draw.circle(self.screen, color, center,
                                        int(self.GRID_WIDTH / 2.5))
+
+    def set_board(self, board):
+        # change the board
+        self.n = board.get_n()
+        self.board = board
+        self.GRID_WIDTH = self.WIDTH / (self.n + 3)
+
+    def close_gui(self):
+        # close window
+        self.running = False
 
     def in_turn_human(self):
         # allow human action

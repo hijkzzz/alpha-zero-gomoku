@@ -10,16 +10,16 @@ class MCTS():
     def __init__(self, game, nnet, args):
         self.game = game
         self.nnet = nnet
-        self.args = args
+        self.args = args    # args: numMCTSSims, cpuct(see the paper)
         self.Qsa = {}       # stores Q values for s,a (as defined in the paper)
         self.Nsa = {}       # stores #times edge s,a was visited
         self.Ns = {}        # stores #times board s was visited
         self.Ps = {}        # stores initial policy (returned by neural net)
 
-        self.Es = {}        # stores game.getGameEnded ended for board s
-        self.Vs = {}        # stores game.getValidMoves for board s
+        self.Es = {}        # cache game ended for board s
+        self.Vs = {}        # cache valid moves for board s
 
-    def getActionProb(self, canonicalBoard, temp=1):
+    def get_action_prob(self, canonical_board, temp=1):
         """
         This function performs numMCTSSims simulations of MCTS starting from
         canonicalBoard.
@@ -29,9 +29,9 @@ class MCTS():
                    proportional to Nsa[(s,a)]**(1./temp)
         """
         for i in range(self.args.numMCTSSims):
-            self.search(canonicalBoard)
+            self.search(canonical_board)
 
-        s = self.game.stringRepresentation(canonicalBoard)
+        s = self.game.stringRepresentation(canonical_board)
         counts = [self.Nsa[(s,a)] if (s,a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
 
         if temp==0:
