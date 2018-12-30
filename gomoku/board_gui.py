@@ -14,11 +14,13 @@ class BoardGUI():
         # resolution
         self.WIDTH = 600
         self.HEIGHT = 600
+        
+        self.board = None
+        self.n = None
+        self.GRID_WIDTH = None
 
-        if self.board
-            self.board = board
-            self.n = board.get_n()
-            self.GRID_WIDTH = self.WIDTH / (self.n + 3)
+        if board:
+            self.set_board(board)
 
         # init
         pygame.init()

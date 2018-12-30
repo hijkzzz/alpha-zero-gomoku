@@ -1,6 +1,6 @@
-from alpha_zero.alpha_zero import AlphaZero
 from gomoku.board_gui import BoardGUI
-from gomoku.board_gui import Gomoku
+from gomoku.gomoku import Gomoku
+from alpha_zero.alpha_zero import AlphaZero
 
 class dotdict(dict):
     def __getattr__(self, name):
@@ -12,15 +12,17 @@ args = dotdict({
 
     'num_iters': 1000,
     'num_eps': 100,
+    'greedy_num': 15,
     'update_threshold': 0.6,
-    'temp_examples_max_len': 100000,
     'area_num': 40,
+    'temp_examples_max_len': 100000,
     'train_examples_max_len': 20,
 
     'num_mcts_sims': 25,
     'cpuct': 1,
 
     'lr': 0.001,
+    'l2': 0.001,
     'dropout': 0.3,
     'epochs': 10,
     'batch_size': 64,
@@ -30,6 +32,8 @@ args = dotdict({
 
 if __name__ == "__main__":
     game = Gomoku(args)
-    board_gui = BoardGUI(args)
-    alpha_zero = AlphaZero(args, game, board_gui)
+    args.action_size = game.get_action_size()
+    board_gui = BoardGUI()
+
+    alpha_zero = AlphaZero(game, args, board_gui)
     alpha_zero.learn()

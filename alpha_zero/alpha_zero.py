@@ -3,9 +3,9 @@ from pickle import Pickler, Unpickler
 import numpy as np
 from collections import deque
 
-from neural_network import NeuralNetWorkWrapper, NeuralNetWork
-from mcts import MCTS
-from arena import Arena
+from .neural_network import NeuralNetWorkWrapper, NeuralNetWork
+from .mcts import MCTS
+from .arena import Arena
 
 class AlphaZero():
     def __init__(self, game, args, board_gui=None):
@@ -113,4 +113,5 @@ class AlphaZero():
 
             # END GAME
             if r != 2:
+                # b, p, v
                 return [(x[0], x[2], r * ((-1) ** (x[1] != self.cur_player))) for x in train_examples]
