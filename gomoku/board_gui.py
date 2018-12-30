@@ -19,28 +19,30 @@ class BoardGUI():
         self.n = None
         self.GRID_WIDTH = None
 
+        # other
+        self.FPS = fps
+        self.human = human
+
         if board:
             self.set_board(board)
 
+        # close window
+        self.running = True
+
+    def loop(self):
         # init
         pygame.init()
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         pygame.display.set_caption("Gomoku")
 
         # timer
-        self.FPS = fps
         self.clock = pygame.time.Clock()
-        self.human = human
 
         # background image
         base_folder = os.path.dirname(__file__)
         self.background_img = pygame.image.load(
             os.path.join(base_folder, 'back.png')).convert()
 
-        # close window
-        self.running = True
-
-    def loop(self):
         while self.running:
             # timer
             self.clock.tick(self.FPS)
@@ -49,7 +51,7 @@ class BoardGUI():
             for event in pygame.event.get():
                 # close window
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
                 # human input
                 if self.human and event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_x, mouse_y = event.pos

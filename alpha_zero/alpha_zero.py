@@ -25,13 +25,13 @@ class AlphaZero():
 
     def learn(self):
         for i in range(self.args.num_iters):
-            print("ITER:" + str(i))
+            print("ITER ::: " + str(i + 1))
 
             # self play
             temp_examples = deque([], maxlen=self.args.temp_examples_max_len)
 
             for eps in range(self.args.num_eps):
-                print("eps:" + str(eps))
+                print("EPS :::: " + str(eps + 1))
                 temp_examples += self.self_play()
             
             # add to train examples
