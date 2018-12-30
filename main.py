@@ -12,7 +12,7 @@ args = dotdict({
 
     'num_iters': 1000,
     'num_eps': 100,
-    'greedy_num': 15,
+    'explore_num': 15,
     'update_threshold': 0.6,
     'area_num': 40,
     'temp_examples_max_len': 100000,
@@ -32,7 +32,8 @@ args = dotdict({
 
 if __name__ == "__main__":
     game = Gomoku(args)
-    args.action_size = game.get_action_size()
+    args['action_size'] = game.get_action_size()
+
     board_gui = BoardGUI()
 
     alpha_zero = AlphaZero(game, args, board_gui)
