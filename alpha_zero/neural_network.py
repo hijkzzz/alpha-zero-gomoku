@@ -10,6 +10,7 @@ import torch.nn.functional as F
 
 import numpy as np
 
+
 class NeuralNetWork(nn.Module):
     """Policy and Value Network
     """
@@ -29,7 +30,8 @@ class NeuralNetWork(nn.Module):
         self.conv4 = nn.Sequential(
             nn.Conv2d(args.num_channel, args.num_channel, kernel_size=3, padding=0), nn.BatchNorm2d(args.num_channel), nn.ReLU())
         # n - 4
-        self.fc1 = nn.Sequential(nn.Linear(args.num_channel * (args.n - 4) ** 2, 1024), nn.ReLU(), nn.Dropout(p=args.dropout))
+        self.fc1 = nn.Sequential(nn.Linear(args.num_channel * (args.n - 4) ** 2, 1024),
+                                 nn.ReLU(), nn.Dropout(p=args.dropout))
         self.fc2 = nn.Sequential(nn.Linear(1024, 512), nn.ReLU(), nn.Dropout(p=args.dropout))
 
         self.v = nn.Sequential(nn.Linear(1024, 1), nn.Tanh())
@@ -44,10 +46,10 @@ class NeuralNetWork(nn.Module):
         fc1 = self.fc1(out)
         fc2 = self.fc2(fc1)
 
-        v =  self.v(fc1)
+        v = self.v(fc1)
         pi = self.pi(fc2)
 
-        return v, pi
+        return [v, pi]
 
 
 class NeuralNetWorkWrapper():
@@ -67,47 +69,60 @@ class NeuralNetWorkWrapper():
 
         self.optim = Adam(self.neural_network.parameters(), lr=args.lr, weight_decay=args.l2)
 
-
     def train(self, examples):
-        for epoch in range(args.epochs):
+        """train neural network
+        """
+
+        self.neural_network.train()
+
+        for epoch in range(self.args.epochs):
             print('EPOCH ::: ' + str(epoch + 1))
 
             batch_idx = 0
             while batch_idx < int(len(examples) / args.batch_size):
                 sample_ids = np.random.randint(len(examples), size=args.batch_size)
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
-                boards, pis, vs = Variable(torch.cat(boards)), Variable(torch.cat(pis)), Variable(torch.cat(vs))
+                boards, pis, vs = Variable(boards).unsqueeze(1), Variable(pis), Variable(vs)
                 if self.cuda:
                     boards, pis, vs = boards.cuda(), pis.cuda(), vs.cuda()
 
-                boards, pis, vs = boards.unsqueeze(3), pis.unsqueeze(1), vs.unsqueeze(1)
-
                 # zero the parameter gradients
-                optimizer.zero_grad()
+                self.optim.zero_grad()
 
                 # forward + backward + optimize
-                outputs = self.neural_network(boards)
-                loss = 
+                output_vs, output_pis = self.neural_network(boards)
+                loss = torch.nn.MSELoss(output_vs, vs) + torch.nn.CrossEntropyLoss(output_pis, pis)
                 loss.backward()
-                optimizer.step()
 
-                
+                self.optim.step()
 
+    def infer(self, boards):
+        """predict v and pi
+        """
 
+        self.neural_network.eval()
 
-    def infer(self, board):
+        boards = Variable(boards).unsqueeze(1)
+        if self.cuda():
+            boards = boards.cuda()
 
+        output_vs, output_pis = self.neural_network(boards)
+
+        return [output_vs, output_pis]
 
     def load_model(self, filename="checkpoint", folder="models"):
+        """load model to file
+        """
+
         filepath = os.path.join(folder, filename)
         self.neural_network.load_state_dict(torch.load(filepath))
 
-        
     def save_model(self, filename="checkpoint", folder="models"):
+        """save model from file
+        """
+
         if not os.path.exists(folder):
             os.mkdir(folder)
 
         filepath = os.path.join(folder, filename)
-        torch.save(self.actor_target.state_dict(), filepath)
-        
-
+        torch.save(self.neural_network.state_dict(), filepath)
