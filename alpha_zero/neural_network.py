@@ -56,12 +56,12 @@ class NeuralNetWorkWrapper():
     """train and predict
     """
 
-    def __init__(self, neural_network, args, cuda=False):
+    def __init__(self, neural_network, args):
         """args: lr, l2, batch_size, dropout
         """
 
         self.neural_network = neural_network
-        self.cuda = cuda
+        self.cuda = torch.cuda.is_available()
         self.args = args
 
         if self.cuda:
@@ -79,8 +79,8 @@ class NeuralNetWorkWrapper():
             print('EPOCH ::: ' + str(epoch + 1))
 
             batch_idx = 0
-            while batch_idx < int(len(examples) / args.batch_size):
-                sample_ids = np.random.randint(len(examples), size=args.batch_size)
+            while batch_idx < int(len(examples) / self.args.batch_size):
+                sample_ids = np.random.randint(len(examples), size=self.args.batch_size)
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
                 boards, pis, vs = Variable(boards).unsqueeze(1), Variable(pis), Variable(vs)
                 if self.cuda:
