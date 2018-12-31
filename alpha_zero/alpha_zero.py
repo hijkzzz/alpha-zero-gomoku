@@ -1,6 +1,7 @@
 from random import shuffle
 import numpy as np
 from collections import deque
+import threading
 
 from .neural_network import NeuralNetWorkWrapper, NeuralNetWork
 from .mcts import MCTS
@@ -23,6 +24,11 @@ class AlphaZero():
 
 
     def learn(self):
+        # start gui
+        if self.board_gui:
+            t = threading.Thread(target=self.board_gui.loop)
+            t.start()
+
         for i in range(self.args.num_iters):
             print("ITER :::: " + str(i + 1))
 
@@ -69,6 +75,11 @@ class AlphaZero():
             else:
                 print('ACCEPTING NEW MODEL')
                 self.nnet.save_model(filename="best_checkpoint")
+
+        # close gui
+        if self.board_gui:
+            self.board_gui.close_gui()
+            t.join()
 
 
     def self_play(self):
