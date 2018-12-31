@@ -46,6 +46,8 @@ class AlphaZero():
                 train_data.extend(e)
             shuffle(train_data)
 
+            print("TRAIN DATA LEN ::: " + str(len(train_data)))
+
             # train neural network
             self.nnet.save_model()
             self.nnet_old.load_model()
