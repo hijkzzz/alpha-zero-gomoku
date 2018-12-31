@@ -23,7 +23,7 @@ args = dotdict({
     'num_mcts_sims': 30,
     'cpuct': 5,
 
-    'lr': 0.002,
+    'lr': 0.003,
     'l2': 0.0001,
     'dropout': 0.3,
     'epochs': 5,
