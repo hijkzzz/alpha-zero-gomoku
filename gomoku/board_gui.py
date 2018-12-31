@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pygame
 import os
-
+import numpy as np
 
 class BoardGUI():
     def __init__(self, board=None, human=False, fps=60):
@@ -112,7 +112,7 @@ class BoardGUI():
 
     def set_board(self, board):
         # change the board
-        self.n = board.get_n()
+        self.n = np.size(board, 0)
         self.board = board
         self.GRID_WIDTH = self.WIDTH / (self.n + 3)
 
