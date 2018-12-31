@@ -1,6 +1,5 @@
 import math
 import numpy as np
-from numba import jit
 
 EPS = 1e-8
 
@@ -24,7 +23,6 @@ class MCTS():
         self.Es = {}        # cache game ended for board s
         self.Vs = {}        # cache valid moves for board s
 
-    @jit(nopython=True)
     def get_action_prob(self, canonical_board, gamma):
         """
         This function performs num_mcts_sims simulations of MCTS starting from
@@ -51,7 +49,6 @@ class MCTS():
         probs = [x / float(sum(counts)) for x in counts]
         return probs
 
-    @jit(nopython=True)
     def search(self, canonical_board):
         """
         This function performs one iteration of MCTS. It is recursively called

@@ -1,6 +1,5 @@
 import sys
 import numpy as np
-from numba import jit
 
 from .board import Board
 from .board_gui import BoardGUI
@@ -10,23 +9,19 @@ class Gomoku():
         self.n = args.n
         self.n_in_row = args.nir
 
-    @jit(nopython=True)
     def get_init_board(self):
         # return initial board (numpy board)
         b = Board(self.n)
         return np.array(b.pieces)
 
-    @jit(nopython=True)
     def get_board_size(self):
         # (a,b) tuple
         return (self.n, self.n)
 
-    @jit(nopython=True)
     def get_action_size(self):
         # return number of actions
         return self.n * self.n
 
-    @jit(nopython=True)
     def get_next_state(self, board, player, action):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
@@ -39,7 +34,6 @@ class Gomoku():
         b.execute_move(move, player)
         return (b.pieces, -player)
 
-    @jit(nopython=True)
     def get_valid_moves(self, board, player):
         # return a fixed size binary vector
         valids = [0] * self.get_action_size()
@@ -53,7 +47,6 @@ class Gomoku():
             valids[self.n * x + y] = 1
         return np.array(valids)
 
-    @jit(nopython=True)
     def get_game_ended(self, board, player):
         # return 2 if not ended, 1 if player 1 won, -1 if player 1 lost, 0 if tied
         # player = 1
@@ -79,13 +72,11 @@ class Gomoku():
             return 2
         return 0
 
-    @jit(nopython=True)
     def get_canonical_form(self, board, player):
         # return state if player==1, else return -state if player==-1
         return player * board
 
     # modified
-    @jit(nopython=True)
     def get_symmetries(self, board, pi):
         # mirror, rotational
         assert(len(pi) == self.n**2)  # 1 for pass
@@ -102,7 +93,6 @@ class Gomoku():
                 l += [(newB, list(newPi.ravel()))]
         return l
 
-    @jit(nopython=True)
     def string_representation(self, board):
         # 8x8 numpy array (canonical board)
         return board.tostring()
