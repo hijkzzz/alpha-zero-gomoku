@@ -18,14 +18,14 @@ args = dotdict({
     'temp_examples_max_len': 100000,
     'train_examples_max_len': 20,
 
-    'num_mcts_sims': 35,
+    'num_mcts_sims': 40,
     'cpuct': 3,
 
     'lr': 0.001,
     'l2': 0.0001,
     'dropout': 0.3,
     'epochs': 5,
-    'batch_size': 128,
+    'batch_size': 64,
     'num_channels': 128,
 })
 

@@ -1,6 +1,5 @@
 import numpy as np
 import time
-import threading
 
 class Arena():
     """
@@ -57,10 +56,6 @@ class Arena():
             twoWon: games won by player2
             draws:  games won by nobody
         """
-        # run gui
-        if self.board_gui:
-            t = threading.Thread(target=self.board_gui.loop)
-            t.start()
 
         num = int(num/2)
         oneWon = 0
@@ -86,10 +81,5 @@ class Arena():
                 twoWon += 1
             else:
                 draws += 1
-        
-        # close gui
-        if self.board_gui:
-            self.board_gui.close_gui()
-            t.join()
         
         return oneWon, twoWon, draws
