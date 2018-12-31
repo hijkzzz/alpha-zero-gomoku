@@ -25,29 +25,30 @@ class NeuralNetWork(nn.Module):
             nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
         # n
         self.conv3 = nn.Sequential(
-            nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=0), nn.BatchNorm2d(args.num_channels), nn.ReLU())
-        # n - 2
-        self.conv4 = nn.Sequential(
-            nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=0), nn.BatchNorm2d(args.num_channels), nn.ReLU())
-        # n - 4
-        self.pi = nn.Sequential(nn.Linear(args.num_channels * (args.n - 4) ** 2, args.action_size),
-                                 nn.ReLU(), nn.Softmax(dim=0))
+            nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
 
-        self.fc = nn.Sequential(nn.Linear(args.num_channels * (args.n - 4) ** 2, 128), nn.ReLU())
-        self.v = nn.Sequential(nn.Linear(128, 1), nn.Tanh())
+
+        self.pi_conv = nn.Sequential(
+            nn.Conv2d(args.num_channels, 4, kernel_size=1, padding=0), nn.BatchNorm2d(4), nn.ReLU())
+        self.pi_fc = nn.Sequential(nn.Linear(4 * args.n ** 2, args.action_size), nn.ReLU(), nn.Softmax(dim=0))
+
+        self.v_conv = nn.Sequential(
+            nn.Conv2d(args.num_channels, 2, kernel_size=1, padding=0), nn.BatchNorm2d(2), nn.ReLU())
+        self.v_fc1 = nn.Sequential(nn.Linear(2 * args.n ** 2, 64), nn.ReLU())
+        self.v_fc2 = nn.Sequential(nn.Linear(64, 1), nn.Tanh())
 
 
     def forward(self, boards):
         out = self.conv1(boards)
         out = self.conv2(out)
         out = self.conv3(out)
-        out = self.conv4(out)
-        out = out.view(out.size(0), -1)
 
-        pi = self.pi(out)
+        pi = self.pi_conv(out)
+        pi = self.pi_fc(pi.view(pi.size(0), -1))
 
-        v = self.fc(out)
-        v = self.v(v)
+        v = self.v_conv(out)
+        v = self.v_fc1(v.view(v.size(0), -1))
+        v = self.v_fc2(v)
 
         return [v, pi]
 
