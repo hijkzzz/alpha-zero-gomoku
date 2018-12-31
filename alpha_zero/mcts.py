@@ -23,14 +23,14 @@ class MCTS():
         self.Es = {}        # cache game ended for board s
         self.Vs = {}        # cache valid moves for board s
 
-    def get_action_prob(self, canonical_board, gamma):
+    def get_action_prob(self, canonical_board, temp):
         """
         This function performs num_mcts_sims simulations of MCTS starting from
         canonicalBoard.
 
         Returns:
             probs: a policy vector where the probability of the ith action is
-                   proportional to Nsa[(s,a)]**(1./gamma)
+                   proportional to Nsa[(s,a)]**(1./temp)
         """
         for i in range(self.args.num_mcts_sims):
             self.search(canonical_board)
@@ -38,14 +38,14 @@ class MCTS():
         s = self.game.string_representation(canonical_board)
         counts = [self.Nsa[(s, a)] if (s, a) in self.Nsa else 0 for a in range(self.game.get_action_size())]
 
-        if gamma == 0:
+        if temp == 0:
             bestA = np.argmax(counts)
             probs = [0] * len(counts)
             probs[bestA] = 1
 
             return probs
 
-        counts = [x ** (1. / gamma) for x in counts]
+        counts = [x ** (1. / temp) for x in counts]
         probs = [x / float(sum(counts)) for x in counts]
         return probs
 
