@@ -14,12 +14,12 @@ args = dotdict({
     'num_eps': 100,
     'explore_num': 40,
     'update_threshold': 0.51,
-    'area_num': 40,
+    'area_num': 20,
     'temp_examples_max_len': 100000,
     'train_examples_max_len': 20,
 
     'num_mcts_sims': 35,
-    'cpuct': 1,
+    'cpuct': 3,
 
     'lr': 0.001,
     'l2': 0.0001,
