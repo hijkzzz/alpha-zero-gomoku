@@ -1,5 +1,4 @@
 from random import shuffle
-from pickle import Pickler, Unpickler
 import numpy as np
 from collections import deque
 
@@ -25,13 +24,13 @@ class AlphaZero():
 
     def learn(self):
         for i in range(self.args.num_iters):
-            print("ITER ::: " + str(i + 1))
+            print("ITER :::: " + str(i + 1))
 
             # self play
             temp_examples = deque([], maxlen=self.args.temp_examples_max_len)
 
             for eps in range(self.args.num_eps):
-                print("EPS :::: " + str(eps + 1))
+                print("EPS ::: " + str(eps + 1) + ", EXAMPLES :::" + str(len(temp_examples)))
                 temp_examples += self.self_play()
             
             # add to train examples
@@ -45,8 +44,6 @@ class AlphaZero():
             for e in self.train_examples:
                 train_data.extend(e)
             shuffle(train_data)
-
-            print("TRAIN DATA LEN ::: " + str(len(train_data)))
 
             # train neural network
             self.nnet.save_model()
