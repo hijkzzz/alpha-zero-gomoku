@@ -30,12 +30,12 @@ class NeuralNetWork(nn.Module):
         self.conv4 = nn.Sequential(
             nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=0), nn.BatchNorm2d(args.num_channels), nn.ReLU())
         # n - 4
-        self.fc1 = nn.Sequential(nn.Linear(args.num_channels * (args.n - 4) ** 2, 512),
-                                 nn.ReLU(), nn.Dropout(p=args.dropout))
-        self.v = nn.Sequential(nn.Linear(512, 1), nn.Tanh())
+        self.pi = nn.Sequential(nn.Linear(args.num_channels * (args.n - 4) ** 2, args.action_size),
+                                 nn.ReLU(), nn.Softmax(dim=0))
 
-        self.fc2 = nn.Sequential(nn.Linear(512, 256), nn.ReLU(), nn.Dropout(p=args.dropout))
-        self.pi = nn.Sequential(nn.Linear(256, args.action_size), nn.Softmax(dim=0))
+        self.fc = nn.Sequential(nn.Linear(args.num_channels * (args.n - 4) ** 2, 128), nn.ReLU())
+        self.v = nn.Sequential(nn.Linear(128, 1), nn.Tanh())
+
 
     def forward(self, boards):
         out = self.conv1(boards)
@@ -43,11 +43,11 @@ class NeuralNetWork(nn.Module):
         out = self.conv3(out)
         out = self.conv4(out)
         out = out.view(out.size(0), -1)
-        fc1 = self.fc1(out)
-        fc2 = self.fc2(fc1)
 
-        v = self.v(fc1)
-        pi = self.pi(fc2)
+        pi = self.pi(out)
+
+        v = self.fc(out)
+        v = self.v(v)
 
         return [v, pi]
 
@@ -70,7 +70,7 @@ class AlphaLoss(torch.nn.Module):
 
     def forward(self, pis, vs, target_pis, target_vs):
         value_loss = F.mse_loss(vs, target_vs)
-        policy_loss = torch.mean(-torch.sum(target_pis * torch.log(pis + 1e-10), 1))
+        policy_loss = F.nll_loss(torch.log(pis + 1e-10), target_pis)
         return value_loss + policy_loss
 
 
