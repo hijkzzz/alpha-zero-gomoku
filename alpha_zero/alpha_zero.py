@@ -30,7 +30,7 @@ class AlphaZero():
             temp_examples = deque([], maxlen=self.args.temp_examples_max_len)
 
             for eps in range(self.args.num_eps):
-                print("EPS ::: " + str(eps + 1) + ", EXAMPLES :::" + str(len(temp_examples)))
+                print("EPS ::: " + str(eps + 1) + ", EXAMPLES ::: " + str(len(temp_examples)))
                 temp_examples += self.self_play()
             
             # add to train examples
