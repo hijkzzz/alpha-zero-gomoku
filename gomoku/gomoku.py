@@ -96,10 +96,3 @@ class Gomoku():
     def string_representation(self, board):
         # 8x8 numpy array (canonical board)
         return board.tostring()
-
-
-if __name__ == "__main__":
-    board = Board(15)
-    board_gui = BoardGUI(board, True)
-    board_gui.loop()
-    

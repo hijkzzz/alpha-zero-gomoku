@@ -60,7 +60,7 @@ class BoardGUI():
 
                     if center[0] in range(0, self.n) and center[1] in range(0, self.n) \
                             and self.board[center[0]][center[1]] == 0:
-                        self.board.execute_move(center, 1)
+                        self.board[center[0]][center[1]] = 1
                         self.human = False
 
             # draw
@@ -106,7 +106,7 @@ class BoardGUI():
                 if self.board[i][j] != 0:
                     center = (int(self.GRID_WIDTH * (i + 2)),
                               int(self.GRID_WIDTH * (j + 2)))
-                    color = self.WHITE if self.board[i][j] == 1 else self.BALCK
+                    color = self.WHITE if self.board[i][j] == 1 else self.BLACK
                     pygame.draw.circle(self.screen, color, center,
                                        int(self.GRID_WIDTH / 2.5))
 
