@@ -11,12 +11,12 @@ args = dotdict({
     'nir': 5,
 
     'num_iters': 1000,
-    'num_eps': 10,
+    'num_eps': 100,
     'explore_num': 15,
     'update_threshold': 0.6,
     'area_num': 40,
     'temp_examples_max_len': 100000,
-    'train_examples_max_len': 20,
+    'train_examples_max_len': 10,
 
     'num_mcts_sims': 25,
     'cpuct': 1,
@@ -24,7 +24,7 @@ args = dotdict({
     'lr': 0.001,
     'l2': 0.001,
     'dropout': 0.3,
-    'epochs': 10,
+    'epochs': 1,
     'batch_size': 64,
     'num_channels': 128,
 })

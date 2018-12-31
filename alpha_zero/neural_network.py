@@ -33,7 +33,7 @@ class NeuralNetWork(nn.Module):
         self.fc1 = nn.Sequential(nn.Linear(args.num_channels * (args.n - 4) ** 2, 512),
                                  nn.ReLU(), nn.Dropout(p=args.dropout))
         self.v = nn.Sequential(nn.Linear(512, 1), nn.Tanh())
-        
+
         self.fc2 = nn.Sequential(nn.Linear(512, 256), nn.ReLU(), nn.Dropout(p=args.dropout))
         self.pi = nn.Sequential(nn.Linear(256, args.action_size), nn.Softmax(dim=0))
 
@@ -123,7 +123,8 @@ class NeuralNetWorkWrapper():
 
                 self.optim.step()
 
-                print("BATCH ::: {}, LOSS ::: {}".format(batch_idx + 1,loss.item()))
+                if batch_idx % 1000 == 0:
+                    print("BATCH ::: {}, LOSS ::: {}".format(batch_idx + 1,loss.item()))
 
     def infer(self, board):
         """predict v and pi
