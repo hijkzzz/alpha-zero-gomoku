@@ -52,6 +52,28 @@ class NeuralNetWork(nn.Module):
         return [v, pi]
 
 
+class AlphaLoss(torch.nn.Module):
+    """
+    Custom loss as defined in the paper :
+    (z - v) ** 2 --> MSE Loss
+    (-pi * logp) --> Cross Entropy Loss
+    z : self_play_winner
+    v : winner
+    pi : self_play_probas
+    p : probas
+    
+    The loss is then averaged over the entire batch
+    """
+
+    def __init__(self):
+        super(AlphaLoss, self).__init__()
+
+    def forward(self, pis, vs, target_pis, target_vs):
+        value_err = torch.pow(vs - target_vs, 2)
+        policy_err = torch.sum(-target_pis * torch.log(pis))
+        return value_err + policy_err
+
+
 class NeuralNetWorkWrapper():
     """train and predict
     """
@@ -66,6 +88,7 @@ class NeuralNetWorkWrapper():
 
         if self.cuda:
             self.neural_network.cuda()
+            print("CUDA ON")
 
         self.optim = Adam(self.neural_network.parameters(), lr=args.lr, weight_decay=args.l2)
 
@@ -74,6 +97,7 @@ class NeuralNetWorkWrapper():
         """
 
         self.neural_network.train()
+        alpha_loss = AlphaLoss()
 
         for epoch in range(self.args.epochs):
             print('EPOCH ::: ' + str(epoch + 1))
@@ -94,9 +118,7 @@ class NeuralNetWorkWrapper():
 
                 # forward + backward + optimize
                 output_vs, output_pis = self.neural_network(boards)
-                value_loss = torch.nn.MSELoss(output_vs, vs)
-                policy_loss = torch.nn.CrossEntropyLoss(output_pis, pis)
-                loss = sum([l for l in value_loss] + [l for l in policy_loss])
+                loss = alpha_loss(output_pis, output_vs, pis, vs)
                 loss.backward()
 
                 self.optim.step()
