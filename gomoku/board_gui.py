@@ -22,7 +22,7 @@ class BoardGUI():
         self.FPS = fps
         self.human = human
 
-        if board:
+        if not board is None:
             self.set_board(board)
 
         # close window

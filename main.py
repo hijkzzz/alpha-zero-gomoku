@@ -2,6 +2,8 @@ from gomoku.board_gui import BoardGUI
 from gomoku.gomoku import Gomoku
 from alpha_zero.alpha_zero import AlphaZero
 
+import numpy as np
+
 class dotdict(dict):
     def __getattr__(self, name):
         return self[name]
@@ -34,7 +36,7 @@ if __name__ == "__main__":
     game = Gomoku(args)
     args['action_size'] = game.get_action_size()
 
-    board_gui = BoardGUI()
+    board_gui = BoardGUI(np.zeros(shape=(args.n, args.n)))
 
     alpha_zero = AlphaZero(game, args, board_gui)
     alpha_zero.learn()
