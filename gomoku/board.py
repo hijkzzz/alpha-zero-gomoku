@@ -46,14 +46,11 @@ class Board():
                     return True
         return False
 
-    def execute_move(self, move, color):
+    def execute_move(self, move, player):
         """Perform the given move on the board; flips pieces as necessary.
         color gives the color pf the piece to play (1=white,-1=black)
         """
         (x,y) = move
         assert self[x][y] == 0
-        self[x][y] = color
-
-    def get_n(self):
-        return self.n
+        self[x][y] = player
 

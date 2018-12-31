@@ -143,14 +143,14 @@ class NeuralNetWorkWrapper():
         return [output_pis[0].cpu().detach().numpy(), output_vs[0].cpu().detach().numpy()]
 
     def load_model(self, filename="checkpoint", folder="models"):
-        """load model to file
+        """load model from file
         """
 
         filepath = os.path.join(folder, filename)
         self.neural_network.load_state_dict(torch.load(filepath))
 
     def save_model(self, filename="checkpoint", folder="models"):
-        """save model from file
+        """save model to file
         """
 
         if not os.path.exists(folder):
