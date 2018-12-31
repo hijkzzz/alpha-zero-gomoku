@@ -40,10 +40,12 @@ class Arena():
         while self.game.get_game_ended(board, cur_player) == 2:
             it += 1
             action = players[cur_player+1](self.game.get_canonical_form(board, cur_player))
-
             board, cur_player = self.game.get_next_state(board, cur_player, action)
-            print("Game over: Turn ", str(it), "Result ", str(self.game.get_game_ended(board, 1)))
 
+            if self.board_gui:
+                self.board_gui.set_board(board)
+
+        print("Game over: Turn ", str(it), "Result ", str(self.game.get_game_ended(board, 1)))
         return self.game.get_game_ended(board, 1)
 
     def play_games(self, num):
