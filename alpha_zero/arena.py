@@ -38,7 +38,7 @@ class Arena():
         it = 0
         while self.game.get_game_ended(board, cur_player) == 2:
             it += 1
-            action = players[cur_player+1](self.game.get_canonical_form(board, cur_player))
+            action = players[cur_player + 1](self.game.get_canonical_form(board, cur_player))
             board, cur_player = self.game.get_next_state(board, cur_player, action)
 
             if self.board_gui:

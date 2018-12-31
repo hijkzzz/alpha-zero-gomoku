@@ -25,8 +25,6 @@ class Gomoku():
     def get_next_state(self, board, player, action):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
-        if action == self.n * self.n:
-            return (board, -player)
 
         b = Board(self.n)
         b.pieces = np.copy(board)
@@ -68,6 +66,7 @@ class Gomoku():
                 if (w in range(self.n - n + 1) and h in range(n - 1, self.n) and board[w][h] != 0 and
                         len(set(board[w + l][h - l] for l in range(n))) == 1):
                     return board[w][h]
+                    
         if b.has_legal_moves():
             return 2
         return 0
