@@ -30,6 +30,8 @@ class BoardGUI():
         self.running = True
 
     def loop(self):
+        self.running = True
+
         # init
         pygame.init()
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
