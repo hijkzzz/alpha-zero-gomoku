@@ -45,7 +45,6 @@ class Arena():
             if self.board_gui:
                 self.board_gui.set_board(board)
 
-        print("Game over: Turn ", str(it), "Result ", str(self.game.get_game_ended(board, 1)))
         return self.game.get_game_ended(board, 1)
 
     def play_games(self, num):
@@ -91,5 +90,6 @@ class Arena():
         # close gui
         if self.board_gui:
             self.board_gui.close_gui()
+            t.join()
         
         return oneWon, twoWon, draws

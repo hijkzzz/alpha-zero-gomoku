@@ -97,7 +97,7 @@ class AlphaZero():
 
         while True:
             episode_step += 1
-            canonical_board = self.game.get_canonical_form(board,self.cur_player)
+            canonical_board = self.game.get_canonical_form(board, self.cur_player)
             gamma = int(episode_step < self.args.explore_num)
 
             pi = mcts.get_action_prob(canonical_board, gamma=gamma)
