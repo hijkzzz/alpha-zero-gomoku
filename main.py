@@ -11,7 +11,7 @@ args = dotdict({
     'nir': 5,
 
     'num_iters': 1000,
-    'num_eps': 100,
+    'num_eps': 10,
     'explore_num': 15,
     'update_threshold': 0.6,
     'area_num': 40,
