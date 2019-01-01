@@ -54,8 +54,8 @@ class BoardGUI():
                 # human input
                 if self.human and event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_x, mouse_y = event.pos
-                    center = (int(mouse_x / self.GRID_WIDTH + 0.5) - 2,
-                              int(mouse_y / self.GRID_WIDTH + 0.5) - 2)
+                    center = (int(mouse_y / self.GRID_WIDTH + 0.5) - 2,
+                              int(mouse_x / self.GRID_WIDTH + 0.5) - 2)
 
                     if center[0] in range(0, self.n) and center[1] in range(0, self.n) \
                             and self.board[center[0]][center[1]] == 0:
@@ -103,8 +103,8 @@ class BoardGUI():
         for i in range(self.n):
             for j in range(self.n):
                 if self.board[i][j] != 0:
-                    center = (int(self.GRID_WIDTH * (i + 2)),
-                              int(self.GRID_WIDTH * (j + 2)))
+                    center = (int(self.GRID_WIDTH * (j + 2)),
+                              int(self.GRID_WIDTH * (i + 2)))
                     color = self.WHITE if self.board[i][j] == 1 else self.BLACK
                     pygame.draw.circle(self.screen, color, center,
                                        int(self.GRID_WIDTH / 2.5))
@@ -118,7 +118,3 @@ class BoardGUI():
     def close_gui(self):
         # close window
         self.running = False
-
-    def in_turn_human(self):
-        # allow human action
-        self.human = True
