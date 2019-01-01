@@ -19,7 +19,7 @@ class NeuralNetWork(nn.Module):
         super(NeuralNetWork, self).__init__()
         # n
         self.conv1 = nn.Sequential(
-            nn.Conv2d(1, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
+            nn.Conv2d(2, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
         # n
         self.conv2 = nn.Sequential(
             nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
@@ -115,6 +115,8 @@ class NeuralNetWorkWrapper():
                 if self.cuda:
                     boards, pis, vs = boards.cuda(), pis.cuda(), vs.cuda()
 
+                boards = torch.cat(((boards + 1) / 2, (1 - boards) / 2), 1)
+
                 # zero the parameter gradients
                 self.optim.zero_grad()
 
@@ -140,6 +142,8 @@ class NeuralNetWorkWrapper():
 
         if self.cuda:
             boards = boards.cuda()
+
+        boards = torch.cat(((boards + 1) / 2, (1- boards) / 2), 1)
 
         output_vs, output_pis = self.neural_network(boards)
 
