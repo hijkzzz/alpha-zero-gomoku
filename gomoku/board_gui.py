@@ -53,14 +53,15 @@ class BoardGUI():
                     self.running = False
                 # human input
                 if self.human and event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_x, mouse_y = event.pos
-                    center = (int(mouse_y / self.GRID_WIDTH + 0.5) - 2,
-                              int(mouse_x / self.GRID_WIDTH + 0.5) - 2)
+                    mouse_y, mouse_x = event.pos
+                    center = (int(mouse_x / self.GRID_WIDTH) - 1,
+                              int(mouse_y / self.GRID_WIDTH) - 1)
 
                     if center[0] in range(0, self.n) and center[1] in range(0, self.n) \
                             and self.board[center[0]][center[1]] == 0:
                         self.board[center[0]][center[1]] = 1
                         self.human = False
+                        
 
             # draw
             self.draw_background()
