@@ -14,7 +14,7 @@ args = dotdict({
 
     'num_iters': 1000,
     'num_eps': 200,
-    'explore_num' : 10,
+    'explore_num' : 7,
     'dirichlet_alpha' : 0.3,
     'update_threshold': 0.55,
     'area_num': 20,
