@@ -113,7 +113,7 @@ class AlphaZero():
             pi = mcts.get_action_prob(canonical_board, temp=temp)
 
             # Dirichlet noise
-            pi = 0.75 * np.array(pi) + 0.25 * np.random.dirichlet(0.03 * np.ones(len(pi)))
+            pi = 0.75 * np.array(pi) + 0.25 * np.random.dirichlet(0.03 * np.ones(len(pi))) * (np.array(pi) > 0)
 
             sym = self.game.get_symmetries(canonical_board, pi)
             for b, p in sym:
