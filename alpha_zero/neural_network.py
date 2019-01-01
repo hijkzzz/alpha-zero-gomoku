@@ -19,10 +19,10 @@ class NeuralNetWork(nn.Module):
         super(NeuralNetWork, self).__init__()
         # n
         self.conv1 = nn.Sequential(
-            nn.Conv2d(1, args.num_channels // 2, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
+            nn.Conv2d(1, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
         # n
         self.conv2 = nn.Sequential(
-            nn.Conv2d(args.num_channels // 2, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
+            nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
         # n
         self.conv3 = nn.Sequential(
             nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
