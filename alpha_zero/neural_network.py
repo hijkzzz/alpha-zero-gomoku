@@ -125,6 +125,8 @@ class NeuralNetWorkWrapper():
 
                 self.optim.step()
 
+                #TODO: add KL
+
                 if batch_idx % 100 == 0:
                     print("BATCH ::: {}, LOSS ::: {}".format(batch_idx + 1, loss.item()))
 
