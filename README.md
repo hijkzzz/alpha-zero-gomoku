@@ -37,6 +37,10 @@ python main.py
 ## GUI
 ![](https://github.com/hijkzzz/alpha-zero-gomoku/blob/master/gui.png)
 
+## TODO
+* multiprocess(asynchronous pipeline)
+* numba
+
 ## References
 * Mastering the Game of Go without Human Knowledge 
 * suragnair/alpha-zero-general
