@@ -89,7 +89,7 @@ class Gomoku():
                 if j:
                     newB = np.fliplr(newB)
                     newPi = np.fliplr(newPi)
-                l += [(newB.copy(), newPi.flatten())]
+                l += [(newB, newPi.ravel())]
         return l
 
     def string_representation(self, board):
