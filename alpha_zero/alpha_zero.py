@@ -109,7 +109,7 @@ class AlphaZero():
             canonical_board = self.game.get_canonical_form(board, self.cur_player)
 
             # temperature
-            temp = 1 if episode_step < self.args.explore_num else 1e-3
+            temp = 1 if episode_step < self.args.explore_num else 0
             pi = mcts.get_action_prob(canonical_board, temp=temp)
 
             # Dirichlet noise
