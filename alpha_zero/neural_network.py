@@ -112,8 +112,6 @@ class NeuralNetWorkWrapper():
                                 torch.Tensor(pis).unsqueeze(1), \
                                 torch.Tensor(vs).unsqueeze(1)
 
-                print(boards)
-
                 if self.cuda:
                     boards, pis, vs = boards.cuda(), pis.cuda(), vs.cuda()
 
