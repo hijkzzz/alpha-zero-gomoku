@@ -9,21 +9,22 @@ class dotdict(dict):
         return self[name]
 
 args = dotdict({
-    'n': 10,
-    'nir': 4,
+    'n': 7,
+    'nir': 3,
 
     'num_iters': 1000,
-    'num_eps': 400,
-    'explore_num' : 15,
+    'num_eps': 200,
+    'explore_num' : 10,
+    'dirichlet_alpha' : 0.3,
     'update_threshold': 0.55,
-    'area_num': 40,
+    'area_num': 20,
     'temp_examples_max_len': 100000,
-    'train_examples_max_len': 3,
+    'train_examples_max_len': 5,
 
-    'num_mcts_sims': 400,
-    'cpuct': 5,
+    'num_mcts_sims': 200,
+    'cpuct': 10,
 
-    'lr': 0.003,
+    'lr': 0.001,
     'l2': 0.0001,
     'epochs': 5,
     'batch_size': 64,
