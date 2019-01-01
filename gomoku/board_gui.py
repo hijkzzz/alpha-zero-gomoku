@@ -103,8 +103,8 @@ class BoardGUI():
         for i in range(self.n):
             for j in range(self.n):
                 if self.board[i][j] != 0:
-                    center = (int(self.GRID_WIDTH * (j + 2)),
-                              int(self.GRID_WIDTH * (i + 2)))
+                    center = (int(self.GRID_WIDTH * (j + 1.5)),
+                              int(self.GRID_WIDTH * (i + 1.5)))
                     color = self.WHITE if self.board[i][j] == 1 else self.BLACK
                     pygame.draw.circle(self.screen, color, center,
                                        int(self.GRID_WIDTH / 2.5))
