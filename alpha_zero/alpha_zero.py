@@ -151,9 +151,7 @@ class AlphaZero():
             while self.board_gui.human:
                 time.sleep(0.1)
 
-            self.cur_player = -1
             board = self.board_gui.board
-
             r = self.game.get_game_ended(board, self.cur_player)
 
             # END GAME
@@ -161,8 +159,10 @@ class AlphaZero():
                 return r
 
             # computer == player-1
+            self.cur_player = -1
             canonical_board = self.game.get_canonical_form(board, self.cur_player)
             pi = mcts.get_action_prob(canonical_board)
+            print(pi)
 
             action = np.random.choice(len(pi), p=pi)
             board, self.cur_player = self.game.get_next_state(board, self.cur_player, action)
