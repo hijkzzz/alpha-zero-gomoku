@@ -19,21 +19,21 @@ class NeuralNetWork(nn.Module):
         super(NeuralNetWork, self).__init__()
         # n
         self.conv1 = nn.Sequential(
-            nn.Conv2d(1, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
+            nn.Conv2d(1, args.num_channels, kernel_size=3, padding=1), nn.ReLU())
         # n
         self.conv2 = nn.Sequential(
-            nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
+            nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.ReLU())
         # n
         self.conv3 = nn.Sequential(
-            nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
+            nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.ReLU())
 
 
         self.pi_conv = nn.Sequential(
-            nn.Conv2d(args.num_channels, 4, kernel_size=1, padding=0), nn.BatchNorm2d(4), nn.ReLU())
+            nn.Conv2d(args.num_channels, 4, kernel_size=1, padding=0), nn.ReLU())
         self.pi_fc = nn.Sequential(nn.Linear(4 * args.n ** 2, args.action_size), nn.ReLU(), nn.Softmax(dim=0))
 
         self.v_conv = nn.Sequential(
-            nn.Conv2d(args.num_channels, 2, kernel_size=1, padding=0), nn.BatchNorm2d(2), nn.ReLU())
+            nn.Conv2d(args.num_channels, 2, kernel_size=1, padding=0), nn.ReLU())
         self.v_fc1 = nn.Sequential(nn.Linear(2 * args.n ** 2, 64), nn.ReLU())
         self.v_fc2 = nn.Sequential(nn.Linear(64, 1), nn.Tanh())
 

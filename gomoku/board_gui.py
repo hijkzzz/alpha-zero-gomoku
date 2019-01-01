@@ -88,7 +88,7 @@ class BoardGUI():
             pygame.draw.line(self.screen, self.BLACK, line[0], line[1], 2)
 
         # draw grid
-        for i in range(self.n):
+        for i in range(self.n - 1):
             pygame.draw.line(
                 self.screen, self.BLACK,
                 (self.GRID_WIDTH * (2 + i), self.GRID_WIDTH),
@@ -113,7 +113,7 @@ class BoardGUI():
         # change the board
         self.n = np.size(board, 0)
         self.board = board
-        self.GRID_WIDTH = self.WIDTH / (self.n + 3)
+        self.GRID_WIDTH = self.WIDTH / (self.n + 2)
 
     def close_gui(self):
         # close window
