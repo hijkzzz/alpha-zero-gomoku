@@ -46,4 +46,4 @@ if __name__ == "__main__":
         alpha_zero.learn()
     else:
         print(alpha_zero.human_play())
-        raw_input()
+        input()
