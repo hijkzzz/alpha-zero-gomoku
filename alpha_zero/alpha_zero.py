@@ -62,8 +62,8 @@ class AlphaZero():
             mcts = MCTS(self.game, self.nnet, self.args)
             mcts_old = MCTS(self.game, self.nnet_old, self.args)
             
-            arena = Arena(lambda x: np.argmax(mcts.get_action_prob(x, temp=0)),
-                          lambda x: np.argmax(mcts_old.get_action_prob(x, temp=0)), 
+            arena = Arena(lambda x: np.argmax(mcts.get_action_prob(x)),
+                          lambda x: np.argmax(mcts_old.get_action_prob(x)), 
                           self.game,
                           self.board_gui)
 
@@ -91,9 +91,6 @@ class AlphaZero():
         ends, the outcome of the game is used to assign values to each example
         in train_examples.
 
-        It uses a temp=1 if episode_step < greedy_num, and thereafter
-        uses temp=0.
-
         Returns:
             train_examples: a list of examples of the form (canonical_board,pi,v)
                            pi is the MCTS informed policy vector, v is +1 if
@@ -110,9 +107,8 @@ class AlphaZero():
         while True:
             episode_step += 1
             canonical_board = self.game.get_canonical_form(board, self.cur_player)
-            temp = int(episode_step < self.args.explore_num)
 
-            pi = mcts.get_action_prob(canonical_board, temp=temp)
+            pi = mcts.get_action_prob(canonical_board, temp=1)
             sym = self.game.get_symmetries(canonical_board, pi)
             for b, p in sym:
                 train_examples.append([b, self.cur_player, p, None])
@@ -158,7 +154,7 @@ class AlphaZero():
 
             # computer == player-1
             canonical_board = self.game.get_canonical_form(board, self.cur_player)
-            pi = mcts.get_action_prob(canonical_board, temp=1)
+            pi = mcts.get_action_prob(canonical_board)
 
             action = np.random.choice(len(pi), p=pi)
             board, self.cur_player = self.game.get_next_state(board, self.cur_player, action)
