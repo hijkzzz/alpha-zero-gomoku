@@ -115,7 +115,7 @@ class NeuralNetWorkWrapper():
                 if self.cuda:
                     boards, pis, vs = boards.cuda(), pis.cuda(), vs.cuda()
 
-                boards = torch.cat(((boards + 1) / 2, (1 - boards) / 2), 1)
+                boards = torch.cat((boards > 0, boards < 0), 1)
 
                 # zero the parameter gradients
                 self.optim.zero_grad()
@@ -143,7 +143,9 @@ class NeuralNetWorkWrapper():
         if self.cuda:
             boards = boards.cuda()
 
-        boards = torch.cat(((boards + 1) / 2, (1- boards) / 2), 1)
+        boards = torch.cat((boards > 0, boards < 0), 1)
+
+        print(boards)
 
         output_vs, output_pis = self.neural_network(boards)
 
