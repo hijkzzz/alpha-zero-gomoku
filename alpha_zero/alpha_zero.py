@@ -109,11 +109,12 @@ class AlphaZero():
             canonical_board = self.game.get_canonical_form(board, self.cur_player)
 
             # temperature
-            temp = int(episode_step < self.args.explore_num)
+            temp = 1 if episode_step < self.args.explore_num else 1e-3
             pi = mcts.get_action_prob(canonical_board, temp=temp)
 
             # Dirichlet noise
             pi = 0.75 * np.array(pi) + 0.25 * np.random.dirichlet(0.03 * np.ones(len(pi))) * (np.array(pi) > 0)
+            pi = pi / np.sum(pi) # renormalize
 
             sym = self.game.get_symmetries(canonical_board, pi)
             for b, p in sym:
