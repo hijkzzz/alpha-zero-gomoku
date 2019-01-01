@@ -2,6 +2,7 @@ from random import shuffle
 import numpy as np
 from collections import deque
 import threading
+import time
 
 from .neural_network import NeuralNetWorkWrapper, NeuralNetWork
 from .mcts import MCTS
@@ -125,3 +126,48 @@ class AlphaZero():
             if r != 2:
                 # b, p, v
                 return [(x[0], x[2], r * ((-1) ** (x[1] != self.cur_player))) for x in train_examples]
+
+
+    def human_play(self):
+        t = threading.Thread(target=self.board_gui.loop)
+        t.start()
+
+        self.nnet.load_model(filename='best_checkpoint')
+        mcts = MCTS(self.game, self.nnet, self.args)
+
+        self.cur_player = 1
+        episode_step = 0
+
+        while True:
+            episode_step += 1
+
+            # human == player1
+            self.board_gui.human = True
+
+            while self.board_gui.human:
+                time.sleep(0.1)
+
+            self.cur_player = -1
+            board = self.board_gui.board
+
+            r = self.game.get_game_ended(board, self.cur_player)
+
+            # END GAME
+            if r != 2:
+                return r
+
+            # computer == player-1
+            canonical_board = self.game.get_canonical_form(board, self.cur_player)
+            pi = mcts.get_action_prob(canonical_board, temp=1)
+
+            action = np.random.choice(len(pi), p=pi)
+            board, self.cur_player = self.game.get_next_state(board, self.cur_player, action)
+            self.board_gui.set_board(board)
+
+            r = self.game.get_game_ended(board, self.cur_player)
+
+            # END GAME
+            if r != 2:
+                return r
+        
+        t.join()
