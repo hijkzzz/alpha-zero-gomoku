@@ -19,7 +19,7 @@ class NeuralNetWork(nn.Module):
         super(NeuralNetWork, self).__init__()
         # n
         self.conv1 = nn.Sequential(
-            nn.Conv2d(2, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
+            nn.Conv2d(1, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
         # n
         self.conv2 = nn.Sequential(
             nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.BatchNorm2d(args.num_channels), nn.ReLU())
@@ -112,10 +112,10 @@ class NeuralNetWorkWrapper():
                                 torch.Tensor(pis).unsqueeze(1), \
                                 torch.Tensor(vs).unsqueeze(1)
 
+                print(boards)
+
                 if self.cuda:
                     boards, pis, vs = boards.cuda(), pis.cuda(), vs.cuda()
-
-                boards = torch.cat((boards > 0, boards < 0), 1).float()
 
                 # zero the parameter gradients
                 self.optim.zero_grad()
@@ -126,8 +126,6 @@ class NeuralNetWorkWrapper():
                 loss.backward()
 
                 self.optim.step()
-
-                #TODO: add KL
 
                 if batch_idx % 100 == 0:
                     print("BATCH ::: {}, LOSS ::: {}".format(batch_idx + 1, loss.item()))
@@ -143,11 +141,10 @@ class NeuralNetWorkWrapper():
         if self.cuda:
             boards = boards.cuda()
 
-        boards = torch.cat((boards > 0, boards < 0), 1).float()
-
         output_vs, output_pis = self.neural_network(boards)
 
         return [output_pis[0].cpu().detach().numpy(), output_vs[0].cpu().detach().numpy()]
+
 
     def load_model(self, filename="checkpoint", folder="models"):
         """load model from file
@@ -155,6 +152,7 @@ class NeuralNetWorkWrapper():
 
         filepath = os.path.join(folder, filename)
         self.neural_network.load_state_dict(torch.load(filepath))
+
 
     def save_model(self, filename="checkpoint", folder="models"):
         """save model to file
