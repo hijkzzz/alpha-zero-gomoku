@@ -12,17 +12,17 @@ args = dotdict({
     'n': 10,
     'nir': 4,
 
-    'num_iters': 20000,
-    'num_eps': 1,
-    'explore_num' : 5,
+    'num_iters': 10000,
+    'num_eps': 10,
+    'explore_num' : 15,
     'dirichlet_alpha' : 0.3,
-    'update_threshold': 0.55,
+    'update_threshold': 0.5,
     'area_num': 10,
     'temp_examples_max_len': 10000,
-    'train_examples_max_len': 1000,
+    'train_examples_max_len': 100,
 
     'num_mcts_sims': 400, 
-    'cpuct': 40,
+    'cpuct': 10,
 
     'lr': 0.001,
     'l2': 0.0001,
