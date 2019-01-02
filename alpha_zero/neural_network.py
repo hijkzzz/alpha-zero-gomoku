@@ -125,7 +125,7 @@ class NeuralNetWorkWrapper():
 
                 self.optim.step()
 
-                if batch_idx % 100 == 0:
+                if batch_idx == int(len(examples) / self.args.batch_size):
                     print("BATCH ::: {}, LOSS ::: {}".format(batch_idx + 1, loss.item()))
 
     def infer(self, board):
