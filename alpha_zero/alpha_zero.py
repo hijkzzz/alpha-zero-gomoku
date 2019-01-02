@@ -20,7 +20,9 @@ class AlphaZero():
         self.game = game
         self.board_gui = board_gui
         self.nnet = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
+        self.nnet.save_model(filename="temp")
         self.nnet_best = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
+        self.nnet_best.load_model(filename="temp")
         self.train_examples = []
 
 
