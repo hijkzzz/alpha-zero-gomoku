@@ -20,7 +20,7 @@ class AlphaZero():
         self.game = game
         self.board_gui = board_gui
         self.nnet = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
-        self.nnet_old = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
+        self.nnet_best = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
         self.train_examples = []
 
 
@@ -37,8 +37,8 @@ class AlphaZero():
             temp_examples = deque([], maxlen=self.args.temp_examples_max_len)
 
             for eps in range(self.args.num_eps):
-                print("EPS ::: " + str(eps + 1) + ", EXAMPLES ::: " + str(len(temp_examples)))
                 temp_examples += self.self_play()
+                print("EPS ::: " + str(eps + 1) + ", EXAMPLES ::: " + str(len(temp_examples)))
             
             # add to train examples
             self.train_examples.append(temp_examples)
@@ -53,17 +53,16 @@ class AlphaZero():
             shuffle(train_data)
 
             # train neural network
-            self.nnet.save_model()
-            self.nnet_old.load_model()
-
             self.nnet.train(train_data)
+            self.nnet.save_model(filename="checkpoint")
 
             # compare performance
             mcts = MCTS(self.game, self.nnet, self.args)
-            mcts_old = MCTS(self.game, self.nnet_old, self.args)
+            self.nnet_best.load_model(filename="best_checkpoint")
+            mcts_best = MCTS(self.game, self.nnet_best, self.args)
             
             arena = Arena(lambda x: np.argmax(mcts.get_action_prob(x)),
-                          lambda x: np.argmax(mcts_old.get_action_prob(x)), 
+                          lambda x: np.argmax(mcts_best.get_action_prob(x)), 
                           self.game,
                           self.board_gui)
 
@@ -72,7 +71,6 @@ class AlphaZero():
 
             if oneWon + twoWon > 0 and float(oneWon) / (oneWon + twoWon) < self.args.update_threshold:
                 print('REJECTING NEW MODEL')
-                self.nnet.load_model()
             else:
                 print('ACCEPTING NEW MODEL')
                 self.nnet.save_model(filename="best_checkpoint")

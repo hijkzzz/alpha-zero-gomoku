@@ -149,7 +149,8 @@ class NeuralNetWorkWrapper():
         """
 
         filepath = os.path.join(folder, filename)
-        self.neural_network.load_state_dict(torch.load(filepath))
+        if os.path.exists(filepath):
+            self.neural_network.load_state_dict(torch.load(filepath))
 
 
     def save_model(self, filename="checkpoint", folder="models"):
