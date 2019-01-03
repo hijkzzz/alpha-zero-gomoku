@@ -63,8 +63,8 @@ class AlphaZero():
             mcts = MCTS(self.game, self.nnet, self.args)
             mcts_old = MCTS(self.game, self.nnet_old, self.args)
             
-            arena = Arena(lambda x: np.argmax(mcts.get_action_prob(x)),
-                          lambda x: np.argmax(mcts_old.get_action_prob(x)), 
+            arena = Arena(lambda x: np.argmax(mcts.get_action_prob(x)[0]),
+                          lambda x: np.argmax(mcts_old.get_action_prob(x)[0]), 
                           self.game,
                           self.board_gui)
 
@@ -112,11 +112,11 @@ class AlphaZero():
             # temperature
             temp = 1 if episode_step < self.args.explore_num else 0
             temp *= self.args.temp
-            pi = mcts.get_action_prob(canonical_board, temp=temp)
+            pi, counts = mcts.get_action_prob(canonical_board, temp=temp)
 
             # Dirichlet noise
             pi = 0.75 * np.array(pi) + \
-                0.25 * np.random.dirichlet(self.args.dirichlet_alpha * np.ones(len(pi))) * (np.array(pi) > 0)
+                0.25 * np.random.dirichlet(self.args.dirichlet_alpha * np.ones(len(pi))) * (np.array(counts) > 0)
             pi = pi / np.sum(pi) # renormalize
 
             sym = self.game.get_symmetries(canonical_board, pi)
@@ -163,7 +163,7 @@ class AlphaZero():
             # computer == player-1
             self.cur_player = -1
             canonical_board = self.game.get_canonical_form(board, self.cur_player)
-            pi = mcts.get_action_prob(canonical_board)
+            pi, _ = mcts.get_action_prob(canonical_board)
 
             action = np.random.choice(len(pi), p=pi)
             board, self.cur_player = self.game.get_next_state(board, self.cur_player, action)
