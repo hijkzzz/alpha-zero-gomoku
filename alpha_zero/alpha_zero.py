@@ -29,7 +29,6 @@ class AlphaZero():
         self.nnet_best.load_model()
 
 
-
     def learn(self):
         # start gui
         if self.board_gui:

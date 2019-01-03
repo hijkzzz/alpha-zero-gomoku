@@ -9,20 +9,20 @@ class dotdict(dict):
         return self[name]
 
 args = dotdict({
-    'n': 10,
+    'n': 6,
     'nir': 4,
 
-    'num_iters': 10000,
+    'num_iters': 1000,
     'num_eps': 10,
-    'explore_num' : 100,
+    'explore_num' : 10,
     'dirichlet_alpha' : 0.3,
     'update_threshold': 0.5,
-    'area_num': 10,
+    'area_num': 4,
     'temp_examples_max_len': 10000,
     'train_examples_max_len': 10,
 
     'num_mcts_sims': 400, 
-    'cpuct': 10,
+    'cpuct': 5,
 
     'lr': 0.001,
     'l2': 0.0001,
@@ -45,5 +45,6 @@ if __name__ == "__main__":
     if not args.human_play:
         alpha_zero.learn()
     else:
+        args.num_mcts_sims = 1000
         print(alpha_zero.human_play())
         input()
