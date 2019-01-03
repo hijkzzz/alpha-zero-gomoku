@@ -22,11 +22,7 @@ class AlphaZero():
         self.train_examples = []
 
         self.nnet = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
-        self.nnet.load_model()
-        self.nnet.save_model()
-
-        self.nnet_best = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
-        self.nnet_best.load_model()
+        self.nnet_old = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
 
 
     def learn(self):
@@ -58,16 +54,17 @@ class AlphaZero():
             shuffle(train_data)
 
             # train neural network
-            self.nnet.train(train_data)
             self.nnet.save_model()
+            self.nnet_old.load_model()
+
+            self.nnet.train(train_data)
 
             # compare performance
             mcts = MCTS(self.game, self.nnet, self.args)
-            self.nnet_best.load_model(filename="best_checkpoint")
-            mcts_best = MCTS(self.game, self.nnet_best, self.args)
+            mcts_old = MCTS(self.game, self.nnet_old, self.args)
             
             arena = Arena(lambda x: np.argmax(mcts.get_action_prob(x)),
-                          lambda x: np.argmax(mcts_best.get_action_prob(x)), 
+                          lambda x: np.argmax(mcts_old.get_action_prob(x)), 
                           self.game,
                           self.board_gui)
 
@@ -76,6 +73,7 @@ class AlphaZero():
 
             if oneWon + twoWon > 0 and float(oneWon) / (oneWon + twoWon) < self.args.update_threshold:
                 print('REJECTING NEW MODEL')
+                self.nnet.load_model()
             else:
                 print('ACCEPTING NEW MODEL')
                 self.nnet.save_model(filename="best_checkpoint")
