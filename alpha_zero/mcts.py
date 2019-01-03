@@ -42,11 +42,11 @@ class MCTS():
             bestA = np.argmax(counts)
             probs = [0]*len(counts)
             probs[bestA]=1
-            return probs
+            return probs, counts
 
         counts = [x ** (1. / temp) for x in counts]
         probs = [x / float(sum(counts)) for x in counts]
-        return probs
+        return probs, counts
 
     def search(self, canonical_board):
         """
