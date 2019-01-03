@@ -15,23 +15,23 @@ args = dotdict({
     'num_iters': 1000,
     'num_eps': 10,
     'explore_num' : 4,
-    'temp' : 5,
+    'temp' : 8,
     'dirichlet_alpha' : 0.3,
-    'update_threshold': 0.5,
+    'update_threshold': 0.55,
     'area_num': 4,
     'temp_examples_max_len': 10000,
-    'train_examples_max_len': 10,
+    'train_examples_max_len': 20,
 
     'num_mcts_sims': 400, 
-    'cpuct': 5,
+    'cpuct': 8,
 
     'lr': 0.001,
     'l2': 0.0001,
-    'epochs': 5,
+    'epochs': 3,
     'batch_size': 256,
     'num_channels': 128,
 
-    'human_play' : False
+    'human_play' : True
 })
 
 
@@ -46,6 +46,5 @@ if __name__ == "__main__":
     if not args.human_play:
         alpha_zero.learn()
     else:
-        args.num_mcts_sims = 1500
         print(alpha_zero.human_play())
         input()
