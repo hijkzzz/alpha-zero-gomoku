@@ -23,15 +23,15 @@ args = dotdict({
     'train_examples_max_len': 20,
 
     'num_mcts_sims': 400, 
-    'cpuct': 5,
+    'cpuct': 10,
 
-    'lr': 0.01,
+    'lr': 0.005,
     'l2': 0.0001,
     'epochs': 2,
     'batch_size': 256,
     'num_channels': 128,
 
-    'human_play' : True
+    'human_play' : False
 })
 
 
