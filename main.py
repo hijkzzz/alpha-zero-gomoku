@@ -17,13 +17,13 @@ args = dotdict({
     'explore_num' : 4,
     'temp' : 10,
     'dirichlet_alpha' : 0.3,
-    'update_threshold': 0.55,
+    'update_threshold': 0.5,
     'area_num': 4,
     'temp_examples_max_len': 10000,
     'train_examples_max_len': 20,
 
     'num_mcts_sims': 400, 
-    'cpuct': 10,
+    'cpuct': 5,
 
     'lr': 0.01,
     'l2': 0.0001,
@@ -31,7 +31,7 @@ args = dotdict({
     'batch_size': 256,
     'num_channels': 128,
 
-    'human_play' : False
+    'human_play' : True
 })
 
 
