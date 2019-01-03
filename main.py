@@ -14,7 +14,7 @@ args = dotdict({
 
     'num_iters': 10000,
     'num_eps': 10,
-    'explore_num' : 15,
+    'explore_num' : 100,
     'dirichlet_alpha' : 0.3,
     'update_threshold': 0.5,
     'area_num': 10,
@@ -22,7 +22,7 @@ args = dotdict({
     'train_examples_max_len': 10,
 
     'num_mcts_sims': 400, 
-    'cpuct': 50,
+    'cpuct': 10,
 
     'lr': 0.001,
     'l2': 0.0001,
