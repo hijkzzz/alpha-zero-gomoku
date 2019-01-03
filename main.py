@@ -19,10 +19,10 @@ args = dotdict({
     'update_threshold': 0.5,
     'area_num': 10,
     'temp_examples_max_len': 10000,
-    'train_examples_max_len': 100,
+    'train_examples_max_len': 10,
 
     'num_mcts_sims': 400, 
-    'cpuct': 5,
+    'cpuct': 50,
 
     'lr': 0.001,
     'l2': 0.0001,

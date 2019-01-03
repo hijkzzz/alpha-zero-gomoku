@@ -19,11 +19,15 @@ class AlphaZero():
         self.args = args
         self.game = game
         self.board_gui = board_gui
-        self.nnet = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
-        self.nnet.save_model(filename="temp")
-        self.nnet_best = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
-        self.nnet_best.load_model(filename="temp")
         self.train_examples = []
+
+        self.nnet = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
+        self.nnet.load_model()
+        self.nnet.save_model()
+
+        self.nnet_best = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
+        self.nnet_best.load_model()
+
 
 
     def learn(self):
@@ -56,7 +60,7 @@ class AlphaZero():
 
             # train neural network
             self.nnet.train(train_data)
-            self.nnet.save_model(filename="checkpoint")
+            self.nnet.save_model()
 
             # compare performance
             mcts = MCTS(self.game, self.nnet, self.args)
@@ -162,7 +166,6 @@ class AlphaZero():
             self.cur_player = -1
             canonical_board = self.game.get_canonical_form(board, self.cur_player)
             pi = mcts.get_action_prob(canonical_board)
-            print(pi)
 
             action = np.random.choice(len(pi), p=pi)
             board, self.cur_player = self.game.get_next_state(board, self.cur_player, action)
