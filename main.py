@@ -14,7 +14,8 @@ args = dotdict({
 
     'num_iters': 1000,
     'num_eps': 10,
-    'explore_num' : 10,
+    'explore_num' : 4,
+    'temp' : 5,
     'dirichlet_alpha' : 0.3,
     'update_threshold': 0.5,
     'area_num': 4,
@@ -45,6 +46,6 @@ if __name__ == "__main__":
     if not args.human_play:
         alpha_zero.learn()
     else:
-        args.num_mcts_sims = 1000
+        args.num_mcts_sims = 1500
         print(alpha_zero.human_play())
         input()

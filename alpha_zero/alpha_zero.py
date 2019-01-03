@@ -113,6 +113,7 @@ class AlphaZero():
 
             # temperature
             temp = 1 if episode_step < self.args.explore_num else 0
+            temp *= self.args.temp
             pi = mcts.get_action_prob(canonical_board, temp=temp)
 
             # Dirichlet noise
