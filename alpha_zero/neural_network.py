@@ -71,7 +71,7 @@ class AlphaLoss(torch.nn.Module):
 
     def forward(self, log_pis, vs, target_pis, target_vs):
         value_loss = F.mse_loss(vs, target_vs)
-        policy_loss = -torch.mean(torch.sum(target_pis * log_pis, 1))
+        policy_loss = F.nll_loss(log_pis, target_pis)
         return value_loss + policy_loss
 
 
