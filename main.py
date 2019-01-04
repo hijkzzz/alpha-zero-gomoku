@@ -13,25 +13,25 @@ args = dotdict({
     'nir': 4,
 
     'num_iters': 1000,
-    'num_eps': 10,
+    'num_eps': 1,
     'explore_num' : 4,
     'temp' : 10,
     'dirichlet_alpha' : 0.3,
     'update_threshold': 0.55,
-    'area_num': 6,
+    'area_num': 4,
     'temp_examples_max_len': 10000,
-    'train_examples_max_len': 100,
+    'train_examples_max_len': 1000,
 
     'num_mcts_sims': 400, 
     'cpuct': 10,
 
     'lr': 0.003,
     'l2': 0.0001,
-    'epochs': 3,
+    'epochs': 5,
     'batch_size': 256,
     'num_channels': 128,
 
-    'human_play' : False
+    'human_play' : True
 })
 
 
