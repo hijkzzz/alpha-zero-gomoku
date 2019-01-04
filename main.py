@@ -23,7 +23,7 @@ args = dotdict({
     'train_examples_max_len': 1000,
 
     'num_mcts_sims': 400, 
-    'cpuct': 10,
+    'cpuct': 5,
 
     'lr': 0.003,
     'l2': 0.0001,
