@@ -123,9 +123,14 @@ class AlphaZero():
                 train_examples.append([b, self.cur_player, p, None])
 
             # Dirichlet noise
-            pi_noise = 0.75 * np.array(pi) + \
-                0.25 * np.random.dirichlet(self.args.dirichlet_alpha * np.ones(len(pi))) * (np.array(counts) > 0)
-            pi_noise = pi / np.sum(pi) # renormalize
+            pi_noise = 0.75 * np.array(pi)
+            temp = 0.25 * np.random.dirichlet(self.args.dirichlet_alpha * np.ones(np.count_nonzero(counts)))
+            j = 0
+            for i, c in enumerate(counts):
+                if c > 0:
+                    pi_noise[i] += temp[j]
+                    j += 1
+            pi_noise /= np.sum(pi_noise)
 
             action = np.random.choice(len(pi_noise), p=pi_noise)
             board, self.cur_player = self.game.get_next_state(board, self.cur_player, action)
