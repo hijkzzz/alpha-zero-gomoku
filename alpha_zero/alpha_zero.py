@@ -114,16 +114,16 @@ class AlphaZero():
             temp *= self.args.temp
             pi, counts = mcts.get_action_prob(canonical_board, temp=temp)
 
-            # Dirichlet noise
-            pi = 0.75 * np.array(pi) + \
-                0.25 * np.random.dirichlet(self.args.dirichlet_alpha * np.ones(len(pi))) * (np.array(counts) > 0)
-            pi = pi / np.sum(pi) # renormalize
-
             sym = self.game.get_symmetries(canonical_board, pi)
             for b, p in sym:
                 train_examples.append([b, self.cur_player, p, None])
 
-            action = np.random.choice(len(pi), p=pi)
+            # Dirichlet noise
+            pi_noise = 0.7 * np.array(pi) + \
+                0.3 * np.random.dirichlet(self.args.dirichlet_alpha * np.ones(len(pi))) * (np.array(counts) > 0)
+            pi_noise = pi / np.sum(pi) # renormalize
+
+            action = np.random.choice(len(pi_noise), p=pi_noise)
             board, self.cur_player = self.game.get_next_state(board, self.cur_player, action)
 
             r = self.game.get_game_ended(board, self.cur_player)
