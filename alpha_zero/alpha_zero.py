@@ -52,7 +52,7 @@ class AlphaZero():
             for e in self.train_examples:
                 train_data.extend(e)
 
-            train_data = sample(train_data, min(len(train_data), self.args.batch_size * 10))
+            train_data = sample(train_data, min(len(train_data), self.args.batch_size))
 
             # train neural network
             self.nnet.save_model()
