@@ -1,4 +1,4 @@
-from random import shuffle, sample
+from random import shuffle
 import numpy as np
 from collections import deque
 import threading
@@ -55,7 +55,7 @@ class AlphaZero():
             if len(train_data) < self.args.batch_size:
                 continue
 
-            train_data = sample(train_data, min(len(train_data), self.args.batch_size * self.args.num_eps))
+            train_data = shuffle(train_data)
 
             # train neural network
             self.nnet.save_model()
