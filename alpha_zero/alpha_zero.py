@@ -1,4 +1,4 @@
-from random import shuffle
+from random import shuffle, sample
 import numpy as np
 from collections import deque
 import threading
@@ -47,11 +47,12 @@ class AlphaZero():
             if len(self.train_examples) > self.args.train_examples_max_len:
                 self.train_examples.pop(0)
             
-            # shuffle train data
+            # sample train data
             train_data = []
             for e in self.train_examples:
                 train_data.extend(e)
-            shuffle(train_data)
+
+            train_data = sample(train_data, self.args.batch_size * 10)
 
             # train neural network
             self.nnet.save_model()
@@ -119,8 +120,8 @@ class AlphaZero():
                 train_examples.append([b, self.cur_player, p, None])
 
             # Dirichlet noise
-            pi_noise = 0.7 * np.array(pi) + \
-                0.3 * np.random.dirichlet(self.args.dirichlet_alpha * np.ones(len(pi))) * (np.array(counts) > 0)
+            pi_noise = 0.75 * np.array(pi) + \
+                0.25 * np.random.dirichlet(self.args.dirichlet_alpha * np.ones(len(pi))) * (np.array(counts) > 0)
             pi_noise = pi / np.sum(pi) # renormalize
 
             action = np.random.choice(len(pi_noise), p=pi_noise)
