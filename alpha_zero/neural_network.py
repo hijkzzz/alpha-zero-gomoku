@@ -70,8 +70,8 @@ class AlphaLoss(torch.nn.Module):
         super(AlphaLoss, self).__init__()
 
     def forward(self, log_pis, vs, target_pis, target_vs):
-        value_loss = F.mse_loss(vs, target_vs)
-        policy_loss = F.nll_loss(log_pis, target_pis)
+        value_loss = torch.mean(torch.pow(vs - target_vs, 2))
+        policy_loss = -torch.mean(torch.sum(target_pis * log_pis, 1))
         return value_loss + policy_loss
 
 
@@ -109,8 +109,8 @@ class NeuralNetWorkWrapper():
                 sample_ids = np.random.randint(len(examples), size=self.args.batch_size)
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
                 boards, pis, vs = torch.Tensor(boards).unsqueeze(1), \
-                                torch.Tensor(pis).unsqueeze(1), \
-                                torch.Tensor(vs).unsqueeze(1)
+                                torch.Tensor(pis), \
+                                torch.Tensor(vs)
 
                 if self.cuda:
                     boards, pis, vs = boards.cuda(), pis.cuda(), vs.cuda()
@@ -125,8 +125,7 @@ class NeuralNetWorkWrapper():
 
                 self.optim.step()
 
-                if batch_idx == int(len(examples) / self.args.batch_size):
-                    print("BATCH ::: {}, LOSS ::: {}".format(batch_idx + 1, loss.item()))
+                print("BATCH ::: {}, LOSS ::: {}".format(batch_idx, loss.item()))
 
     def infer(self, board):
         """predict v and pi
