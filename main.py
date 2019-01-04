@@ -31,7 +31,7 @@ args = dotdict({
     'batch_size': 256,
     'num_channels': 128,
 
-    'human_play' : True
+    'human_play' : False
 })
 
 
@@ -46,6 +46,6 @@ if __name__ == "__main__":
     if not args.human_play:
         alpha_zero.learn()
     else:
-        args.num_channels = 1000
+        args.human_play = 1000
         print(alpha_zero.human_play())
         input()
