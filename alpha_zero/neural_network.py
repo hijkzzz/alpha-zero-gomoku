@@ -30,7 +30,7 @@ class NeuralNetWork(nn.Module):
 
         self.pi_conv = nn.Sequential(
             nn.Conv2d(args.num_channels, 4, kernel_size=1, padding=0), nn.ReLU())
-        self.pi_fc = nn.Sequential(nn.Linear(4 * args.n ** 2, args.action_size), nn.ReLU(), nn.Softmax(dim=0))
+        self.pi_fc = nn.Sequential(nn.Linear(4 * args.n ** 2, args.action_size), nn.ReLU(), nn.LogSoftmax(dim=1))
 
         self.v_conv = nn.Sequential(
             nn.Conv2d(args.num_channels, 2, kernel_size=1, padding=0), nn.ReLU())
@@ -69,9 +69,9 @@ class AlphaLoss(torch.nn.Module):
     def __init__(self):
         super(AlphaLoss, self).__init__()
 
-    def forward(self, pis, vs, target_pis, target_vs):
+    def forward(self, log_pis, vs, target_pis, target_vs):
         value_loss = F.mse_loss(vs, target_vs)
-        policy_loss = -torch.mean(torch.sum(target_pis * torch.log(pis + 1e-10), 1))
+        policy_loss = -torch.mean(torch.sum(target_pis * log_pis, 1))
         return value_loss + policy_loss
 
 
