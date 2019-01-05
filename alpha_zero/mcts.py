@@ -97,7 +97,7 @@ class MCTS():
         best_act = -1
 
         for a in range(self.game.get_action_size()):
-            if valids[a]:
+            if valids[a] == 1:
                 if (s, a) in self.Qsa:
                     u = self.Qsa[(s, a)] + self.args.cpuct * self.Ps[s][a] * \
                         math.sqrt(self.Ns[s]) / (1 + self.Nsa[(s, a)])
