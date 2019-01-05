@@ -111,8 +111,7 @@ class AlphaZero():
             canonical_board = self.game.get_canonical_form(board, self.cur_player)
 
             # temperature
-            temp = 1 if episode_step < self.args.explore_num else 0
-            temp *= self.args.temp
+            temp = self.args.temp if episode_step <= self.args.explore_num else 0
             pi, counts = mcts.get_action_prob(canonical_board, temp=temp)
 
             sym = self.game.get_symmetries(canonical_board, pi)
