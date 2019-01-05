@@ -22,7 +22,9 @@ class AlphaZero():
         self.train_examples = []
 
         self.nnet = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
+        self.nnet.save_model()
         self.nnet_old = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
+        self.nnet_old.load_model()
 
 
     def learn(self):
@@ -56,8 +58,9 @@ class AlphaZero():
 
             # train neural network
             self.nnet.save_model()
-            self.nnet_old.load_model()
+            self.nnet_old.load_model(filename="best_checkpoint")
 
+            self.nnet.set_learning_rate(self.args.lr - i / self.args.num_iters * self.args.lr)
             self.nnet.train(train_data)
 
             # compare performance
@@ -74,7 +77,6 @@ class AlphaZero():
 
             if oneWon + twoWon > 0 and float(oneWon) / (oneWon + twoWon) < self.args.update_threshold:
                 print('REJECTING NEW MODEL')
-                self.nnet.load_model()
             else:
                 print('ACCEPTING NEW MODEL')
                 self.nnet.save_model(filename="best_checkpoint")
