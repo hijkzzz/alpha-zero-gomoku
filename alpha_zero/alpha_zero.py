@@ -147,33 +147,32 @@ class AlphaZero():
         self.nnet.load_model(filename='best_checkpoint')
         mcts = MCTS(self.game, self.nnet, self.args)
 
-        self.cur_player = 1
+        self.cur_player = -1
         episode_step = 0
 
         while True:
             episode_step += 1
 
-            # human == player1
-            self.board_gui.human = True
+            # computer == player-1
+            self.cur_player = -1
+            canonical_board = self.game.get_canonical_form(self.board_gui.board, self.cur_player)
+            pi, _ = mcts.get_action_prob(canonical_board)
 
-            while self.board_gui.human:
-                time.sleep(0.1)
+            action = np.random.choice(len(pi), p=pi)
+            board, self.cur_player = self.game.get_next_state(self.board_gui.board, self.cur_player, action)
+            self.board_gui.set_board(board)
 
-            board = self.board_gui.board
             r = self.game.get_game_ended(board, self.cur_player)
 
             # END GAME
             if r != 2:
                 return r
 
-            # computer == player-1
-            self.cur_player = -1
-            canonical_board = self.game.get_canonical_form(board, self.cur_player)
-            pi, _ = mcts.get_action_prob(canonical_board)
+            # human == player1
+            self.board_gui.human = True
 
-            action = np.random.choice(len(pi), p=pi)
-            board, self.cur_player = self.game.get_next_state(board, self.cur_player, action)
-            self.board_gui.set_board(board)
+            while self.board_gui.human:
+                time.sleep(0.1)
 
             r = self.game.get_game_ended(board, self.cur_player)
 
