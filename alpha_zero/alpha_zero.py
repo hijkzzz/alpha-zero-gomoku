@@ -147,13 +147,13 @@ class AlphaZero():
         self.nnet.load_model(filename='best_checkpoint')
         mcts = MCTS(self.game, self.nnet, self.args)
 
-        self.cur_player = -1
         episode_step = 0
 
         while True:
             episode_step += 1
 
             # computer == player-1
+            self.cur_player = -1
             canonical_board = self.game.get_canonical_form(self.board_gui.board, self.cur_player)
             pi, _ = mcts.get_action_prob(canonical_board)
 
