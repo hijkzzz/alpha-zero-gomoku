@@ -142,6 +142,14 @@ class NeuralNetWorkWrapper():
 
         return [output_pis[0].cpu().detach().numpy(), output_vs[0].cpu().detach().numpy()]
 
+    
+    def set_learning_rate(self, lr):
+        """set learning rate
+        """
+
+        for param_group in self.optim.param_groups:
+            param_group['lr'] = lr
+
 
     def load_model(self, filename="checkpoint", folder="models"):
         """load model from file
