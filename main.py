@@ -31,7 +31,7 @@ args = dotdict({
     'batch_size': 512,
     'num_channels': 128,
 
-    'human_play' : False
+    'human_play' : True
 })
 
 
@@ -46,6 +46,6 @@ if __name__ == "__main__":
     if not args.human_play:
         alpha_zero.learn()
     else:
-        args['num_mcts_sims'] *= 3
+        args['num_mcts_sims'] *= 2
         print(alpha_zero.human_play())
         input()
