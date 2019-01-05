@@ -22,9 +22,8 @@ class AlphaZero():
         self.train_examples = []
 
         self.nnet = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
-        self.nnet.save_model()
+        self.nnet.save_model(filename="best_checkpoint")
         self.nnet_old = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
-        self.nnet_old.load_model()
 
 
     def learn(self):

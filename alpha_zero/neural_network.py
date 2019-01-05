@@ -156,10 +156,6 @@ class NeuralNetWorkWrapper():
         """
 
         filepath = os.path.join(folder, filename)
-        if not os.path.exists(filepath):
-            print(filepath, "NOT EXISTS")
-            return
-
         self.neural_network.load_state_dict(torch.load(filepath))
 
 
