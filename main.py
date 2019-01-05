@@ -31,7 +31,7 @@ args = dotdict({
     'batch_size': 512,
     'num_channels': 128,
 
-    'human_play' : True
+    'human_play' : False
 })
 
 
