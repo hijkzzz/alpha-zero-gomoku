@@ -40,8 +40,8 @@ class MCTS():
 
         if temp == 0:
             bestA = np.argmax(counts)
-            probs = [0]*len(counts)
-            probs[bestA]=1
+            probs = [0] * len(counts)
+            probs[bestA] = 1
             return probs, counts
 
         counts = [x ** (1. / temp) for x in counts]
@@ -93,7 +93,7 @@ class MCTS():
         # SELECT
         # pick the action with the highest upper confidence bound
         valids = self.Vs[s]
-        cur_best = float('-inf')
+        cur_best = -float('inf')
         best_act = -1
 
         for a in range(self.game.get_action_size()):

@@ -51,6 +51,10 @@ class Board():
         color gives the color pf the piece to play (1=white,-1=black)
         """
         (x,y) = move
-        assert self[x][y] == 0
+
+        if self[x][y] != 0:
+            print(self.pieces, move)
+            assert self[x][y] == 0
+            
         self[x][y] = player
 
