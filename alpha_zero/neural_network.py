@@ -100,7 +100,7 @@ class NeuralNetWorkWrapper():
         state_batch1 = (board_batch < 0).float() 
 
         state_batch2 = torch.zeros((len(last_action_batch), 1, self.args.n, self.args.n)).float()
-        state_batch3 = torch.ones((len(last_action_batch), 1, self.args.n, self.args.n)).float()
+        state_batch3 = torch.ones((len(cur_player_batch), 1, self.args.n, self.args.n)).float()
         for i in range(len(board_batch)):
             state_batch3[i][0] *= cur_player_batch[i]
 
@@ -163,7 +163,7 @@ class NeuralNetWorkWrapper():
         # adaptively adjust the learning rate
         if kl > self.args.kl_targ * 2 and self.args.lr > 0.001:
             self.args.lr /= 1.5
-        elif kl < self.args.kl_targ / 2 and self.args.lr < 0.2:
+        elif kl < self.args.kl_targ / 2 and self.args.lr < 0.1:
             self.args.lr *= 1.5
 
 
