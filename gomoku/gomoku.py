@@ -32,12 +32,12 @@ class Gomoku():
         b.execute_move(move, player)
         return (b.pieces, -player)
 
-    def get_valid_moves(self, board, player):
+    def get_valid_moves(self, board):
         # return a fixed size binary vector
         valids = [0] * self.get_action_size()
         b = Board(self.n)
         b.pieces = np.copy(board)
-        legal_moves = b.get_legal_moves(player)
+        legal_moves = b.get_legal_moves()
 
         if len(legal_moves) == 0:
             return None

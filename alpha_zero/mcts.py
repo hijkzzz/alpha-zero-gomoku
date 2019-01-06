@@ -82,10 +82,20 @@ class MCTS():
         if s not in self.Ps:
             p_batch, v_batch = self.nnet.infer(board.reshape((1, self.args.n, self.args.n)), [last_action], [cur_player]) 
             self.Ps[s], v = p_batch[0], v_batch[0]
-            valids = self.game.get_valid_moves(board, 1)
+
+            valids = self.game.get_valid_moves(board)
             self.Ps[s] = self.Ps[s] * valids      # masking invalid moves
+
             sum_Ps_s = np.sum(self.Ps[s])
-            self.Ps[s] /= sum_Ps_s    # renormalize
+
+            if sum_Ps_s > 0:
+                self.Ps[s] /= sum_Ps_s    # renormalize
+            else:
+                # NB! All valid moves may be masked if either your NNet architecture is insufficient or you've get overfitting or something else.
+                # If you have got dozens or hundreds of these messages you should pay attention to your NNet and/or training process.  
+                print("All valid moves were masked, do workaround.")
+                self.Ps[s] = self.Ps[s] + valids
+                self.Ps[s] /= np.sum(self.Ps[s])
 
             self.Vs[s] = valids
             self.Ns[s] = 0

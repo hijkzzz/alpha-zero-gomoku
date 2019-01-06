@@ -23,9 +23,8 @@ class Board():
     def __getitem__(self, index): 
         return self.pieces[index]
 
-    def get_legal_moves(self, color):
-        """Returns all the legal moves for the given color.
-        (1 for white, -1 for black
+    def get_legal_moves(self):
+        """Returns all the legal moves
         """
         moves = set()  # stores the legal moves.
 

@@ -33,12 +33,12 @@ class AlphaZero():
             t.start()
 
         for i in range(self.args.num_iters):
-            print("ITER :::: " + str(i + 1))
+            print("ITER ::: " + str(i + 1))
 
             # self play
             for eps in range(self.args.num_eps):
                 self.examples_buffer.extend(self.self_play())
-                print("EPS :: " + str(eps + 1) + ", EXAMPLES ::: " + str(len(self.examples_buffer)))
+                print("EPS :: " + str(eps + 1) + ", EXAMPLES :: " + str(len(self.examples_buffer)))
             
             # sample train data
             if len(self.examples_buffer) < self.args.batch_size:
@@ -49,7 +49,7 @@ class AlphaZero():
             self.nnet.save_model()
             self.nnet.train(train_data)
 
-            if (i + 1) % self.args.check_times == 0:
+            if (i + 1) % self.args.check_freq == 0:
                 # compare performance
                 self.nnet_old.load_model(filename="best_checkpoint")
                 mcts = MCTS(self.game, self.nnet, self.args)
