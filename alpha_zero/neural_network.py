@@ -154,6 +154,8 @@ class NeuralNetWorkWrapper():
                 axis=1)
             )
 
+            print("EPOCH :: {}, LOSS :: {}, LR :: {}, KL :: {}".format(epoch + 1, loss.item(), self.args.lr, kl))
+
             # early stopping if D_KL diverges badly
             if kl > self.args.kl_targ * 4:  
                 break
@@ -164,7 +166,6 @@ class NeuralNetWorkWrapper():
             elif kl < self.args.kl_targ / 2 and self.args.lr < 0.4:
                 self.args.lr *= 1.5
 
-            print("EPOCH :: {}, LOSS :: {}, LR :: {}, KL :: {}".format(epoch + 1, loss.item(), self.args.lr, kl))
 
     def infer(self, board_batch, last_action_batch, cur_player_batch):
         """predict pi and v
