@@ -43,6 +43,8 @@ class AlphaZero():
             # sample train data
             if len(self.examples_buffer) < self.args.batch_size:
                 continue
+
+            print("sampling...")
             train_data = sample(self.examples_buffer, self.args.batch_size)
 
             # train neural network
