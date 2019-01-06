@@ -27,7 +27,6 @@ class NeuralNetWork(nn.Module):
         self.conv3 = nn.Sequential(
             nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.ReLU())
 
-
         self.pi_conv = nn.Sequential(
             nn.Conv2d(args.num_channels, 4, kernel_size=1, padding=0), nn.ReLU())
         self.pi_fc = nn.Sequential(nn.Linear(4 * args.n ** 2, args.action_size), nn.ReLU(), nn.LogSoftmax(dim=1))
@@ -36,7 +35,6 @@ class NeuralNetWork(nn.Module):
             nn.Conv2d(args.num_channels, 2, kernel_size=1, padding=0), nn.ReLU())
         self.v_fc1 = nn.Sequential(nn.Linear(2 * args.n ** 2, 64), nn.ReLU())
         self.v_fc2 = nn.Sequential(nn.Linear(64, 1), nn.Tanh())
-
 
     def forward(self, boards):
         out = self.conv1(boards)
@@ -50,7 +48,7 @@ class NeuralNetWork(nn.Module):
         v = self.v_fc1(v.view(v.size(0), -1))
         v = self.v_fc2(v)
 
-        return [v, pi]
+        return pi, v
 
 
 class AlphaLoss(torch.nn.Module):
@@ -62,7 +60,7 @@ class AlphaLoss(torch.nn.Module):
     v : winner
     pi : self_play_probas
     p : probas
-    
+
     The loss is then averaged over the entire batch
     """
 
@@ -100,49 +98,64 @@ class NeuralNetWorkWrapper():
         self.neural_network.train()
         alpha_loss = AlphaLoss()
 
+        # prepare train data
+        board_batch, pi_batch, vs_batch = list(zip(*[example for example in examples]))
+        board_batch, pi_batch, vs_batch = torch.Tensor(board_batch).unsqueeze(1), \
+            torch.Tensor(pi_batch), \
+            torch.Tensor(vs_batch)
+
+        if self.cuda:
+            board_batch, pi_batch, vs_batch = board_batch.cuda(), pi_batch.cuda(), vs_batch.cuda()
+
+        old_pi, old_v = self.infer(board_batch)
+
         for epoch in range(self.args.epochs):
-            print('EPOCH ::: ' + str(epoch + 1))
+            # zero the parameter gradients
+            self.optim.zero_grad()
+            self.set_learning_rate(self.args.lr)
 
-            batch_idx = 0
-            while batch_idx < int(len(examples) / self.args.batch_size):
-                batch_idx += 1
-                sample_ids = np.random.randint(len(examples), size=self.args.batch_size)
-                boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
-                boards, pis, vs = torch.Tensor(boards).unsqueeze(1), \
-                                torch.Tensor(pis), \
-                                torch.Tensor(vs)
+            # forward + backward + optimize
+            vs, log_pis = self.neural_network(board_batch)
+            loss = alpha_loss(log_pis, vs, pi_batch, vs_batch)
+            loss.backward()
 
-                if self.cuda:
-                    boards, pis, vs = boards.cuda(), pis.cuda(), vs.cuda()
+            self.optim.step()
 
-                # zero the parameter gradients
-                self.optim.zero_grad()
+            # calculate KL
+            new_pi, new_v = self.infer(board_batch)
 
-                # forward + backward + optimize
-                output_vs, output_pis = self.neural_network(boards)
-                loss = alpha_loss(output_pis, output_vs, pis, vs)
-                loss.backward()
+            kl = np.mean(np.sum(old_pi * (
+                np.log(old_pi + 1e-10) - np.log(new_pi + 1e-10)),
+                axis=1)
+            )
 
-                self.optim.step()
+            # early stopping if D_KL diverges badly
+            if kl > self.args.kl_targ * 4:  
+                break
 
-                print("BATCH ::: {}, LOSS ::: {}".format(batch_idx, loss.item()))
+            # adaptively adjust the learning rate
+            if kl > self.args.kl_targ * 2 and self.args.lr > 0.1:
+                self.args.lr /= 1.5
+            elif kl < self.args.kl_targ / 2 and self.args.lr < 10:
+                self.args.lr *= 1.5
 
-    def infer(self, board):
-        """predict v and pi
+            print("EPOCH :: {}, LOSS :: {}, LR :: {}, KL :: {}".format(epoch + 1, loss.item(), self.args.lr, kl))
+
+    def infer(self, board, data_format='MCTS'):
+        """predict pi and v
         """
 
         self.neural_network.eval()
 
-        boards = torch.Tensor(board).unsqueeze(0).unsqueeze(1)
+        if data_format == 'MCTS':
+            boards = torch.Tensor(board).unsqueeze(0).unsqueeze(1)
 
-        if self.cuda:
-            boards = boards.cuda()
+            if self.cuda:
+                boards = boards.cuda()
 
-        output_vs, output_pis = self.neural_network(boards)
+        log_pis, vs  = self.neural_network(boards)
+        return np.exp(log_pis.cpu().detach().numpy()), vs.cpu().detach().numpy()
 
-        return [output_pis[0].cpu().detach().numpy(), output_vs[0].cpu().detach().numpy()]
-
-    
     def set_learning_rate(self, lr):
         """set learning rate
         """
@@ -150,14 +163,12 @@ class NeuralNetWorkWrapper():
         for param_group in self.optim.param_groups:
             param_group['lr'] = lr
 
-
     def load_model(self, filename="checkpoint", folder="models"):
         """load model from file
         """
 
         filepath = os.path.join(folder, filename)
         self.neural_network.load_state_dict(torch.load(filepath))
-
 
     def save_model(self, filename="checkpoint", folder="models"):
         """save model to file

@@ -19,7 +19,7 @@ class AlphaZero():
         self.args = args
         self.game = game
         self.board_gui = board_gui
-        self.train_examples = []
+        self.examples_buffer = deque([], maxlen=self.args.examples_buffer_max_len)
 
         self.nnet = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
         self.nnet.save_model(filename="best_checkpoint")
@@ -36,29 +36,17 @@ class AlphaZero():
             print("ITER :::: " + str(i + 1))
 
             # self play
-            temp_examples = deque([], maxlen=self.args.temp_examples_max_len)
-
             for eps in range(self.args.num_eps):
-                temp_examples += self.self_play()
-                print("EPS ::: " + str(eps + 1) + ", EXAMPLES ::: " + str(len(temp_examples)))
+                self.examples_buffer.extend(self.self_play())
+                print("EPS :: " + str(eps + 1) + ", EXAMPLES ::: " + str(len(self.examples_buffer)))
             
-            # add to train examples
-            self.train_examples.append(temp_examples)
-
-            if len(self.train_examples) > self.args.train_examples_max_len:
-                self.train_examples.pop(0)
-
             # sample train data
-            train_data = []
-            for e in self.train_examples:
-                train_data.extend(e)
-
-            train_data = sample(train_data, min(len(train_data), self.args.batch_size * self.args.num_eps))
+            if len(self.examples_buffer) < self.args.batch_size:
+                continue
+            train_data = sample(self.examples_buffer, self.args.batch_size))
 
             # train neural network
             self.nnet.save_model()
-
-            self.nnet.set_learning_rate(self.args.lr - i / self.args.num_iters * self.args.lr)
             self.nnet.train(train_data)
 
             if (i + 1) % self.args.check_times == 0:
