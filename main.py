@@ -26,11 +26,11 @@ args = dotdict({
     'cpuct': 5,
 
     'lr': 0.002,
-    'l2': 0.0001,
+    'l2': 0.0002,
     'epochs': 5,
     'batch_size': 512,
     'num_channels': 128,
-    'kl_targ': 0.06,
+    'kl_targ': 0.03,
 
     'human_play' : False
 })
