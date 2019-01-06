@@ -80,7 +80,8 @@ class MCTS():
 
         # EXPAND(Not Visited)
         if s not in self.Ps:
-            self.Ps[s], v = self.nnet.infer(canonical_board)
+            p, v = self.nnet.infer(canonical_board)
+            self.Ps[s], v = p[0], v[0]
             valids = self.game.get_valid_moves(canonical_board, 1)
             self.Ps[s] = self.Ps[s] * valids      # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
