@@ -25,7 +25,7 @@ args = dotdict({
     'num_mcts_sims': 400, 
     'cpuct': 10,
 
-    'lr': 0.02,
+    'lr': 0.002,
     'l2': 0.0001,
     'epochs': 5,
     'batch_size': 512,

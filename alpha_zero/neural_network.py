@@ -163,7 +163,7 @@ class NeuralNetWorkWrapper():
         # adaptively adjust the learning rate
         if kl > self.args.kl_targ * 2 and self.args.lr > 0.001:
             self.args.lr /= 1.5
-        elif kl < self.args.kl_targ / 2 and self.args.lr < 0.4:
+        elif kl < self.args.kl_targ / 2 and self.args.lr < 0.2:
             self.args.lr *= 1.5
 
 
