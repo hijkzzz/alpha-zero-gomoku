@@ -72,7 +72,8 @@ class MCTS():
 
         # query node type
         if s not in self.Es:
-            self.Es[s] = self.game.get_game_ended(board) * cur_player
+            r = self.game.get_game_ended(board)
+            self.Es[s] = 2 if r == 2 else r * cur_player
 
         # TERMINAL NODE
         if self.Es[s] != 2:
