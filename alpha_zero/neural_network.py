@@ -159,9 +159,9 @@ class NeuralNetWorkWrapper():
                 break
 
             # adaptively adjust the learning rate
-            if kl > self.args.kl_targ * 2 and self.args.lr > 0.2:
+            if kl > self.args.kl_targ * 2 and self.args.lr > 0.002:
                 self.args.lr /= 1.5
-            elif kl < self.args.kl_targ / 2 and self.args.lr < 0.02:
+            elif kl < self.args.kl_targ / 2 and self.args.lr < 0.2:
                 self.args.lr *= 1.5
 
             print("EPOCH :: {}, LOSS :: {}, LR :: {}, KL :: {}".format(epoch + 1, loss.item(), self.args.lr, kl))
