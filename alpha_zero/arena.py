@@ -39,7 +39,8 @@ class Arena():
         last_action = -1
         while self.game.get_game_ended(board) == 2:
             it += 1
-            action = players[cur_player + 1](board, last_action, cur_player)
+            ps, _ = players[cur_player + 1].get_action_prob(board, last_action, cur_player)
+            action = np.argmax(ps)
             last_action = action
             board, cur_player = self.game.get_next_state(board, cur_player, action)
 

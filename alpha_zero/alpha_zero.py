@@ -8,6 +8,7 @@ from .neural_network import NeuralNetWorkWrapper, NeuralNetWork
 from .mcts import MCTS
 from .arena import Arena
 
+
 class AlphaZero():
     def __init__(self, game, args, board_gui=None):
         """args: num_mcts_sims, cpuct(mcts)
@@ -25,7 +26,6 @@ class AlphaZero():
         self.nnet.save_model(filename="best_checkpoint")
         self.nnet_old = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
 
-
     def learn(self):
         # start gui
         if self.board_gui:
@@ -39,7 +39,7 @@ class AlphaZero():
             for eps in range(self.args.num_eps):
                 self.examples_buffer.extend(self.self_play())
                 print("EPS :: " + str(eps + 1) + ", EXAMPLES :: " + str(len(self.examples_buffer)))
-            
+
             # sample train data
             if len(self.examples_buffer) < self.args.batch_size:
                 continue
@@ -54,11 +54,8 @@ class AlphaZero():
                 self.nnet_old.load_model(filename="best_checkpoint")
                 mcts = MCTS(self.game, self.nnet, self.args)
                 mcts_old = MCTS(self.game, self.nnet_old, self.args)
-                
-                arena = Arena(lambda x: np.argmax(mcts.get_action_prob(x)[0]),
-                            lambda x: np.argmax(mcts_old.get_action_prob(x)[0]), 
-                            self.game,
-                            self.board_gui)
+
+                arena = Arena(mcts, mcts_old, self.game, self.board_gui)
 
                 oneWon, twoWon, draws = arena.play_games(self.args.area_num)
                 print("NEW/PREV WINS : %d / %d ; DRAWS : %d" % (oneWon, twoWon, draws))
@@ -73,7 +70,6 @@ class AlphaZero():
         if self.board_gui:
             self.board_gui.close_gui()
             t.join()
-
 
     def self_play(self):
         """
@@ -129,7 +125,6 @@ class AlphaZero():
                 # b, p, v, last_action, cur_player
                 return [(x[0], x[2], r * x[1], x[3], x[1]) for x in train_examples]
 
-
     def human_play(self):
         t = threading.Thread(target=self.board_gui.loop)
         t.start()
@@ -169,5 +164,5 @@ class AlphaZero():
             # END GAME
             if r != 2:
                 return r
-        
+
         t.join()
