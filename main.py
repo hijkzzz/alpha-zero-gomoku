@@ -14,7 +14,7 @@ args = dotdict({
 
     'num_iters': 3000,
     'num_eps': 1,
-    'explore_num' : 4,
+    'explore_num' : 2,
     'temp' : 10,
     'dirichlet_alpha' : 0.3,
     'update_threshold': 0.55,
@@ -32,7 +32,7 @@ args = dotdict({
     'num_channels': 128,
     'kl_targ': 0.02,
 
-    'human_play' : True
+    'human_play' : False
 })
 
 

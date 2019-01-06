@@ -45,9 +45,8 @@ class Gomoku():
             valids[self.n * x + y] = 1
         return np.array(valids)
 
-    def get_game_ended(self, board, player):
+    def get_game_ended(self, board):
         # return 2 if not ended, 1 if player 1 won, -1 if player 1 lost, 0 if tied
-        # player = 1
         b = Board(self.n)
         b.pieces = np.copy(board)
         n = self.n_in_row
@@ -70,10 +69,6 @@ class Gomoku():
         if b.has_legal_moves():
             return 2
         return 0
-
-    def get_canonical_form(self, board, player):
-        # return state if player==1, else return -state if player==-1
-        return player * board
 
     # modified
     def get_symmetries(self, board, pi):

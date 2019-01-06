@@ -19,7 +19,7 @@ class NeuralNetWork(nn.Module):
         super(NeuralNetWork, self).__init__()
         # n
         self.conv1 = nn.Sequential(
-            nn.Conv2d(1, args.num_channels, kernel_size=3, padding=1), nn.ReLU())
+            nn.Conv2d(4, args.num_channels, kernel_size=3, padding=1), nn.ReLU())
         # n
         self.conv2 = nn.Sequential(
             nn.Conv2d(args.num_channels, args.num_channels, kernel_size=3, padding=1), nn.ReLU())
@@ -91,38 +91,61 @@ class NeuralNetWorkWrapper():
 
         self.optim = Adam(self.neural_network.parameters(), lr=args.lr, weight_decay=args.l2)
 
+    def get_states(self, board_batch, last_action_batch, cur_player_batch):
+        """generate state batch
+        """
+
+        board_batch = torch.Tensor(board_batch).unsqueeze(1)
+        state_batch0 = (board_batch > 0).float()
+        state_batch1 = (board_batch < 0).float() 
+
+        state_batch2 = torch.zeros((len(last_action_batch), 1, self.args.n, self.args.n))
+        state_batch3 = torch.ones((len(last_action_batch), 1, self.args.n, self.args.n))
+        for i in range(len(board_batch)):
+            state_batch3[i][0] *= cur_player_batch[i]
+
+            last_action = last_action_batch[i]
+            if last_action == -1:
+                continue
+            x, y = last_action // self.args.n, last_action % self.args.n
+            state_batch2[i][0][x][y] = 1
+
+
+        return torch.cat((state_batch0, state_batch1, state_batch2, state_batch3), dim=1)
+
     def train(self, examples):
         """train neural network
         """
 
-        self.neural_network.train()
         alpha_loss = AlphaLoss()
 
         # prepare train data
-        board_batch, pi_batch, vs_batch = list(zip(*[example for example in examples]))
-        board_batch, pi_batch, vs_batch = torch.Tensor(board_batch).unsqueeze(1), \
+        board_batch, pi_batch, vs_batch, last_action_batch, cur_player_batch = list(zip(*[example for example in examples]))
+        state_batch, pi_batch, vs_batch = self.get_states(board_batch, last_action_batch, cur_player_batch), \
             torch.Tensor(pi_batch), \
             torch.Tensor(vs_batch)
 
         if self.cuda:
-            board_batch, pi_batch, vs_batch = board_batch.cuda(), pi_batch.cuda(), vs_batch.cuda()
+            state_batch, pi_batch, vs_batch = board_batch.cuda(), pi_batch.cuda(), vs_batch.cuda()
 
-        old_pi, old_v = self.infer(board_batch)
+        old_pi, old_v = self.infer2(state_batch)
 
         for epoch in range(self.args.epochs):
+            self.neural_network.train()
+
             # zero the parameter gradients
             self.optim.zero_grad()
             self.set_learning_rate(self.args.lr)
 
             # forward + backward + optimize
-            vs, log_pis = self.neural_network(board_batch)
+            vs, log_pis = self.neural_network(state_batch)
             loss = alpha_loss(log_pis, vs, pi_batch, vs_batch)
             loss.backward()
 
             self.optim.step()
 
             # calculate KL
-            new_pi, new_v = self.infer(board_batch)
+            new_pi, new_v = self.infer2(state_batch)
 
             kl = np.mean(np.sum(old_pi * (
                 np.log(old_pi + 1e-10) - np.log(new_pi + 1e-10)),
@@ -141,19 +164,29 @@ class NeuralNetWorkWrapper():
 
             print("EPOCH :: {}, LOSS :: {}, LR :: {}, KL :: {}".format(epoch + 1, loss.item(), self.args.lr, kl))
 
-    def infer(self, board, data_format='MCTS'):
+    def infer(self, board_batch, last_action_batch, cur_player_batch):
         """predict pi and v
         """
 
         self.neural_network.eval()
 
-        if data_format == 'MCTS':
-            boards = torch.Tensor(board).unsqueeze(0).unsqueeze(1)
+        states = self.get_states(board_batch, last_action_batch, cur_player_batch)
 
-            if self.cuda:
-                boards = boards.cuda()
+        if self.cuda:
+            states = states.cuda()
 
-        log_pis, vs  = self.neural_network(boards)
+        log_pis, vs  = self.neural_network(states)
+        return np.exp(log_pis.cpu().detach().numpy()), vs.cpu().detach().numpy()
+
+    def infer2(self, states):
+        """predict pi and v
+        """
+        self.neural_network.eval()
+
+        if self.cuda:
+            states = states.cuda()
+
+        log_pis, vs  = self.neural_network(states)
         return np.exp(log_pis.cpu().detach().numpy()), vs.cpu().detach().numpy()
 
     def set_learning_rate(self, lr):
