@@ -12,7 +12,7 @@ args = dotdict({
     'n': 6,
     'nir': 4,
 
-    'num_iters': 2000,
+    'num_iters': 3000,
     'num_eps': 1,
     'explore_num' : 2,
     'temp' : 1,
@@ -30,7 +30,7 @@ args = dotdict({
     'epochs': 5,
     'batch_size': 512,
     'num_channels': 128,
-    'kl_targ': 0.03,
+    'kl_targ': 0.04,
 
     'human_play' : False
 })
