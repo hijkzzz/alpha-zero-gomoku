@@ -67,9 +67,9 @@ class AlphaLoss(torch.nn.Module):
     def __init__(self):
         super(AlphaLoss, self).__init__()
 
-    def forward(self, log_pis, vs, target_pis, target_vs):
+    def forward(self, log_ps, vs, target_pis, target_vs):
         value_loss = torch.mean(torch.pow(vs - target_vs, 2))
-        policy_loss = -torch.mean(torch.sum(target_pis * log_pis, 1))
+        policy_loss = -torch.mean(torch.sum(target_pis * log_ps, 1))
         return value_loss + policy_loss
 
 
@@ -99,8 +99,8 @@ class NeuralNetWorkWrapper():
         state_batch0 = (board_batch > 0).float()
         state_batch1 = (board_batch < 0).float() 
 
-        state_batch2 = torch.zeros((len(last_action_batch), 1, self.args.n, self.args.n))
-        state_batch3 = torch.ones((len(last_action_batch), 1, self.args.n, self.args.n))
+        state_batch2 = torch.zeros((len(last_action_batch), 1, self.args.n, self.args.n)).float()
+        state_batch3 = torch.ones((len(last_action_batch), 1, self.args.n, self.args.n)).float()
         for i in range(len(board_batch)):
             state_batch3[i][0] *= cur_player_batch[i]
 
@@ -109,7 +109,6 @@ class NeuralNetWorkWrapper():
                 continue
             x, y = last_action // self.args.n, last_action % self.args.n
             state_batch2[i][0][x][y] = 1
-
 
         return torch.cat((state_batch0, state_batch1, state_batch2, state_batch3), dim=1)
 
@@ -120,13 +119,16 @@ class NeuralNetWorkWrapper():
         alpha_loss = AlphaLoss()
 
         # prepare train data
-        board_batch, pi_batch, vs_batch, last_action_batch, cur_player_batch = list(zip(*[example for example in examples]))
-        state_batch, pi_batch, vs_batch = self.get_states(board_batch, last_action_batch, cur_player_batch), \
-            torch.Tensor(pi_batch), \
-            torch.Tensor(vs_batch)
+        board_batch, p_batch, v_batch, last_action_batch, cur_player_batch = list(zip(*[example for example in examples]))
+
+        state_batch = self.get_states(board_batch, last_action_batch, cur_player_batch)
+        p_batch = torch.Tensor(p_batch)
+        v_batch = torch.Tensor(v_batch).unsqueeze(1)
 
         if self.cuda:
-            state_batch, pi_batch, vs_batch = board_batch.cuda(), pi_batch.cuda(), vs_batch.cuda()
+            state_batch = state_batch.cuda()
+            p_batch = p_batch.cuda()
+            v_batch = v_batch.cuda()
 
         old_pi, old_v = self.infer2(state_batch)
 
@@ -138,8 +140,8 @@ class NeuralNetWorkWrapper():
             self.set_learning_rate(self.args.lr)
 
             # forward + backward + optimize
-            vs, log_pis = self.neural_network(state_batch)
-            loss = alpha_loss(log_pis, vs, pi_batch, vs_batch)
+            log_ps, vs = self.neural_network(state_batch)
+            loss = alpha_loss(log_ps, vs, p_batch, v_batch)
             loss.backward()
 
             self.optim.step()
@@ -175,19 +177,16 @@ class NeuralNetWorkWrapper():
         if self.cuda:
             states = states.cuda()
 
-        log_pis, vs  = self.neural_network(states)
-        return np.exp(log_pis.cpu().detach().numpy()), vs.cpu().detach().numpy()
+        log_ps, vs  = self.neural_network(states)
+        return np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy()
 
     def infer2(self, states):
         """predict pi and v
         """
         self.neural_network.eval()
 
-        if self.cuda:
-            states = states.cuda()
-
-        log_pis, vs  = self.neural_network(states)
-        return np.exp(log_pis.cpu().detach().numpy()), vs.cpu().detach().numpy()
+        log_ps, vs  = self.neural_network(states)
+        return np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy()
 
     def set_learning_rate(self, lr):
         """set learning rate
