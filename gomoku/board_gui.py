@@ -21,6 +21,7 @@ class BoardGUI():
 
         self.FPS = fps
         self.human = human
+        self.last_action = -1
 
         if not board is None:
             self.set_board(board)
@@ -60,6 +61,8 @@ class BoardGUI():
                     if center[0] in range(0, self.n) and center[1] in range(0, self.n) \
                             and self.board[center[0]][center[1]] == 0:
                         self.board[center[0]][center[1]] = 1
+                        self.last_action = center[0] * self.n + center[1]
+
                         self.human = False
                         
 

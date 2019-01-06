@@ -43,7 +43,7 @@ class AlphaZero():
             # sample train data
             if len(self.examples_buffer) < self.args.batch_size:
                 continue
-            train_data = sample(self.examples_buffer, self.args.batch_size))
+            train_data = sample(self.examples_buffer, self.args.batch_size)
 
             # train neural network
             self.nnet.save_model()
@@ -84,7 +84,7 @@ class AlphaZero():
         in train_examples.
 
         Returns:
-            train_examples: a list of examples of the form (canonical_board,pi,v)
+            train_examples: a list of examples of the form (board,pi,v)
                            pi is the MCTS informed policy vector, v is +1 if
                            the player eventually won the game, else -1.
         """
@@ -94,19 +94,19 @@ class AlphaZero():
         board = self.game.get_init_board()
         mcts = MCTS(self.game, self.nnet, self.args)
         self.cur_player = 1
-        episode_step = 0
+        last_action = -1
 
+        episode_step = 0
         while True:
             episode_step += 1
-            canonical_board = self.game.get_canonical_form(board, self.cur_player)
 
             # temperature
             temp = self.args.temp if episode_step <= self.args.explore_num else 0
-            pi, counts = mcts.get_action_prob(canonical_board, temp=temp)
+            pi, counts = mcts.get_action_prob(board, last_action, self.cur_player, temp=temp)
 
-            sym = self.game.get_symmetries(canonical_board, pi)
+            sym = self.game.get_symmetries(board, pi)
             for b, p in sym:
-                train_examples.append([b, self.cur_player, p, None])
+                train_examples.append([b, self.cur_player, p, last_action])
 
             # Dirichlet noise
             pi_noise = 0.75 * np.array(pi)
@@ -119,14 +119,15 @@ class AlphaZero():
             pi_noise /= np.sum(pi_noise)
 
             action = np.random.choice(len(pi_noise), p=pi_noise)
+            last_action = action
             board, self.cur_player = self.game.get_next_state(board, self.cur_player, action)
 
-            r = self.game.get_game_ended(board, self.cur_player)
+            r = self.game.get_game_ended(board)
 
             # END GAME
             if r != 2:
-                # b, p, v
-                return [(x[0], x[2], r * ((-1) ** (x[1] != self.cur_player))) for x in train_examples]
+                # b, p, v, last_action, cur_player
+                return [(x[0], x[2], r * x[1], x[3], x[1]) for x in train_examples]
 
 
     def human_play(self):
@@ -136,6 +137,7 @@ class AlphaZero():
         self.nnet.load_model(filename='best_checkpoint')
         mcts = MCTS(self.game, self.nnet, self.args)
 
+        last_action = -1
         episode_step = 0
 
         while True:
@@ -143,14 +145,13 @@ class AlphaZero():
 
             # computer == player-1
             self.cur_player = -1
-            canonical_board = self.game.get_canonical_form(self.board_gui.board, self.cur_player)
-            pi, _ = mcts.get_action_prob(canonical_board)
+            pi, _ = mcts.get_action_prob(self.board_gui.board, last_action, self.cur_player)
 
             action = np.random.choice(len(pi), p=pi)
             board, self.cur_player = self.game.get_next_state(self.board_gui.board, self.cur_player, action)
             self.board_gui.set_board(board)
 
-            r = self.game.get_game_ended(board, self.cur_player)
+            r = self.game.get_game_ended(board)
 
             # END GAME
             if r != 2:
@@ -162,7 +163,8 @@ class AlphaZero():
             while self.board_gui.human:
                 time.sleep(0.1)
 
-            r = self.game.get_game_ended(board, self.cur_player)
+            last_action = self.board_gui.last_action
+            r = self.game.get_game_ended(board)
 
             # END GAME
             if r != 2:
