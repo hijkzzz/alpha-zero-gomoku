@@ -15,7 +15,7 @@ args = dotdict({
     'num_iters': 2000,
     'num_eps': 1,
     'explore_num' : 2,
-    'temp' : 5,
+    'temp' : 1,
     'dirichlet_alpha' : 0.3,
     'update_threshold': 0.55,
     'area_num': 10,
@@ -25,7 +25,7 @@ args = dotdict({
     'num_mcts_sims': 400, 
     'cpuct': 5,
 
-    'lr': 0.002,
+    'lr': 0.005,
     'l2': 0.0002,
     'epochs': 5,
     'batch_size': 512,
