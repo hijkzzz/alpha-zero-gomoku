@@ -20,12 +20,12 @@ args = dotdict({
     'update_threshold': 0.55,
     'area_num': 10,
     'check_freq' : 50, 
-    'examples_buffer_max_len': 10000,
+    'examples_buffer_max_len': 20000,
 
     'num_mcts_sims': 400, 
     'cpuct': 5,
 
-    'lr': 0.005,
+    'lr': 0.002,
     'l2': 0.0002,
     'epochs': 5,
     'batch_size': 512,

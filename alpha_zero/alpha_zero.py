@@ -36,8 +36,10 @@ class AlphaZero():
             print("ITER ::: " + str(i + 1))
 
             # self play
+            self.cur_player = 1
             for eps in range(self.args.num_eps):
                 self.examples_buffer.extend(self.self_play())
+                self.cur_player = -self.cur_player
                 print("EPS :: " + str(eps + 1) + ", EXAMPLES :: " + str(len(self.examples_buffer)))
 
             # sample train data
@@ -91,8 +93,8 @@ class AlphaZero():
 
         board = self.game.get_init_board()
         mcts = MCTS(self.game, self.nnet, self.args)
-        self.cur_player = 1
         last_action = -1
+        cur_player = self.cur_player
 
         episode_step = 0
         while True:
@@ -100,11 +102,11 @@ class AlphaZero():
 
             # temperature
             temp = self.args.temp if episode_step <= self.args.explore_num else 0
-            pi, counts = mcts.get_action_prob(board, last_action, self.cur_player, temp=temp)
+            pi, counts = mcts.get_action_prob(board, last_action, cur_player, temp=temp)
 
             sym = self.game.get_symmetries(board, pi)
             for b, p in sym:
-                train_examples.append([b, self.cur_player, p, last_action])
+                train_examples.append([b, p, last_action, cur_player])
 
             # Dirichlet noise
             pi_noise = 0.75 * np.array(pi)
@@ -118,14 +120,14 @@ class AlphaZero():
 
             action = np.random.choice(len(pi_noise), p=pi_noise)
             last_action = action
-            board, self.cur_player = self.game.get_next_state(board, self.cur_player, action)
+            board, cur_player = self.game.get_next_state(board, cur_player, action)
 
             r = self.game.get_game_ended(board)
 
             # END GAME
             if r != 2:
                 # b, p, v, last_action, cur_player
-                return [(x[0], x[2], r * x[1], x[3], x[1]) for x in train_examples]
+                return [(x[0], x[1], r * x[3], x[2], x[3]) for x in train_examples]
 
     def human_play(self):
         t = threading.Thread(target=self.board_gui.loop)
