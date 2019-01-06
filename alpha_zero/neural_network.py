@@ -154,17 +154,17 @@ class NeuralNetWorkWrapper():
                 axis=1)
             )
 
-            print("EPOCH :: {}, LOSS :: {}, LR :: {}, KL :: {}".format(epoch + 1, loss.item(), self.args.lr, kl))
-
             # early stopping if D_KL diverges badly
             if kl > self.args.kl_targ * 4:  
                 break
 
-            # adaptively adjust the learning rate
-            if kl > self.args.kl_targ * 2 and self.args.lr > 0.001:
-                self.args.lr /= 1.5
-            elif kl < self.args.kl_targ / 2 and self.args.lr < 0.4:
-                self.args.lr *= 1.5
+        print("LOSS :: {}, LR :: {}, KL :: {}".format(loss.item(), self.args.lr, kl))
+        
+        # adaptively adjust the learning rate
+        if kl > self.args.kl_targ * 2 and self.args.lr > 0.001:
+            self.args.lr /= 1.5
+        elif kl < self.args.kl_targ / 2 and self.args.lr < 0.4:
+            self.args.lr *= 1.5
 
 
     def infer(self, board_batch, last_action_batch, cur_player_batch):
