@@ -23,7 +23,6 @@ class AlphaZero():
         self.examples_buffer = deque([], maxlen=self.args.examples_buffer_max_len)
 
         self.nnet = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
-        self.nnet.save_model(filename="best_checkpoint")
         self.nnet_old = NeuralNetWorkWrapper(NeuralNetWork(self.args), self.args)
 
     def learn(self):
@@ -31,6 +30,8 @@ class AlphaZero():
         if self.board_gui:
             t = threading.Thread(target=self.board_gui.loop)
             t.start()
+
+        self.nnet.save_model(filename="best_checkpoint")
 
         for i in range(self.args.num_iters):
             print("ITER ::: " + str(i + 1))
@@ -142,6 +143,19 @@ class AlphaZero():
         while True:
             episode_step += 1
 
+            # human == player1
+            self.board_gui.human = True
+
+            while self.board_gui.human:
+                time.sleep(0.1)
+
+            last_action = self.board_gui.last_action
+            r = self.game.get_game_ended(self.board_gui.board)
+
+            # END GAME
+            if r != 2:
+                return r
+
             # computer == player-1
             self.cur_player = -1
             pi, _ = mcts.get_action_prob(self.board_gui.board, last_action, self.cur_player)
@@ -150,20 +164,7 @@ class AlphaZero():
             board, self.cur_player = self.game.get_next_state(self.board_gui.board, self.cur_player, action)
             self.board_gui.set_board(board)
 
-            r = self.game.get_game_ended(board)
-
-            # END GAME
-            if r != 2:
-                return r
-
-            # human == player1
-            self.board_gui.human = True
-
-            while self.board_gui.human:
-                time.sleep(0.1)
-
-            last_action = self.board_gui.last_action
-            r = self.game.get_game_ended(board)
+            r = self.game.get_game_ended(self.board_gui.board)
 
             # END GAME
             if r != 2:
