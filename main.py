@@ -32,7 +32,7 @@ args = dotdict({
     'num_channels': 128,
     'kl_targ': 0.04,
 
-    'human_play' : False
+    'human_play' : True
 })
 
 
