@@ -1,0 +1,13 @@
+[*]
+# 文件的charset。有以下几种类型：latin1, utf-8, utf-8-bom, utf-16be, utf-16le
+charset = utf-8
+# 缩进使用 tab 或者 space
+indent_style = space
+# 缩进为 space 时，缩进的字符数
+# indent_size = 2
+# 换行符的类型。lf, cr, crlf三种
+end_of_line = lf
+# 是否将行尾空格自动删除
+trim_trailing_whitespace = true
+# 是否使文件以一个空白行结尾
+insert_final_newline = true
