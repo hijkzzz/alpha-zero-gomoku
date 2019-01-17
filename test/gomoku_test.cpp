@@ -52,6 +52,7 @@ int main() {
     std::cout << std::get<0>(legal_moves[i]) << ", " << std::get<1>(legal_moves[i])
               << std::endl;
   }
+  std::cout << legal_moves.size() << std::endl;
 
   // test get_game_status
   auto game_status = gomoku.get_game_status();

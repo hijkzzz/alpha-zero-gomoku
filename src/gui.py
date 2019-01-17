@@ -3,36 +3,55 @@ import pygame
 import os
 import numpy as np
 
-class BoardGUI():
-    def __init__(self, board=None, human=False, fps=60):
+class GomokuGUI():
+    def __init__(self, args, is_human=False, fps=30):
 
-        # color
-        self.WHITE = (255, 255, 255)
-        self.BLACK = (0, 0, 0)
-        self.GREEN = (0, 255, 0)
+        # color, white for player 1, black for player -1
+        self.white = (255, 255, 255)
+        self.black = (0, 0, 0)
+        self.green = (0, 255, 0)
 
-        # resolution
-        self.WIDTH = 600
-        self.HEIGHT = 600
-        
-        self.board = None
-        self.n = None
-        self.GRID_WIDTH = None
+        # window size
+        self.width = 800
+        self.height = 800
 
-        self.FPS = fps
-        self.human = human
-        self.last_action = -1
+        self.n = args.n
+        self.grid_width = self.width / (self.n + 3)
+        self.fps = fps
 
-        if not board is None:
-            self.set_board(board)
+        self.reset_window()
 
+        # human player
+        self.is_human = is_human
+        self.last_action = None
+        self.human_color = args.human_color
+
+        # is running
+        self.is_running = True
+
+    def reset_window(self):
+        self.board = np.zeros((self.n, self.n), dtype=int)
+        self.number = np.zeros((self.n, self.n), dtype=int)
+        self.k = 1 # step number
+
+    def close_window(self):
         # close window
-        self.running = True
+        self.is_running = False
+
+    def in_turn_of_human(self):
+        self.is_human = True
+
+    def execute_move(self, color, move):
+        x, y = move
+        assert self.board[x][y] == 0
+        self.board[x][y] = color
+        self.number[x][y] = self.k
+        self.k += 1
 
     def loop(self):
         # init
         pygame.init()
-        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Gomoku")
 
         # timer
@@ -41,84 +60,81 @@ class BoardGUI():
         # background image
         base_folder = os.path.dirname(__file__)
         self.background_img = pygame.image.load(
-            os.path.join(base_folder, 'back.png')).convert()
+            os.path.join(base_folder, '../assets/background.png')).convert()
 
-        while self.running:
+        # font
+        self.font = pygame.font.SysFont('Arial', 22)
+
+        while self.is_running:
             # timer
-            self.clock.tick(self.FPS)
+            self.clock.tick(self.fps)
 
             # handle event
             for event in pygame.event.get():
                 # close window
                 if event.type == pygame.QUIT:
-                    self.running = False
-                # human input
-                if self.human and event.type == pygame.MOUSEBUTTONDOWN:
+                    self.is_running = False
+                # human play
+                if self.is_human and event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_y, mouse_x = event.pos
-                    center = (int(mouse_x / self.GRID_WIDTH) - 1,
-                              int(mouse_y / self.GRID_WIDTH) - 1)
+                    position = (int(mouse_x / self.grid_width + 0.5) - 2,
+                              int(mouse_y / self.grid_width + 0.5) - 2)
 
-                    if center[0] in range(0, self.n) and center[1] in range(0, self.n) \
-                            and self.board[center[0]][center[1]] == 0:
-                        self.board[center[0]][center[1]] = 1
-                        self.last_action = center[0] * self.n + center[1]
-
-                        self.human = False
-                        
+                    if position[0] in range(0, self.n) and position[1] in range(0, self.n) \
+                            and self.board[position[0]][position[1]] == 0:
+                        self.execute_move(self.human_color, position)
+                        self.last_action = position
+                        self.is_human = False
 
             # draw
-            self.draw_background()
-            self.draw_chessman()
+            self.__draw_background()
+            self.__draw_chessman()
 
             # refresh
             pygame.display.flip()
 
-    def draw_background(self):
+    def __draw_background(self):
         # load background
         self.screen.blit(self.background_img, (0, 0))
 
         # draw lines
         rect_lines = [
-            ((self.GRID_WIDTH, self.GRID_WIDTH),
-             (self.GRID_WIDTH, self.HEIGHT - self.GRID_WIDTH)),
-            ((self.GRID_WIDTH, self.GRID_WIDTH), (self.WIDTH - self.GRID_WIDTH,
-                                                  self.GRID_WIDTH)),
-            ((self.GRID_WIDTH, self.HEIGHT - self.GRID_WIDTH),
-             (self.WIDTH - self.GRID_WIDTH, self.HEIGHT - self.GRID_WIDTH)),
-            ((self.WIDTH - self.GRID_WIDTH, self.GRID_WIDTH),
-             (self.WIDTH - self.GRID_WIDTH, self.HEIGHT - self.GRID_WIDTH)),
+            ((self.grid_width, self.grid_width),
+             (self.grid_width, self.height - self.grid_width)),
+            ((self.grid_width, self.grid_width), (self.width - self.grid_width,
+                                                  self.grid_width)),
+            ((self.grid_width, self.height - self.grid_width),
+             (self.width - self.grid_width, self.height - self.grid_width)),
+            ((self.width - self.grid_width, self.grid_width),
+             (self.width - self.grid_width, self.height - self.grid_width)),
         ]
         for line in rect_lines:
-            pygame.draw.line(self.screen, self.BLACK, line[0], line[1], 2)
+            pygame.draw.line(self.screen, self.black, line[0], line[1], 2)
 
         # draw grid
-        for i in range(self.n - 1):
+        for i in range(self.n):
             pygame.draw.line(
-                self.screen, self.BLACK,
-                (self.GRID_WIDTH * (2 + i), self.GRID_WIDTH),
-                (self.GRID_WIDTH * (2 + i), self.HEIGHT - self.GRID_WIDTH))
+                self.screen, self.black,
+                (self.grid_width * (2 + i), self.grid_width),
+                (self.grid_width * (2 + i), self.height - self.grid_width))
             pygame.draw.line(
-                self.screen, self.BLACK,
-                (self.GRID_WIDTH, self.GRID_WIDTH * (2 + i)),
-                (self.HEIGHT - self.GRID_WIDTH, self.GRID_WIDTH * (2 + i)))
+                self.screen, self.black,
+                (self.grid_width, self.grid_width * (2 + i)),
+                (self.height - self.grid_width, self.grid_width * (2 + i)))
 
-    def draw_chessman(self):
+    def __draw_chessman(self):
         # draw chessmen
         for i in range(self.n):
             for j in range(self.n):
                 if self.board[i][j] != 0:
-                    center = (int(self.GRID_WIDTH * (j + 1.5)),
-                              int(self.GRID_WIDTH * (i + 1.5)))
-                    color = self.WHITE if self.board[i][j] == 1 else self.BLACK
-                    pygame.draw.circle(self.screen, color, center,
-                                       int(self.GRID_WIDTH / 2.5))
-
-    def set_board(self, board):
-        # change the board
-        self.n = np.size(board, 0)
-        self.board = board
-        self.GRID_WIDTH = self.WIDTH / (self.n + 2)
-
-    def close_gui(self):
-        # close window
-        self.running = False
+                    # circle
+                    position = (int(self.grid_width * (j + 2)),
+                              int(self.grid_width * (i + 2)))
+                    color = self.white if self.board[i][j] == 1 else self.black
+                    pygame.draw.circle(self.screen, color, position,
+                                       int(self.grid_width / 2.3))
+                    # number text
+                    position = (position[0] - 10, position[1] - 10)
+                    color = self.white if self.board[i][j] == -1 else self.black
+                    text = self.font.render(str(self.number[i][j]), 3, color)
+                    self.screen.blit(text, position)
