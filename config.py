@@ -2,8 +2,13 @@ class dotdict(dict):
     def __getattr__(self, name):
         return self[name]
 
+    def __setattr__(self, name, value):
+        self[name] = value
+
 args = dotdict({
-    'n': 12,
+    'debug': True,
+
+    'n': 10,
     'nir': 5,
 
     'num_iters': 100000,
@@ -26,4 +31,9 @@ args = dotdict({
     'batch_size': 512,
     'num_channels': 128,
     'kl_targ': 0.04,
+
+    'human_color': 1
 })
+
+
+args.action_size = args.n ** 2

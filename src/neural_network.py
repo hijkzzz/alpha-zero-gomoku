@@ -64,12 +64,18 @@ class AlphaLoss(torch.nn.Module):
     The loss is then averaged over the entire batch
     """
 
-    def __init__(self):
+    def __init__(self, args):
         super(AlphaLoss, self).__init__()
+        self.args = args
 
-    def forward(self, log_ps, vs, target_pis, target_vs):
+    def forward(self, log_ps, vs, target_ps, target_vs):
         value_loss = torch.mean(torch.pow(vs - target_vs, 2))
-        policy_loss = -torch.mean(torch.sum(target_pis * log_ps, 1))
+        policy_loss = -torch.mean(torch.sum(target_ps * log_ps, 1))
+
+        # DEBUG
+        if self.args.debug == True:
+            print(value_loss, policy_loss)
+
         return value_loss + policy_loss
 
 
@@ -77,51 +83,29 @@ class NeuralNetWorkWrapper():
     """train and predict
     """
 
-    def __init__(self, neural_network, args):
+    def __init__(self, args):
         """args: lr, l2, batch_size, dropout
         """
 
-        self.neural_network = neural_network
-        self.cuda = torch.cuda.is_available()
+        self.neural_network = NeuralNetWork(args)
         self.args = args
+        self.cuda = torch.cuda.is_available()
 
         if self.cuda:
             self.neural_network.cuda()
             print("CUDA ON")
 
         self.optim = Adam(self.neural_network.parameters(), lr=args.lr, weight_decay=args.l2)
+        self.alpha_loss = AlphaLoss(self.args)
 
-    def get_states(self, board_batch, last_action_batch, cur_player_batch):
-        """generate state batch
-        """
-
-        board_batch = torch.Tensor(board_batch).unsqueeze(1)
-        state_batch0 = (board_batch > 0).float()
-        state_batch1 = (board_batch < 0).float() 
-
-        state_batch2 = torch.zeros((len(last_action_batch), 1, self.args.n, self.args.n)).float()
-        state_batch3 = torch.ones((len(cur_player_batch), 1, self.args.n, self.args.n)).float()
-        for i in range(len(board_batch)):
-            state_batch3[i][0] *= cur_player_batch[i]
-
-            last_action = last_action_batch[i]
-            if last_action == -1:
-                continue
-            x, y = last_action // self.args.n, last_action % self.args.n
-            state_batch2[i][0][x][y] = 1
-
-        return torch.cat((state_batch0, state_batch1, state_batch2, state_batch3), dim=1)
-
-    def train(self, examples):
+    def train(self, example_batch):
         """train neural network
         """
 
-        alpha_loss = AlphaLoss()
+        # extract train data
+        board_batch, p_batch, v_batch, last_action_batch, cur_player_batch = list(zip(*[example for example in example_batch]))
 
-        # prepare train data
-        board_batch, p_batch, v_batch, last_action_batch, cur_player_batch = list(zip(*[example for example in examples]))
-
-        state_batch = self.get_states(board_batch, last_action_batch, cur_player_batch)
+        state_batch = self.__data_convert(board_batch, last_action_batch, cur_player_batch)
         p_batch = torch.Tensor(p_batch)
         v_batch = torch.Tensor(v_batch).unsqueeze(1)
 
@@ -130,36 +114,37 @@ class NeuralNetWorkWrapper():
             p_batch = p_batch.cuda()
             v_batch = v_batch.cuda()
 
-        old_pi, old_v = self.infer2(state_batch)
+        # for calculating KL divergence
+        old_p, old_v = self.__infer(state_batch)
 
         for epoch in range(self.args.epochs):
             self.neural_network.train()
 
             # zero the parameter gradients
-            self.optim.zero_grad()
             self.set_learning_rate(self.args.lr)
+            self.optim.zero_grad()
 
             # forward + backward + optimize
             log_ps, vs = self.neural_network(state_batch)
-            loss = alpha_loss(log_ps, vs, p_batch, v_batch)
+            loss = self.alpha_loss(log_ps, vs, p_batch, v_batch)
             loss.backward()
 
             self.optim.step()
 
-            # calculate KL
-            new_pi, new_v = self.infer2(state_batch)
+            # calculate KL divergence
+            new_pi, new_v = self.__infer(state_batch)
 
-            kl = np.mean(np.sum(old_pi * (
-                np.log(old_pi + 1e-10) - np.log(new_pi + 1e-10)),
+            kl = np.mean(np.sum(old_p * (
+                np.log(old_v + 1e-10) - np.log(new_pi + 1e-10)),
                 axis=1)
             )
 
             # early stopping if D_KL diverges badly
-            if kl > self.args.kl_targ * 4:  
+            if kl > self.args.kl_targ * 4:
                 break
 
         print("LOSS :: {}, LR :: {}, KL :: {}".format(loss.item(), self.args.lr, kl))
-        
+
         # adaptively adjust the learning rate
         if kl > self.args.kl_targ * 2 and self.args.lr > 0.001:
             self.args.lr /= 1.5
@@ -168,26 +153,55 @@ class NeuralNetWorkWrapper():
 
 
     def infer(self, board_batch, last_action_batch, cur_player_batch):
-        """predict pi and v
+        """predict p and v by raw input
         """
 
-        self.neural_network.eval()
-
-        states = self.get_states(board_batch, last_action_batch, cur_player_batch)
-
+        states = self.__data_convert(board_batch, last_action_batch, cur_player_batch)
         if self.cuda:
             states = states.cuda()
 
-        log_ps, vs  = self.neural_network(states)
-        return np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy()
-
-    def infer2(self, states):
-        """predict pi and v
-        """
         self.neural_network.eval()
-
         log_ps, vs  = self.neural_network(states)
+
+        # DEBUG
+        if self.args.debug == True:
+            print(np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy())
+
         return np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy()
+
+    def __infer(self, state_batch):
+        """predict p and v by state
+        """
+
+        self.neural_network.eval()
+        log_ps, vs  = self.neural_network(state_batch)
+
+        return np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy()
+
+    def __data_convert(self, board_batch, last_action_batch, cur_player_batch):
+        """convert data format
+        """
+
+        board_batch = torch.Tensor(board_batch).unsqueeze(1)
+
+        player1_batch0 = (board_batch > 0).float()
+        plater_1_batch0 = (board_batch < 0).float()
+        last_action_batch0 = torch.zeros((len(last_action_batch), 1, self.args.n, self.args.n)).float()
+        cur_player_batch0 = torch.ones((len(cur_player_batch), 1, self.args.n, self.args.n)).float()
+
+        for i in range(len(cur_player_batch0)):
+            cur_player_batch[i][0] *= cur_player_batch[i]
+
+            last_action = last_action_batch[i]
+            if not last_action is None:
+                x, y = last_action
+                last_action_batch0[i][0][x][y] = 1
+
+        # DEBUG
+        if self.args.debug == True:
+            print(torch.cat((player1_batch0, plater_1_batch0, last_action_batch0, cur_player_batch0), dim=1))
+
+        return torch.cat((player1_batch0, plater_1_batch0, last_action_batch0, cur_player_batch0), dim=1)
 
     def set_learning_rate(self, lr):
         """set learning rate
