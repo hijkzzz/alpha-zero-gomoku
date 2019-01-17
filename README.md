@@ -3,12 +3,12 @@ Gomoku AI based on AlphaZero
 
 ## Args
 ```
-main.py
+config.py
 
-    'n': 10,                                 board size 
+    'n': 12,                                 board size
     'nir': 5,                                n in row
 
-    'num_iters': 10000,                      train iterations
+    'num_iters': 100000,                      train iterations
     'num_eps': 1,                            self play times in per iter
     'explore_num' : 2,                       explore step in a game
     'temp' : 1,                              temperature
@@ -19,6 +19,7 @@ main.py
     'examples_buffer_max_len': 10000,        max length of examples buffer
 
     'num_mcts_sims': 400,                    mcts simulation times
+    'num_mcts_threads': 4                    mcts threads number
     'cpuct': 5,                              PUCT coeff
 
     'lr': 0.002,                             learning rate
@@ -31,7 +32,18 @@ main.py
 
 ## Run
 ```
-python main.py
+# Compile C++ files
+mkdir build
+cd build
+cmake --build ..
+
+cd ../src
+
+# Start learning
+python main.py learn
+
+# Start testing
+python main.py human
 ```
 
 ## GUI
@@ -39,5 +51,9 @@ python main.py
 
 
 ## References
-* Mastering the Game of Go without Human Knowledge 
-* suragnair/alpha-zero-general
+* Mastering the Game of Go without Human Knowledge
+* Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm
+* Parallel Monte-Carlo Tree Search
+* A Lock-free Multithreaded Monte-Carlo TreeSearch Algorithm
+* On the Scalability of Parallel UCT
+* github.com/suragnair/alpha-zero-general
