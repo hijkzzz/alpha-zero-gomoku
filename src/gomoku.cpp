@@ -10,14 +10,14 @@ Gomoku::Gomoku(unsigned int n, unsigned int n_in_row, int first_color)
   }
 };
 
-std::vector<Gomoku::move_type> Gomoku::get_legal_moves() {
+std::vector<int> Gomoku::get_legal_moves() {
   auto n = this->n;
-  std::vector<std::tuple<unsigned int, unsigned int>> legal_moves;
+  std::vector<int> legal_moves(this->get_action_size());
 
   for (unsigned int i = 0; i < n; i++) {
     for (unsigned int j = 0; j < n; j++) {
       if (this->board[i][j] == 0) {
-        legal_moves.emplace_back(std::make_tuple(i, j));
+        legal_moves[i * this->n + j] = 1;
       }
     }
   }

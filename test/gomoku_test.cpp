@@ -47,8 +47,7 @@ int main() {
   // test get_legal_moves
   auto legal_moves = gomoku.get_legal_moves();
   for (unsigned int i = 0; i < legal_moves.size(); i++) {
-    std::cout << std::get<0>(legal_moves[i]) << ", " << std::get<1>(legal_moves[i])
-              << std::endl;
+    std::cout << legal_moves[i] << ", ";
   }
   std::cout << legal_moves.size() << std::endl;
 
