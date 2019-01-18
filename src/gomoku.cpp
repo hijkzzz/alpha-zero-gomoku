@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-Gomoku::Gomoku(unsigned int n, unsigned int n_in_row)
-    : n(n), n_in_row(n_in_row), cur_color(0), last_move(std::make_tuple(-1, -1)) {
+Gomoku::Gomoku(unsigned int n, unsigned int n_in_row, int first_color)
+    : n(n), n_in_row(n_in_row), cur_color(first_color), last_move(std::make_tuple(-1, -1)) {
   for (unsigned int i = 0; i < n; i++) {
     this->board.emplace_back(std::vector<int>(n, 0));
   }
@@ -38,7 +38,7 @@ bool Gomoku::has_legal_moves() {
   return false;
 };
 
-void Gomoku::execute_move(int color, const move_type &move) {
+void Gomoku::execute_move(const move_type &move) {
   auto i = std::get<0>(move);
   auto j = std::get<1>(move);
 
@@ -46,9 +46,9 @@ void Gomoku::execute_move(int color, const move_type &move) {
     throw std::runtime_error("execute_move borad[i][j] != 0.");
   }
 
-  this->board[i][j] = color;
+  this->board[i][j] = this->cur_color;
   this->last_move = move;
-  this->cur_color = -color;
+  this->cur_color = -this->cur_color;
 };
 
 std::tuple<bool, int> Gomoku::get_game_status() {
