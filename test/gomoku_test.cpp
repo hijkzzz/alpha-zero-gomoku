@@ -2,17 +2,6 @@
 #include <vector>
 #include <gomoku.h>
 
-void display(std::vector<std::vector<int>> board) {
-  auto n = board.size();
-
-  for (unsigned int i = 0; i < n; i++) {
-    for (unsigned int j = 0; j < n; j++) {
-      std::cout << board[i][j] << " ,";
-    }
-    std::cout << std::endl;
-  }
-}
-
 int main() {
   Gomoku gomoku(10, 5);
 
@@ -41,7 +30,16 @@ int main() {
   gomoku.execute_move(-1, std::make_tuple(3, 1));
   // gomoku.execute_move(-1, std::make_tuple(4, 0));
 
-  display(gomoku.get_board());
+  // test display
+  gomoku.display();
+
+  // test get_xxx
+  std::cout << gomoku.get_action_size() << std::endl;
+  std::cout << gomoku.get_current_color() << std::endl;
+
+  auto last_move = gomoku.get_last_move();
+  std::cout << std::get<0>(last_move) << ", " << std::get<1>(last_move)
+            << std::endl;
 
   // test has_legal_moves
   std::cout << gomoku.has_legal_moves() << std::endl;

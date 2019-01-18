@@ -34,6 +34,3 @@ args = dotdict({
 
     'human_color': 1
 })
-
-
-args.action_size = args.n ** 2
