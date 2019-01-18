@@ -10,6 +10,15 @@ import config
 
 if __name__ == "__main__":
     config.args.debug = True
+    config.args.action_size = config.args.n ** 2
+
     policy_value_net = neural_network.NeuralNetWorkWrapper(config.args)
 
-    # Neural network is not convenient for unit testing
+    # test data convert
+
+    # test loss
+
+    # test train
+
+    # test infer
+

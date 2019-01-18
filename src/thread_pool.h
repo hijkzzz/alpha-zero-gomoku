@@ -13,7 +13,7 @@
 
 class ThreadPool {
 public:
-  using Task = std::function<void()>;
+  using task_type = std::function<void()>;
 
   inline ThreadPool(unsigned short thread_num = 4) {
     this->idl_thread_num = thread_num;
@@ -68,11 +68,11 @@ public:
       throw std::runtime_error("commit on ThreadPool is stopped.");
 
     // declare return type
-    using RetType = decltype(f(args...));
+    using return_type = decltype(f(args...));
 
     // make a shared ptr for packaged_task
     // packaged_task package the bind function and future
-    auto task_ptr = std::make_shared<std::packaged_task<RetType()>>(
+    auto task_ptr = std::make_shared<std::packaged_task<return_type()>>(
         std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 
     {
@@ -90,7 +90,7 @@ public:
 
 private:
   std::vector<std::thread> pool; // thead pool
-  std::queue<Task> tasks;        // tasks queue
+  std::queue<task_type> tasks;   // tasks queue
   std::mutex lock;               // lock for tasks queue
   std::condition_variable cv;    // condition variable for tasks queue
 

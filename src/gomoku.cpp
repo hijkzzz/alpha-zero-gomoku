@@ -1,17 +1,16 @@
-#include <assert.h>
 #include <math.h>
 #include <gomoku.h>
 
-Gomoku::Gomoku(unsigned int n, unsigned int n_in_row) {
-  this->n = n;
-  this->n_in_row = n_in_row;
+#include <iostream>
 
+Gomoku::Gomoku(unsigned int n, unsigned int n_in_row)
+    : n(n), n_in_row(n_in_row), cur_color(0), last_move(std::make_tuple(-1, -1)) {
   for (unsigned int i = 0; i < n; i++) {
     this->board.emplace_back(std::vector<int>(n, 0));
   }
 };
 
-std::vector<std::tuple<unsigned int, unsigned int>> Gomoku::get_legal_moves() {
+std::vector<Gomoku::move_type> Gomoku::get_legal_moves() {
   auto n = this->n;
   std::vector<std::tuple<unsigned int, unsigned int>> legal_moves;
 
@@ -39,20 +38,17 @@ bool Gomoku::has_legal_moves() {
   return false;
 };
 
-void Gomoku::execute_move(int color,
-                          const std::tuple<unsigned int, unsigned int> &move) {
+void Gomoku::execute_move(int color, const move_type &move) {
   auto i = std::get<0>(move);
   auto j = std::get<1>(move);
 
-  if(!this->board[i][j] == 0) {
+  if (!this->board[i][j] == 0) {
     throw std::runtime_error("execute_move borad[i][j] != 0.");
   }
 
   this->board[i][j] = color;
-};
-
-const std::vector<std::vector<int>> &Gomoku::get_board() {
-  return this->board;
+  this->last_move = move;
+  this->cur_color = -color;
 };
 
 std::tuple<bool, int> Gomoku::get_game_status() {
@@ -114,3 +110,15 @@ std::tuple<bool, int> Gomoku::get_game_status() {
     return std::make_tuple(true, 0);
   }
 };
+
+
+void Gomoku::display() {
+  auto n = this->board.size();
+
+  for (unsigned int i = 0; i < n; i++) {
+    for (unsigned int j = 0; j < n; j++) {
+      std::cout << this->board[i][j] << ", ";
+    }
+    std::cout << std::endl;
+  }
+}
