@@ -18,9 +18,9 @@ public:
   std::tuple<bool, int> get_game_status();
 
 private:
-  std::vector<std::vector<int>> board;
-  unsigned int n;
-  unsigned int n_in_row;
+  std::vector<std::vector<int>> board; // game borad
+  unsigned int n; // board size
+  unsigned int n_in_row; // 5 in row or else
 };
 
 #endif // __GOMOKU__

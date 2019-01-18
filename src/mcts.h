@@ -22,8 +22,8 @@ class TreeNode {
     double get_value();
 
   private:
-    TreeNode* parent;
-    std::unordered_map<std::string, TreeNode*> children;
+    TreeNode* parent; // store tree
+    std::unordered_map<std::string, TreeNode*> children; // store tree
 
     unsigned int N;
     std::unordered_map<std::string, double> P;
