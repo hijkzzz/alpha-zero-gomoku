@@ -67,7 +67,7 @@ MCTS::MCTS(PyObject *policy_value_fn, unsigned int c_puct,
            unsigned int num_mcts_sims, std::shared_ptr<ThreadPool> thread_pool)
     : policy_value_fn(policy_value_fn), c_puct(c_puct),
       num_mcts_sims(num_mcts_sims), thread_pool(thread_pool),
-      root(std::make_shared<TreeNode>(nullptr, 0)) {}
+      root(std::make_shared<TreeNode>(nullptr, 1.)) {}
 
 std::vector<double> MCTS::get_action_probs(std::shared_ptr<Gomoku> gomoku,
                                            double temp) {
@@ -75,6 +75,7 @@ std::vector<double> MCTS::get_action_probs(std::shared_ptr<Gomoku> gomoku,
   std::vector<std::future<void>> futures;
 
   for (unsigned int i = 0; i < this->num_mcts_sims; i++) {
+    // copy gomoku
     auto game = std::make_shared<Gomoku>(*gomoku);
     auto future = this->thread_pool->commit(
         std::bind(&MCTS::simulate, this, std::placeholders::_1), game);
@@ -127,6 +128,53 @@ std::vector<double> MCTS::get_action_probs(std::shared_ptr<Gomoku> gomoku,
 
 void MCTS::simulate(std::shared_ptr<Gomoku> game) {
   // execute one simulation
+  auto node = this->root;
 
+  while (true) {
+    if (node->is_leaf()) {
+      break;
+    }
+
+    // select
+    auto action = node->select(this->c_puct);
+    auto n = game->get_n();
+    game->execute_move(std::make_tuple(action / n, action % n));
+  }
+
+  // predict action_probs and value by neural network
+  std::vector<double> action_priors;
+  double value;
+
+  {
+    // TODO: call python
+  }
+
+  // get game status
+  auto status = game->get_game_status();
+
+  // not end
+  if (!std::get<0>(status)) {
+    // expand
+    node->expand(action_priors);
+  } else {
+    // end
+    auto winner = std::get<1>(status);
+    value = (winner == 0 ? 0 : (winner == game->get_current_color() ? 1 : -1));
+  }
+
+  // backup, -value because game->get_current_color() is next player
+  node->backup(-value);
   return;
+}
+
+void MCTS::reset(unsigned int last_action) {
+  // reset the tree
+
+  auto &children = this->root->children;
+  // reuse the child tree
+  if (children.find(last_action) != children.end()) {
+    this->root = children[last_action];
+  } else {
+    this->root = std::make_shared<TreeNode>(nullptr, 1.);
+  }
 }

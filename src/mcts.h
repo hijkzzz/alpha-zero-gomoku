@@ -47,6 +47,7 @@ public:
   std::vector<double> get_action_probs(std::shared_ptr<Gomoku> gomoku,
                                        double temp = 1e-3);
   void simulate(std::shared_ptr<Gomoku> game);
+  void reset(unsigned int last_move);
 
 private:
   std::shared_ptr<TreeNode> root;
