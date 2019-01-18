@@ -9,6 +9,7 @@ import config
 
 
 if __name__ == "__main__":
+    config.args.debug = True
     policy_value_net = neural_network.NeuralNetWorkWrapper(config.args)
 
     # Neural network is not convenient for unit testing

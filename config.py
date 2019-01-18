@@ -6,7 +6,7 @@ class dotdict(dict):
         self[name] = value
 
 args = dotdict({
-    'debug': True,
+    'debug': False,
 
     'n': 10,
     'nir': 5,
@@ -22,8 +22,8 @@ args = dotdict({
     'examples_buffer_max_len': 10000,
 
     'num_mcts_sims': 400,
-    'num_mcts_threads': 4,
     'cpuct': 5,
+    'thread_pool_size': 4,
 
     'lr': 0.002,
     'l2': 0.0002,
