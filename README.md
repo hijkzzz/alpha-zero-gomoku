@@ -1,14 +1,15 @@
 # AlphaZero Gomoku
-Gomoku AI based on AlphaZero
+Gomoku AI based on AlphaZero(parallel MCTS)
 
 ## Args
 ```
 config.py
+    'debug': False,                          print debug information
 
     'n': 12,                                 board size
     'nir': 5,                                n in row
 
-    'num_iters': 100000,                      train iterations
+    'num_iters': 100000,                     train iterations
     'num_eps': 1,                            self play times in per iter
     'explore_num' : 2,                       explore step in a game
     'temp' : 1,                              temperature
@@ -19,8 +20,8 @@ config.py
     'examples_buffer_max_len': 10000,        max length of examples buffer
 
     'num_mcts_sims': 400,                    mcts simulation times
-    'num_mcts_threads': 4                    mcts threads number
     'cpuct': 5,                              PUCT coeff
+    'thread_pool_size': 4                    mcts threads number
 
     'lr': 0.002,                             learning rate
     'l2': 0.0001,                            L2
@@ -28,6 +29,15 @@ config.py
     'batch_size': 512,                       batch size
     'num_channels': 128,                     convolution neural network channel size
     'kl_targ': 0.04,                         threshold of KL divergence
+```
+
+## Dependencies
+```
+CMake 3.0+
+GCC/MSVC/LLVM(C++11)
+
+pytorch 0.4+
+pygame
 ```
 
 ## Run

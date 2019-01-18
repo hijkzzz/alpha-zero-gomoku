@@ -7,41 +7,48 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include <atomic>
+#include <memory>
 
 #include <gomoku.h>
+#include <thread_pool.h>
 
-class TreeNode {
+class TreeNode : std::enable_shared_from_this<TreeNode> {
   public:
-    TreeNode(TreeNode* parent, std::unordered_map<std::string, double> P);
+    TreeNode(std::shared_ptr<TreeNode> parent, double p_sa);
 
-    TreeNode* select();
-    void expand();
-    void backup();
+    unsigned int select(double c_puct);
+    void expand(const std::vector<double>& action_priors);
+    void backup(double leaf_value);
 
     bool is_leaf();
-    double get_value();
+    double get_value(double c_puct);
 
   private:
-    TreeNode* parent; // store tree
-    std::unordered_map<std::string, TreeNode*> children; // store tree
+    // store tree
+    std::shared_ptr<TreeNode> parent;
+    std::unordered_map<unsigned int, std::shared_ptr<TreeNode>> children;
 
-    unsigned int N;
-    std::unordered_map<std::string, double> P;
-    std::unordered_map<std::string, double> Q;
+    // non lock
+    unsigned int n_visited;
+    double p_sa;
+    double q_sa;
+
+    std::atomic<double> virtual_loss;
 };
 
 class MCTS {
   public:
-    MCTS(Gomoku* gomoku, PyObject* policy_value_fn, unsigned int cpuct, unsigned int num_mcts_sims, unsigned int num_mcts_threads);
-    std::vector<double> get_action_probs(double temp=1e-3);
-    void search();
+    MCTS(PyObject* policy_value_fn, unsigned int c_puct, unsigned int num_mcts_sims, std::shared_ptr<ThreadPool> thread_pool);
+    std::vector<double> get_action_probs(std::shared_ptr<Gomoku> gomoku, double temp=1e-3);
+    void search(std::vector<std::vector<int>>& board);
 
   private:
-    TreeNode* root;
-    Gomoku* gomoku;
+    std::shared_ptr<TreeNode> root;
+    std::shared_ptr<ThreadPool> thread_pool;
     PyObject* policy_value_fn;
 
-    unsigned int cpuct;
+    unsigned int c_puct;
     unsigned int num_mcts_sims;
     unsigned int num_mcts_threads;
 };
