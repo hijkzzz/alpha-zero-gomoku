@@ -44,7 +44,9 @@ void Gomoku::execute_move(int color,
   auto i = std::get<0>(move);
   auto j = std::get<1>(move);
 
-  assert(this->board[i][j] == 0);
+  if(!this->board[i][j] == 0) {
+    throw std::runtime_error("execute_move borad[i][j] != 0.");
+  }
 
   this->board[i][j] = color;
 };
