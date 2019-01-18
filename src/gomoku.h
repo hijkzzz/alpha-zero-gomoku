@@ -13,7 +13,7 @@ public:
   Gomoku(unsigned int n, unsigned int n_in_row, int first_color);
 
   bool has_legal_moves();
-  std::vector<move_type> get_legal_moves();
+  std::vector<int> get_legal_moves();
   void execute_move(const move_type &move);
   std::tuple<bool, int> get_game_status();
   void display();

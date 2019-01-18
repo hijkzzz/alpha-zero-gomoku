@@ -2,7 +2,8 @@
 #include <math.h>
 #include <float.h>
 
-#include <algorithm>
+#include <numeric>
+#include <iostream>
 
 // TreeNode
 TreeNode::TreeNode(std::shared_ptr<TreeNode> parent, double p_sa)
@@ -147,6 +148,35 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
 
   {
     // TODO: call python
+  }
+
+  // mask invalid actions
+  auto legal_moves = game->get_legal_moves();
+  double sum = 0;
+  for (unsigned int i = 0; i < action_priors.size(); i++) {
+    if (legal_moves[i] == 1) {
+      sum += action_priors[i];
+    } else {
+      action_priors[i] = 0;
+    }
+  }
+
+  if (sum > DBL_EPSILON) {
+    std::for_each(action_priors.begin(), action_priors.end(),
+                  [sum](auto &x) { x /= sum; });
+  } else {
+    // all masked
+
+    // NB! All valid moves may be masked if either your NNet architecture is
+    // insufficient or you've get overfitting or something else. If you have got
+    // dozens or hundreds of these messages you should pay attention to your
+    // NNet and/or training process.
+    std::cout << "All valid moves were masked, do workaround." << std::endl;
+
+    sum = std::accumulate(legal_moves.begin(), legal_moves.end());
+    for (unsigned int i = 0; i < action_priors.size(); i++) {
+      action_priors[i] = legal_moves[i] / sum;
+    }
   }
 
   // get game status
