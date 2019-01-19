@@ -9,17 +9,22 @@
 TreeNode::TreeNode(std::shared_ptr<TreeNode> parent, double p_sa)
     : parent(parent), p_sa(p_sa) {}
 
-unsigned int TreeNode::select(double c_puct) {
+unsigned int TreeNode::select(double c_puct, double c_virual_loss) {
   double best_value = -DBL_MAX;
   unsigned int best_move = 0;
+  std::shared_ptr<TreeNode> best_node;
 
   for (auto it = this->children.begin(); it != this->children.end(); it++) {
-    double cur_value = it->second->get_value(c_puct);
+    double cur_value = it->second->get_value(c_puct, c_virual_loss);
     if (cur_value > best_value) {
       best_value = cur_value;
       best_move = it->first;
+      best_node = it->second;
     }
   }
+
+  // add vitural loss
+  this->virtual_loss--;
 
   return best_move;
 }
@@ -38,37 +43,40 @@ void TreeNode::expand(const std::vector<double> &action_priors) {
   }
 }
 
-void TreeNode::backup(double leaf_value) {
-  if (this->parent.get() != nullptr) {
-    this->parent->backup(-leaf_value);
-  }
-
-  this->q_sa =
-      (this->n_visited * this->q_sa + leaf_value) / (this->n_visited + 1);
+void TreeNode::backup(double value) {
+  this->q_sa = (this->n_visited * this->q_sa + value) / (this->n_visited + 1);
   this->n_visited += 1;
+
+  // remove virtual loss
+  this->virtual_loss++;
+
+  if (this->parent.get() != nullptr) {
+    this->parent->backup(-value);
+  }
 }
 
 bool TreeNode::is_leaf() { return this->children.size() == 0; }
 
-double TreeNode::get_value(double c_puct) {
-  n_visited = this->n_visited;
+double TreeNode::get_value(double c_puct, double c_virual_loss) {
+  auto n_visited = this->n_visited;
   double u =
       (c_puct * this->p_sa * sqrt(this->parent->n_visited) / (1 + n_visited));
 
   // free-lock tree search: if n_visited is 0, then ignore q_sa
   if (n_visited == 0) {
-    return u + this->virtual_loss;
+    return u + this->virtual_loss.load() * c_virual_loss;
   }
 
-  return this->q_sa + u + this->virtual_loss;
+  return this->q_sa + u + this->virtual_loss.load() * c_virual_loss;
 }
 
 // MCTS
-MCTS::MCTS(PyObject *policy_value_fn, unsigned int c_puct,
-           unsigned int num_mcts_sims, std::shared_ptr<ThreadPool> thread_pool)
-    : policy_value_fn(policy_value_fn), c_puct(c_puct),
-      num_mcts_sims(num_mcts_sims), thread_pool(thread_pool),
-      root(std::make_shared<TreeNode>(nullptr, 1.)) {}
+MCTS::MCTS(PyObject *neural_network, unsigned int c_puct,
+       unsigned int num_mcts_sims, double c_virtual_loss,
+       std::shared_ptr<ThreadPool> thread_pool)
+    : neural_network(neural_network), c_puct(c_puct),
+      num_mcts_sims(num_mcts_sims), c_virtual_loss(c_virtual_loss),
+      thread_pool(thread_pool), root(std::make_shared<TreeNode>(nullptr, 1.)) {}
 
 std::vector<double> MCTS::get_action_probs(std::shared_ptr<Gomoku> gomoku,
                                            double temp) {
@@ -143,12 +151,9 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
   }
 
   // predict action_probs and value by neural network
-  std::vector<double> action_priors;
-  double value;
-
-  {
-    // TODO: call python
-  }
+  auto res = this->infer(game);
+  std::vector<double> action_priors = std::move(std::get<0>(res));
+  double value = std::get<1>(res);
 
   // mask invalid actions
   auto legal_moves = game->get_legal_moves();
@@ -173,7 +178,7 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
     // NNet and/or training process.
     std::cout << "All valid moves were masked, do workaround." << std::endl;
 
-    sum = std::accumulate(legal_moves.begin(), legal_moves.end());
+    sum = std::accumulate(legal_moves.begin(), legal_moves.end(), 0);
     for (unsigned int i = 0; i < action_priors.size(); i++) {
       action_priors[i] = legal_moves[i] / sum;
     }
@@ -195,6 +200,22 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
   // backup, -value because game->get_current_color() is next player
   node->backup(-value);
   return;
+}
+
+std::tuple<std::vector<double>, double>
+MCTS::infer(std::shared_ptr<Gomoku> game) {
+  // infer action probs and value by neural network
+
+  // lock and infer
+  {
+    std::lock_guard<std::mutex> lock(this->lock);
+
+    PyObject *res = PyEval_CallObject(this->policy_value_fn, nullptr);
+  }
+
+  // convert to cpp
+
+  return {};
 }
 
 void MCTS::reset(unsigned int last_action) {
