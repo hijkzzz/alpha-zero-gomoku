@@ -24,8 +24,8 @@ public:
   void expand(const std::vector<double> &action_priors);
   void backup(double leaf_value);
 
-  bool is_leaf();
-  double get_value(double c_puct, double c_virual_loss);
+  bool is_leaf() const;
+  double get_value(double c_puct, double c_virual_loss) const;
 
 private:
   // store tree
@@ -46,7 +46,7 @@ public:
   MCTS(PyObject *neural_network, unsigned int c_puct,
        unsigned int num_mcts_sims, double c_virtual_loss,
        std::shared_ptr<ThreadPool> thread_pool);
-  std::vector<double> get_action_probs(std::shared_ptr<Gomoku> gomoku,
+  std::vector<double> get_action_probs(std::shared_ptr<const Gomoku> gomoku,
                                        double temp = 1e-3);
   void simulate(std::shared_ptr<Gomoku> game);
   void reset(unsigned int last_move);

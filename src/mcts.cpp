@@ -55,9 +55,9 @@ void TreeNode::backup(double value) {
   }
 }
 
-bool TreeNode::is_leaf() { return this->children.size() == 0; }
+bool TreeNode::is_leaf() const { return this->children.size() == 0; }
 
-double TreeNode::get_value(double c_puct, double c_virual_loss) {
+double TreeNode::get_value(double c_puct, double c_virual_loss) const {
   auto n_visited = this->n_visited;
   double u =
       (c_puct * this->p_sa * sqrt(this->parent->n_visited) / (1 + n_visited));
@@ -78,7 +78,7 @@ MCTS::MCTS(PyObject *neural_network, unsigned int c_puct,
       num_mcts_sims(num_mcts_sims), c_virtual_loss(c_virtual_loss),
       thread_pool(thread_pool), root(std::make_shared<TreeNode>(nullptr, 1.)) {}
 
-std::vector<double> MCTS::get_action_probs(std::shared_ptr<Gomoku> gomoku,
+std::vector<double> MCTS::get_action_probs(std::shared_ptr<const Gomoku> gomoku,
                                            double temp) {
   // submit simulate tasks to thread_pool
   std::vector<std::future<void>> futures;
@@ -145,7 +145,7 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
     }
 
     // select
-    auto action = node->select(this->c_puct);
+    auto action = node->select(this->c_puct, this->c_virtual_loss);
     auto n = game->get_n();
     game->execute_move(std::make_tuple(action / n, action % n));
   }
@@ -206,6 +206,7 @@ std::tuple<std::vector<double>, double>
 MCTS::infer(std::shared_ptr<Gomoku> game) {
   // infer action probs and value by neural network
 
+  // TODO:
   // lock and infer
   {
     std::lock_guard<std::mutex> lock(this->lock);
@@ -213,7 +214,6 @@ MCTS::infer(std::shared_ptr<Gomoku> game) {
     PyObject *res = PyEval_CallObject(this->policy_value_fn, nullptr);
   }
 
-  // convert to cpp
 
   return {};
 }

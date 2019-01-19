@@ -18,11 +18,11 @@ public:
   std::tuple<bool, int> get_game_status();
   void display();
 
-  inline unsigned int get_action_size() { return this->n * this->n; }
-  inline const board_type &get_board() { return this->board; }
-  inline move_type get_last_move() { return this->last_move; }
-  inline int get_current_color() { return this->cur_color; }
-  inline unsigned int get_n() { return this->n; }
+  inline unsigned int get_action_size() const { return this->n * this->n; }
+  inline const board_type &get_board() const { return this->board; }
+  inline move_type get_last_move() const { return this->last_move; }
+  inline int get_current_color() const { return this->cur_color; }
+  inline unsigned int get_n() const { return this->n; }
 
 private:
   board_type board;      // game borad
