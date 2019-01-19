@@ -3,32 +3,22 @@
 #include <gomoku.h>
 
 int main() {
-  Gomoku gomoku(10, 5);
+  Gomoku gomoku(10, 5, 1);
 
   // test execute_move
-  // gomoku.execute_move(1, std::make_tuple(0, 0));
-  // gomoku.execute_move(1, std::make_tuple(1, 1));
-  // gomoku.execute_move(1, std::make_tuple(2, 2));
-  // gomoku.execute_move(1, std::make_tuple(3, 3));
-  // gomoku.execute_move(1, std::make_tuple(4, 4));
+  gomoku.execute_move(std::make_tuple(0, 4));
+  gomoku.execute_move(std::make_tuple(6, 1));
 
-  // gomoku.execute_move(1, std::make_tuple(8, 0));
-  // gomoku.execute_move(1, std::make_tuple(8, 1));
-  // gomoku.execute_move(1, std::make_tuple(8, 2));
-  // gomoku.execute_move(1, std::make_tuple(8, 3));
-  // gomoku.execute_move(1, std::make_tuple(8, 4));
+  gomoku.execute_move(std::make_tuple(1, 3));
+  gomoku.execute_move(std::make_tuple(6, 2));
 
-  // gomoku.execute_move(1, std::make_tuple(0, 9));
-  // gomoku.execute_move(1, std::make_tuple(1, 9));
-  // gomoku.execute_move(1, std::make_tuple(2, 9));
-  // gomoku.execute_move(1, std::make_tuple(3, 9));
-  // gomoku.execute_move(1, std::make_tuple(4, 9));
+  gomoku.execute_move(std::make_tuple(2, 2));
+  gomoku.execute_move(std::make_tuple(6, 3));
 
-  gomoku.execute_move(-1, std::make_tuple(0, 4));
-  gomoku.execute_move(-1, std::make_tuple(1, 3));
-  gomoku.execute_move(-1, std::make_tuple(2, 2));
-  gomoku.execute_move(-1, std::make_tuple(3, 1));
-  // gomoku.execute_move(-1, std::make_tuple(4, 0));
+  gomoku.execute_move(std::make_tuple(3, 1));
+  gomoku.execute_move(std::make_tuple(6, 4));
+
+  gomoku.execute_move(std::make_tuple(4, 0));
 
   // test display
   gomoku.display();

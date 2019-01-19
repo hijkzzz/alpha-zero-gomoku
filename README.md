@@ -42,6 +42,7 @@ CMake 3.0+
 GCC/MSVC/LLVM(C++11)
 
 pytorch 0.4+
+pygame
 ```
 
 ## Run
