@@ -9,9 +9,6 @@ import config
 
 
 if __name__ == "__main__":
-    config.args.debug = True
-    config.args.action_size = config.args.n ** 2
-
     policy_value_net = neural_network.NeuralNetWorkWrapper(config.args)
 
     # test data convert

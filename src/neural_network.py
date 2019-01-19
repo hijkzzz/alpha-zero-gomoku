@@ -72,10 +72,6 @@ class AlphaLoss(torch.nn.Module):
         value_loss = torch.mean(torch.pow(vs - target_vs, 2))
         policy_loss = -torch.mean(torch.sum(target_ps * log_ps, 1))
 
-        # DEBUG
-        if self.args.debug == True:
-            print(value_loss, policy_loss)
-
         return value_loss + policy_loss
 
 
@@ -87,9 +83,9 @@ class NeuralNetWorkWrapper():
         """args: lr, l2, batch_size, dropout
         """
 
-        self.neural_network = NeuralNetWork(args)
         self.args = args
         self.cuda = torch.cuda.is_available()
+        self.neural_network = NeuralNetWork(args)
 
         if self.cuda:
             self.neural_network.cuda()
@@ -154,6 +150,7 @@ class NeuralNetWorkWrapper():
 
     def infer(self, board_batch, last_action_batch, cur_player_batch):
         """predict p and v by raw input
+           return list
         """
 
         states = self.__data_convert(board_batch, last_action_batch, cur_player_batch)
@@ -163,14 +160,13 @@ class NeuralNetWorkWrapper():
         self.neural_network.eval()
         log_ps, vs  = self.neural_network(states)
 
-        # DEBUG
-        if self.args.debug == True:
-            print(np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy())
+        res = (np.exp(log_ps.cpu().detach().numpy()).tolist(), vs.cpu().detach().numpy().tolist())
 
-        return np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy()
+        return res
 
     def __infer(self, state_batch):
         """predict p and v by state
+           return numpy object
         """
 
         self.neural_network.eval()
@@ -180,6 +176,7 @@ class NeuralNetWorkWrapper():
 
     def __data_convert(self, board_batch, last_action_batch, cur_player_batch):
         """convert data format
+           return tensor
         """
 
         board_batch = torch.Tensor(board_batch).unsqueeze(1)
