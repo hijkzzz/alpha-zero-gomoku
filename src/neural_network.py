@@ -150,7 +150,7 @@ class NeuralNetWorkWrapper():
 
     def infer(self, board_batch, last_action_batch, cur_player_batch):
         """predict p and v by raw input
-           return list
+           return numpy object
         """
 
         states = self.__data_convert(board_batch, last_action_batch, cur_player_batch)
@@ -160,9 +160,7 @@ class NeuralNetWorkWrapper():
         self.neural_network.eval()
         log_ps, vs  = self.neural_network(states)
 
-        res = (np.exp(log_ps.cpu().detach().numpy()).tolist(), vs.cpu().detach().numpy().tolist())
-
-        return res
+        return np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy()
 
     def __infer(self, state_batch):
         """predict p and v by state
@@ -193,10 +191,6 @@ class NeuralNetWorkWrapper():
             if not last_action is None:
                 x, y = last_action
                 last_action_batch0[i][0][x][y] = 1
-
-        # DEBUG
-        if self.args.debug == True:
-            print(torch.cat((player1_batch0, plater_1_batch0, last_action_batch0, cur_player_batch0), dim=1))
 
         return torch.cat((player1_batch0, plater_1_batch0, last_action_batch0, cur_player_batch0), dim=1)
 
