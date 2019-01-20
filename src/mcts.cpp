@@ -206,14 +206,11 @@ std::tuple<std::vector<double>, double>
 MCTS::infer(std::shared_ptr<Gomoku> game) {
   // infer action probs and value by neural network
 
-  // TODO:
-  // lock and infer
+  // TODO:lock and infer
   {
     std::lock_guard<std::mutex> lock(this->lock);
 
-    PyObject *res = PyEval_CallObject(this->policy_value_fn, nullptr);
   }
-
 
   return {};
 }

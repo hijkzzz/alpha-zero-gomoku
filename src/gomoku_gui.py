@@ -22,24 +22,32 @@ class GomokuGUI():
         self.reset_window()
 
         # human player
-        self.is_human = is_human
-        self.last_action = None
         self.human_color = human_color
+        self.is_human = is_human
+        self.human_action = None
 
         # is running
         self.is_running = True
 
     def reset_window(self):
+        # clean status
         self.board = np.zeros((self.n, self.n), dtype=int)
         self.number = np.zeros((self.n, self.n), dtype=int)
         self.k = 1 # step number
+
+        self.human_action = None
 
     def close_window(self):
         # close window
         self.is_running = False
 
-    def in_turn_of_human(self):
-        self.is_human = True
+    def set_is_human(self, value):
+        # set is human
+        self.is_human = value
+
+    def get_human_action(self):
+        # get human action
+        return self.human_action
 
     def execute_move(self, color, move):
         x, y = move
@@ -82,9 +90,9 @@ class GomokuGUI():
 
                     if position[0] in range(0, self.n) and position[1] in range(0, self.n) \
                             and self.board[position[0]][position[1]] == 0:
+                        self.set_is_human(False)
                         self.execute_move(self.human_color, position)
-                        self.last_action = position
-                        self.is_human = False
+                        self.human_action = position
 
             # draw
             self._draw_background()
@@ -133,7 +141,7 @@ class GomokuGUI():
                     color = self.white if self.board[i][j] == 1 else self.black
                     pygame.draw.circle(self.screen, color, position,
                                        int(self.grid_width / 2.3))
-                    # number text
+                    # text
                     position = (position[0] - 10, position[1] - 10)
                     color = self.white if self.board[i][j] == -1 else self.black
                     text = self.font.render(str(self.number[i][j]), 3, color)

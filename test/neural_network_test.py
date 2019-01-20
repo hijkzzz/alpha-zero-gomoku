@@ -1,27 +1,22 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import sys
+sys.path.append('../src')
+import neural_network
 import torch
 
-sys.path.append('..')
-sys.path.append('../src')
 
-import neural_network
 
 if __name__ == "__main__":
-    args = {
-        'n': 5,
-        'nir': 3,
+    lr = 0.002
+    l2 = 0.0002
+    epochs = 5
+    batch_size = 512
+    kl_targ = 0.04
+    num_channels = 128
+    n = 5
 
-        'lr': 0.002,
-        'l2': 0.0002,
-        'epochs': 5,
-        'batch_size': 512,
-        'num_channels': 128,
-        'kl_targ': 0.04
-    }
-
-    policy_value_net = neural_network.NeuralNetWorkWrapper(args)
+    policy_value_net = neural_network.NeuralNetWorkWrapper(lr, l2, batch_size, kl_targ, epochs, num_channels, n)
 
     # test data convert
     board_batch = [[[1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1]],
@@ -44,8 +39,9 @@ if __name__ == "__main__":
     print('loss \n', loss.cpu())
 
     # test train
-    example_batch = list(zip(board_batch, last_action_batch, cur_player_batch, p_batch.cpu().numpy().tolist(), v_batch.cpu().numpy().tolist()))
-    print(example_batch)
+    example_batch = list(zip(board_batch, last_action_batch, cur_player_batch,
+                             p_batch.cpu().numpy().tolist(), v_batch.cpu().numpy().tolist()))
+    print('train\n', example_batch)
 
     policy_value_net.train(example_batch)
 
