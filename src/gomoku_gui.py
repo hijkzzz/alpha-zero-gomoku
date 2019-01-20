@@ -87,13 +87,13 @@ class GomokuGUI():
                         self.is_human = False
 
             # draw
-            self.__draw_background()
-            self.__draw_chessman()
+            self._draw_background()
+            self._draw_chessman()
 
             # refresh
             pygame.display.flip()
 
-    def __draw_background(self):
+    def _draw_background(self):
         # load background
         self.screen.blit(self.background_img, (0, 0))
 
@@ -122,7 +122,7 @@ class GomokuGUI():
                 (self.grid_width, self.grid_width * (2 + i)),
                 (self.height - self.grid_width, self.grid_width * (2 + i)))
 
-    def __draw_chessman(self):
+    def _draw_chessman(self):
         # draw chessmen
         for i in range(self.n):
             for j in range(self.n):
