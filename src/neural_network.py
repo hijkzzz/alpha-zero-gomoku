@@ -15,11 +15,8 @@ class NeuralNetWork(nn.Module):
     """Policy and Value Network
     """
 
-    def __init__(self, args):
+    def __init__(self, num_channels, n):
         super(NeuralNetWork, self).__init__()
-
-        num_channels = args['num_channels']
-        n = args['n']
 
         # n
         self.conv1 = nn.Sequential(
@@ -68,9 +65,8 @@ class AlphaLoss(torch.nn.Module):
     The loss is then averaged over the entire batch
     """
 
-    def __init__(self, args):
+    def __init__(self):
         super(AlphaLoss, self).__init__()
-        self.args = args
 
     def forward(self, log_ps, vs, target_ps, target_vs):
         value_loss = torch.mean(torch.pow(vs - target_vs, 2))
@@ -83,20 +79,26 @@ class NeuralNetWorkWrapper():
     """train and predict
     """
 
-    def __init__(self, args):
-        """args: lr, l2, batch_size, dropout
+    def __init__(self, lr, l2, batch_size, kl_targ, epochs, num_channels, n):
+        """ init
         """
+        self.lr = lr
+        self.l2 = l2
+        self.batch_size = batch_size
+        self.kl_targ = kl_targ
+        self.epochs = epochs
+        self.num_channels = num_channels
+        self.n = n
 
-        self.args = args
         self.cuda = torch.cuda.is_available()
-        self.neural_network = NeuralNetWork(args)
+        self.neural_network = NeuralNetWork(num_channels, n)
 
         if self.cuda:
             self.neural_network.cuda()
             print("CUDA ON")
 
-        self.optim = Adam(self.neural_network.parameters(), lr=args['lr'], weight_decay=args['l2'])
-        self.alpha_loss = AlphaLoss(self.args)
+        self.optim = Adam(self.neural_network.parameters(), lr=self.lr, weight_decay=self.l2)
+        self.alpha_loss = AlphaLoss()
 
     def train(self, example_batch):
         """train neural network
@@ -117,11 +119,11 @@ class NeuralNetWorkWrapper():
         # for calculating KL divergence
         old_p, old_v = self._infer(state_batch)
 
-        for epoch in range(self.args['epochs']):
+        for epoch in range(self.epochs):
             self.neural_network.train()
 
             # zero the parameter gradients
-            self.set_learning_rate(self.args['lr'])
+            self.set_learning_rate(self.lr)
             self.optim.zero_grad()
 
             # forward + backward + optimize
@@ -140,16 +142,18 @@ class NeuralNetWorkWrapper():
             )
 
             # early stopping if D_KL diverges badly
-            if kl > self.args['kl_targ'] * 4:
+            if kl > self.kl_targ * 4:
                 break
 
-        print("LOSS :: {}, LR :: {}, KL :: {}".format(loss.item(), self.args['lr'], kl))
+        print("LOSS :: {}, LR :: {}, KL :: {}".format(loss.item(), self.lr, kl))
 
         # adaptively adjust the learning rate
-        if kl > self.args['kl_targ'] * 2 and self.args['lr'] > 0.001:
-            self.args['lr'] /= 1.5
-        elif kl < self.args['kl_targ'] / 2 and self.args['lr'] < 0.1:
-            self.args['lr'] *= 1.5
+        if kl > self.kl_targ * 2 and self.lr > 0.001:
+            self.lr /= 1.5
+        elif kl < self.kl_targ / 2 and self.lr < 0.2:
+            self.lr *= 1.5
+
+        self.set_learning_rate(self.lr)
 
 
     def infer(self, feature_batch):
@@ -180,7 +184,7 @@ class NeuralNetWorkWrapper():
         """convert data format
            return tensor
         """
-        n = self.args['n']
+        n = self.n
 
         board_batch = torch.Tensor(board_batch).unsqueeze(1)
 

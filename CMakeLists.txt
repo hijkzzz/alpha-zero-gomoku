@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(alpha_zero)
+project(lib)
 set(CMAKE_BUILD_TYPE DEBUG)
 
 # python
@@ -22,18 +22,9 @@ add_test(gomoku_test gomoku_test)
 
 # thread pool
 add_executable(thread_pool_test ${PROJECT_SOURCE_DIR}/test/thread_pool_test.cpp)
-target_link_libraries(thread_pool_test lib)
 add_test(thread_pool_test thread_pool_test)
 
 # mcts
 add_executable(mcts_test ${PROJECT_SOURCE_DIR}/test/mcts_test.cpp)
 target_link_libraries(mcts_test lib)
 add_test(mcts_test mcts_test)
-
-# trainer
-
-# tester
-
-# main
-add_executable(main ${PROJECT_SOURCE_DIR}/main.cpp)
-target_link_libraries(main lib)
