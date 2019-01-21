@@ -39,8 +39,8 @@ bool Gomoku::has_legal_moves() {
 };
 
 void Gomoku::execute_move(const move_type &move) {
-  auto i = std::get<0>(move);
-  auto j = std::get<1>(move);
+  auto i = move / this->get_n();
+  auto j = move % this->get_n();
 
   if (!this->board[i][j] == 0) {
     throw std::runtime_error("execute_move borad[i][j] != 0.");

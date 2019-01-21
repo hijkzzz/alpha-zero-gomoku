@@ -42,21 +42,21 @@ private:
 
 class MCTS {
 public:
+  using function_type = std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> (*)(std::shared_ptr<Gomoku> gomoku);
 
-  MCTS(PyObject *neural_network, unsigned int c_puct,
+  MCTS(function_type neural_network_infer, unsigned int c_puct,
        unsigned int num_mcts_sims, double c_virtual_loss,
        std::shared_ptr<ThreadPool> thread_pool);
   std::vector<double> get_action_probs(std::shared_ptr<const Gomoku> gomoku,
                                        double temp = 1e-3);
   void simulate(std::shared_ptr<Gomoku> game);
   void reset(unsigned int last_move);
-  std::tuple<std::vector<double>, double> infer(std::shared_ptr<Gomoku> game);
+  std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> infer(std::shared_ptr<Gomoku> game);
 
 private:
   std::shared_ptr<TreeNode> root;
   std::shared_ptr<ThreadPool> thread_pool; // compatible with C
-  PyObject *neural_network;
-  std::mutex lock;
+  function_type neural_network_infer;
 
   unsigned int c_puct;
   unsigned int num_mcts_sims;

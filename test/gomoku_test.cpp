@@ -6,19 +6,19 @@ int main() {
   Gomoku gomoku(10, 5, 1);
 
   // test execute_move
-  gomoku.execute_move(std::make_tuple(0, 4));
-  gomoku.execute_move(std::make_tuple(6, 1));
+  gomoku.execute_move(10 * 0 + 4);
+  gomoku.execute_move(10 * 6 + 1);
 
-  gomoku.execute_move(std::make_tuple(1, 3));
-  gomoku.execute_move(std::make_tuple(6, 2));
+  gomoku.execute_move(10 * 1 + 3);
+  gomoku.execute_move(10 * 6 + 2);
 
-  gomoku.execute_move(std::make_tuple(2, 2));
-  gomoku.execute_move(std::make_tuple(6, 3));
+  gomoku.execute_move(10 * 2 + 2);
+  gomoku.execute_move(10 * 6 + 3);
 
-  gomoku.execute_move(std::make_tuple(3, 1));
-  gomoku.execute_move(std::make_tuple(6, 4));
+  gomoku.execute_move(10 * 3 + 1);
+  gomoku.execute_move(10 * 6 + 4);
 
-  gomoku.execute_move(std::make_tuple(4, 0));
+  gomoku.execute_move(10 * 4 + 0);
 
   // test display
   gomoku.display();
@@ -27,9 +27,7 @@ int main() {
   std::cout << gomoku.get_action_size() << std::endl;
   std::cout << gomoku.get_current_color() << std::endl;
 
-  auto last_move = gomoku.get_last_move();
-  std::cout << std::get<0>(last_move) << ", " << std::get<1>(last_move)
-            << std::endl;
+  std::cout << gomoku.get_last_move() << std::endl;
 
   // test has_legal_moves
   std::cout << gomoku.has_legal_moves() << std::endl;
