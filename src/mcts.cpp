@@ -71,10 +71,10 @@ double TreeNode::get_value(double c_puct, double c_virual_loss) const {
 }
 
 // MCTS
-MCTS::MCTS(PyObject *neural_network, unsigned int c_puct,
+MCTS::MCTS(function_type neural_network_infer, unsigned int c_puct,
        unsigned int num_mcts_sims, double c_virtual_loss,
        std::shared_ptr<ThreadPool> thread_pool)
-    : neural_network(neural_network), c_puct(c_puct),
+    : neural_network_infer(neural_network_infer), c_puct(c_puct),
       num_mcts_sims(num_mcts_sims), c_virtual_loss(c_virtual_loss),
       thread_pool(thread_pool), root(std::make_shared<TreeNode>(nullptr, 1.)) {}
 
@@ -147,13 +147,13 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
     // select
     auto action = node->select(this->c_puct, this->c_virtual_loss);
     auto n = game->get_n();
-    game->execute_move(std::make_tuple(action / n, action % n));
+    game->execute_move(action);
   }
 
   // predict action_probs and value by neural network
   auto res = this->infer(game);
-  std::vector<double> action_priors = std::move(std::get<0>(res));
-  double value = std::get<1>(res);
+  std::vector<double> action_priors = std::move(std::get<0>(res))[0];
+  double value = std::get<1>(res)[0][0];
 
   // mask invalid actions
   auto legal_moves = game->get_legal_moves();
@@ -202,17 +202,19 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
   return;
 }
 
-std::tuple<std::vector<double>, double>
+std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>>
 MCTS::infer(std::shared_ptr<Gomoku> game) {
   // infer action probs and value by neural network
 
-  // TODO:lock and infer
-  {
-    std::lock_guard<std::mutex> lock(this->lock);
+  // get GIL
+  PyGILState_STATE state = PyGILState_Ensure();
 
-  }
+  // infer
+  auto res = this->neural_network_infer(game);
 
-  return {};
+  // free GIL
+  PyGILState_Release(state);
+  return res;
 }
 
 void MCTS::reset(unsigned int last_action) {

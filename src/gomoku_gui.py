@@ -21,13 +21,13 @@ class GomokuGUI():
 
         self.reset_window()
 
+        # is running
+        self.is_running = True
+
         # human player
         self.human_color = human_color
         self.is_human = is_human
         self.human_action = None
-
-        # is running
-        self.is_running = True
 
     def reset_window(self):
         # clean status
@@ -41,20 +41,20 @@ class GomokuGUI():
         # close window
         self.is_running = False
 
-    def set_is_human(self, value):
-        # set is human
-        self.is_human = value
-
-    def get_human_action(self):
-        # get human action
-        return self.human_action
-
     def execute_move(self, color, move):
         x, y = move
         assert self.board[x][y] == 0
         self.board[x][y] = color
         self.number[x][y] = self.k
         self.k += 1
+
+    def set_is_human(self, value = True):
+        # set is human
+        self.is_human = value
+
+    def get_human_action(self):
+        # get human action
+        return self.human_action
 
     def loop(self):
         # init

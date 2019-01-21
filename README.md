@@ -1,5 +1,5 @@
 # AlphaZero Gomoku
-Gomoku AI based on AlphaZero(parallel MCTS)
+A multi-threaded implementation of AlphaZero
 
 ## Args
 ```
@@ -38,8 +38,9 @@ Gomoku AI based on AlphaZero(parallel MCTS)
 
 ## Dependencies
 ```
+SWIG 3.0+
 CMake 3.0+
-GCC/MSVC/LLVM(C++11)
+GCC/MSVC(support C++11)
 
 pytorch 0.4+
 pygame
@@ -47,19 +48,21 @@ pygame
 
 ## Run
 ```
-# Compile C++ files
+# Generate Python wrapper
+swig xxx
+
+# Compile C/C++ source
 mkdir build
 cd build
 cmake --build ..
 
+# Run
 cd ../src
-
-TODO:
 
 ```
 
 ## GUI
-![](https =//github.com/hijkzzz/alpha-zero-gomoku/blob/master/gui.png)
+![](https =//github.com/hijkzzz/alpha-zero-gomoku/blob/master/assets/gomoku_gui.png)
 
 
 ## References

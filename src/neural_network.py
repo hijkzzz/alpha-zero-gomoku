@@ -158,7 +158,7 @@ class NeuralNetWorkWrapper():
 
     def infer(self, feature_batch):
         """predict p and v by raw input
-           return list
+           return numpy
         """
         board_batch, last_action_batch, cur_player_batch = list(zip(*feature_batch))
         states = self._data_convert(board_batch, last_action_batch, cur_player_batch)
@@ -168,7 +168,7 @@ class NeuralNetWorkWrapper():
         self.neural_network.eval()
         log_ps, vs  = self.neural_network(states)
 
-        return np.exp(log_ps.cpu().detach().numpy()).tolist(), vs.cpu().detach().numpy().tolist()
+        return np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy()
 
     def _infer(self, state_batch):
         """predict p and v by state

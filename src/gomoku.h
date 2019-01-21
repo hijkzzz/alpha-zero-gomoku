@@ -7,7 +7,7 @@
 
 class Gomoku {
 public:
-  using move_type = std::tuple<unsigned int, unsigned int>;
+  using move_type = unsigned int;
   using board_type = std::vector<std::vector<int>>;
 
   Gomoku(unsigned int n, unsigned int n_in_row, int first_color);
