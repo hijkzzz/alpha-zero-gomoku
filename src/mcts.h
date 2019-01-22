@@ -17,20 +17,24 @@ public:
   // friend class can access private variables
   friend class MCTS;
 
-  TreeNode(TreeNode* parent, double p_sa);
-  ~TreeNode();
+  TreeNode();
+  TreeNode(const TreeNode &node);
+  TreeNode(TreeNode *parent, double p_sa, unsigned action_size);
+
+  TreeNode &operator=(const TreeNode &p);
 
   unsigned int select(double c_puct, double c_virtual_loss);
   void expand(const std::vector<double> &action_priors);
   void backup(double leaf_value);
 
-  bool is_leaf() const;
   double get_value(double c_puct, double c_virtual_loss) const;
+  inline int get_is_leaf() const { return this->is_leaf.load(); }
 
 private:
   // store tree
-  TreeNode* parent;
-  std::unordered_map<unsigned int, TreeNode*> children;
+  TreeNode *parent;
+  std::vector<TreeNode *> children;
+  std::atomic<int> is_leaf;
 
   // non lock
   unsigned int n_visited;
@@ -42,24 +46,26 @@ private:
 
 class MCTS {
 public:
-  using function_type = std::vector<std::vector<std::vector<double>>> (*)(std::shared_ptr<Gomoku> gomoku);
+  using function_type = std::vector<std::vector<std::vector<double>>> (*)(
+      std::shared_ptr<Gomoku> gomoku);
 
-  MCTS(function_type neural_network_infer, unsigned int c_puct,
+  MCTS(std::shared_ptr<ThreadPool> thread_pool,
+       function_type neural_network_infer, unsigned int c_puct,
        unsigned int num_mcts_sims, double c_virtual_loss,
-       std::shared_ptr<ThreadPool> thread_pool);
+       unsigned int action_size);
   std::vector<double> get_action_probs(std::shared_ptr<const Gomoku> gomoku,
                                        double temp = 1e-3);
-  ~MCTS();
   void reset(unsigned int last_move);
 
 private:
   void simulate(std::shared_ptr<Gomoku> game);
 
   // variables
-  TreeNode* root;
+  TreeNode root;
   std::shared_ptr<ThreadPool> thread_pool;
   function_type neural_network_infer;
 
+  unsigned int action_size;
   unsigned int c_puct;
   unsigned int num_mcts_sims;
   double c_virtual_loss;

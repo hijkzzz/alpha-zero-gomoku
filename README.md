@@ -69,6 +69,6 @@ cd ../src
 * Mastering the Game of Go without Human Knowledge
 * Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm
 * Parallel Monte-Carlo Tree Search
-* A Lock-free Multithreaded Monte-Carlo TreeSearch Algorithm
+* A Lock-free Multithreaded Monte-Carlo Tree Search Algorithm
 * On the Scalability of Parallel UCT
 * github.com/suragnair/alpha-zero-general
