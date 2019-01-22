@@ -12,9 +12,11 @@ thread_local TreeNode thread_object_pool[thread_object_pool_size];
 thread_local unsigned int thread_object_pool_index = 0;
 
 // TreeNode
-TreeNode::TreeNode() : is_leaf(1) {}
+TreeNode::TreeNode()
+    : is_leaf(1), virtual_loss(0), q_sa(0), p_sa(0), n_visited(0) {}
 
-TreeNode::TreeNode(const TreeNode &node) { // because automic<>, define copy function
+TreeNode::TreeNode(
+    const TreeNode &node) { // because automic<>, define copy function
   // struct
   this->parent = node.parent;
   this->children = node.children;
@@ -28,7 +30,8 @@ TreeNode::TreeNode(const TreeNode &node) { // because automic<>, define copy fun
 }
 
 TreeNode::TreeNode(TreeNode *parent, double p_sa, unsigned int action_size)
-    : parent(parent), p_sa(p_sa), children(action_size, nullptr), is_leaf(1) {}
+    : parent(parent), p_sa(p_sa), children(action_size, nullptr), is_leaf(1),
+      virtual_loss(0), q_sa(0), n_visited(0) {}
 
 TreeNode &TreeNode::operator=(const TreeNode &node) {
   if (this == &node) {
@@ -85,11 +88,13 @@ void TreeNode::expand(const std::vector<double> &action_priors) {
     if (this->children[i] == nullptr) {
       // get object from object pool
       TreeNode *new_node = &thread_object_pool[thread_object_pool_index];
-      thread_object_pool_index = (thread_object_pool_index + 1) % thread_object_pool_size;
+      thread_object_pool_index =
+          (thread_object_pool_index + 1) % thread_object_pool_size;
 
       new_node->parent = this;
       new_node->p_sa = action_priors[i];
-      new_node->children = std::move(std::vector<TreeNode *>(action_size, nullptr));
+      new_node->children =
+          std::move(std::vector<TreeNode *>(action_size, nullptr));
 
       this->children[i] = new_node;
     }
