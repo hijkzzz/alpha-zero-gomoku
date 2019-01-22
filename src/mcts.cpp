@@ -3,30 +3,67 @@
 #include <float.h>
 
 #include <numeric>
+#include <thread>
 #include <iostream>
 
-// TreeNode
-TreeNode::TreeNode(TreeNode* parent, double p_sa)
-    : parent(parent), p_sa(p_sa) {}
+// thread local object pool
+#define thread_object_pool_size 10000
+thread_local TreeNode thread_object_pool[thread_object_pool_size];
+thread_local unsigned int thread_object_pool_index = 0;
 
-TreeNode::~TreeNode() {
-  // clean sub tree
-  for(auto &pair : this->children){
-    delete pair.second;
+// TreeNode
+TreeNode::TreeNode() : is_leaf(1) {}
+
+TreeNode::TreeNode(const TreeNode &node) { // because automic<>, define copy function
+  // struct
+  this->parent = node.parent;
+  this->children = node.children;
+  this->is_leaf.store(node.is_leaf.load());
+
+  this->n_visited = node.n_visited;
+  this->p_sa = node.p_sa;
+  this->q_sa = node.q_sa;
+
+  this->virtual_loss.store(node.virtual_loss.load());
+}
+
+TreeNode::TreeNode(TreeNode *parent, double p_sa, unsigned int action_size)
+    : parent(parent), p_sa(p_sa), children(action_size, nullptr), is_leaf(1) {}
+
+TreeNode &TreeNode::operator=(const TreeNode &node) {
+  if (this == &node) {
+    return *this;
   }
+
+  // struct
+  this->parent = node.parent;
+  this->children = node.children;
+  this->is_leaf.store(node.is_leaf.load());
+
+  this->n_visited = node.n_visited;
+  this->p_sa = node.p_sa;
+  this->q_sa = node.q_sa;
+  this->virtual_loss.store(node.virtual_loss.load());
+
+  return *this;
 }
 
 unsigned int TreeNode::select(double c_puct, double c_virtual_loss) {
   double best_value = -DBL_MAX;
   unsigned int best_move = 0;
-  TreeNode* best_node;
+  TreeNode *best_node;
 
-  for (auto it = this->children.begin(); it != this->children.end(); it++) {
-    double cur_value = it->second->get_value(c_puct, c_virtual_loss);
+  for (unsigned int i = 0; i < this->children.size(); i++) {
+    // empty node
+    if (children[i] == nullptr) {
+      continue;
+    }
+
+    double cur_value = children[i]->get_value(c_puct, c_virtual_loss);
     if (cur_value > best_value) {
       best_value = cur_value;
-      best_move = it->first;
-      best_node = it->second;
+      best_move = i;
+      best_node = children[i];
     }
   }
 
@@ -37,17 +74,29 @@ unsigned int TreeNode::select(double c_puct, double c_virtual_loss) {
 }
 
 void TreeNode::expand(const std::vector<double> &action_priors) {
-  // std::for_each(action_priors.begin(), action_priors.end(), [](double x) {
-  // std::cout << x << ", "; }); std::cout << std::endl;
+  auto action_size = this->children.size();
 
-  for (unsigned int i = 0; i < action_priors.size(); i++) {
+  for (unsigned int i = 0; i < action_size; i++) {
     // illegal action
-    if (abs(action_priors[i] - 0) < DBL_EPSILON) {
+    if (abs(action_priors[i] - 0) < FLT_EPSILON) {
       continue;
     }
 
-    this->children[i] = new TreeNode(this, action_priors[i]);
+    if (this->children[i] == nullptr) {
+      // get object from object pool
+      TreeNode *new_node = &thread_object_pool[thread_object_pool_index];
+      thread_object_pool_index = (thread_object_pool_index + 1) % thread_object_pool_size;
+
+      new_node->parent = this;
+      new_node->p_sa = action_priors[i];
+      new_node->children = std::move(std::vector<TreeNode *>(action_size, nullptr));
+
+      this->children[i] = new_node;
+    }
   }
+
+  // expand, not leaf
+  this->is_leaf.store(0);
 }
 
 void TreeNode::backup(double value) {
@@ -61,8 +110,6 @@ void TreeNode::backup(double value) {
     this->parent->backup(-value);
   }
 }
-
-bool TreeNode::is_leaf() const { return this->children.size() == 0; }
 
 double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
   auto n_visited = this->n_visited;
@@ -80,12 +127,28 @@ double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
 }
 
 // MCTS
-MCTS::MCTS(function_type neural_network_infer, unsigned int c_puct,
+MCTS::MCTS(std::shared_ptr<ThreadPool> thread_pool,
+           function_type neural_network_infer, unsigned int c_puct,
            unsigned int num_mcts_sims, double c_virtual_loss,
-           std::shared_ptr<ThreadPool> thread_pool)
+           unsigned int action_size)
     : neural_network_infer(neural_network_infer), c_puct(c_puct),
       num_mcts_sims(num_mcts_sims), c_virtual_loss(c_virtual_loss),
-      thread_pool(thread_pool), root(new TreeNode(nullptr, 1.)) {}
+      thread_pool(thread_pool), action_size(action_size),
+      root(nullptr, 1., action_size) {}
+
+void MCTS::reset(unsigned int last_action) {
+  // reset the tree
+  auto &children = this->root.children;
+
+  // reuse the child tree
+  if (children[last_action] != nullptr) {
+    this->root = *children[last_action];
+    this->root.parent = nullptr;
+
+  } else {
+    this->root = TreeNode(nullptr, 1., this->action_size);
+  }
+}
 
 std::vector<double> MCTS::get_action_probs(std::shared_ptr<const Gomoku> gomoku,
                                            double temp) {
@@ -109,49 +172,47 @@ std::vector<double> MCTS::get_action_probs(std::shared_ptr<const Gomoku> gomoku,
 
   // calculate probs
   std::vector<double> action_probs(gomoku->get_action_size(), 0);
-  const auto &children = this->root->children;
+  const auto &children = this->root.children;
 
   // greedy
-  if (temp - 1e-3 < DBL_EPSILON) {
+  if (temp - 1e-3 < FLT_EPSILON) {
     unsigned int max_count = 0;
     unsigned int best_action = 0;
 
-    for (auto &pair : children) {
-      if (pair.second->n_visited > max_count) {
-        max_count = pair.second->n_visited;
-        best_action = pair.first;
+    for (unsigned int i = 0; i < children.size(); i++) {
+      if (children[i] && children[i]->n_visited > max_count) {
+        max_count = children[i]->n_visited;
+        best_action = i;
       }
     }
 
     action_probs[best_action] = 1.;
     return action_probs;
-  }
 
-  // explore
-  double sum = 0;
-  for (auto &pair : children) {
-    auto action = pair.first;
-    double count = pair.second->n_visited;
-
-    if (count > 0) {
-      action_probs[action] = pow(count, 1 / temp);
-      sum += action_probs[action];
+  } else {
+    // explore
+    double sum = 0;
+    for (unsigned int i = 0; i < children.size(); i++) {
+      if (children[i] && children[i]->n_visited > 0) {
+        action_probs[i] = pow(children[i]->n_visited, 1 / temp);
+        sum += action_probs[i];
+      }
     }
+
+    // renormalization
+    std::for_each(action_probs.begin(), action_probs.end(),
+                  [sum](double &x) { x /= sum; });
+
+    return action_probs;
   }
-
-  // renormalization
-  std::for_each(action_probs.begin(), action_probs.end(),
-                [sum](double &x) { x /= sum; });
-
-  return action_probs;
 }
 
 void MCTS::simulate(std::shared_ptr<Gomoku> game) {
   // execute one simulation
-  auto node = this->root;
+  auto node = &this->root;
 
   while (true) {
-    if (node->is_leaf()) {
+    if (node->get_is_leaf()) {
       break;
     }
 
@@ -183,7 +244,7 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
     }
 
     // renormalization
-    if (sum > DBL_EPSILON) {
+    if (sum > FLT_EPSILON) {
       std::for_each(action_priors.begin(), action_priors.end(),
                     [sum](double &x) { x /= sum; });
     } else {
@@ -213,28 +274,4 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
   // backup, -value because game->get_current_color() is next player
   node->backup(-value);
   return;
-}
-
-MCTS::~MCTS() {
-  delete this->root;
-}
-
-void MCTS::reset(unsigned int last_action) {
-  // reset the tree
-  auto &children = this->root->children;
-  TreeNode* new_root;
-
-  // reuse the child tree
-  if (children.find(last_action) != children.end()) {
-    new_root = children[last_action];
-    // unlink parent
-    children.erase(last_action);
-    new_root->parent = nullptr;
-  } else {
-    new_root = new TreeNode(nullptr, 1.);
-  }
-
-  // release old tree
-  delete this->root;
-  this->root = new_root;
 }
