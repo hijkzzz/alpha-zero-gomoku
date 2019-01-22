@@ -9,14 +9,14 @@ infer_test(std::shared_ptr<Gomoku> gomoku) {
 }
 
 int main() {
-  auto t = std::shared_ptr<ThreadPool>(new ThreadPool(4));
+  auto t = std::shared_ptr<ThreadPool>(new ThreadPool(1));
   auto g = std::shared_ptr<Gomoku>(new Gomoku(5, 3, 1));
   g->execute_move(0);
   g->execute_move(1);
   g->execute_move(2);
   g->display();
 
-  auto m = std::shared_ptr<MCTS>(new MCTS(t, infer_test, 5, 1, 0.1, 5 * 5));
+  auto m = std::shared_ptr<MCTS>(new MCTS(t, infer_test, 5, 100, 0.1, 5 * 5));
 
   std::cout << "RUNNING" << std::endl;
 
