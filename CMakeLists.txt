@@ -3,8 +3,8 @@ project(lib)
 set(CMAKE_BUILD_TYPE DEBUG)
 
 # python
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
+# find_package(PythonLibs REQUIRED)
+# include_directories(${PYTHON_INCLUDE_DIRS})
 
 # library
 include_directories(${PROJECT_SOURCE_DIR}/src)

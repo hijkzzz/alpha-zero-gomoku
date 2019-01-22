@@ -4,7 +4,7 @@
 #include <iostream>
 
 Gomoku::Gomoku(unsigned int n, unsigned int n_in_row, int first_color)
-    : n(n), n_in_row(n_in_row), cur_color(first_color), last_move(std::make_tuple(-1, -1)) {
+    : n(n), n_in_row(n_in_row), cur_color(first_color), last_move(-1) {
   for (unsigned int i = 0; i < n; i++) {
     this->board.emplace_back(std::vector<int>(n, 0));
   }
@@ -12,7 +12,7 @@ Gomoku::Gomoku(unsigned int n, unsigned int n_in_row, int first_color)
 
 std::vector<int> Gomoku::get_legal_moves() {
   auto n = this->n;
-  std::vector<int> legal_moves(this->get_action_size());
+  std::vector<int> legal_moves(this->get_action_size(), 0);
 
   for (unsigned int i = 0; i < n; i++) {
     for (unsigned int j = 0; j < n; j++) {
@@ -48,10 +48,11 @@ void Gomoku::execute_move(const move_type &move) {
 
   this->board[i][j] = this->cur_color;
   this->last_move = move;
+  // change player
   this->cur_color = -this->cur_color;
 };
 
-std::tuple<bool, int> Gomoku::get_game_status() {
+std::vector<int> Gomoku::get_game_status() {
   // return (is ended, winner)
   auto n = this->n;
   auto n_in_row = this->n_in_row;
@@ -68,7 +69,7 @@ std::tuple<bool, int> Gomoku::get_game_status() {
           sum += this->board[i][j + k];
         }
         if (abs(sum) == n_in_row) {
-          return std::make_tuple(true, this->board[i][j]);
+          return {1, this->board[i][j]};
         }
       }
 
@@ -78,7 +79,7 @@ std::tuple<bool, int> Gomoku::get_game_status() {
           sum += this->board[i + k][j];
         }
         if (abs(sum) == n_in_row) {
-          return std::make_tuple(true, this->board[i][j]);
+          return {1, this->board[i][j]};
         }
       }
 
@@ -88,7 +89,7 @@ std::tuple<bool, int> Gomoku::get_game_status() {
           sum += this->board[i + k][j + k];
         }
         if (abs(sum) == n_in_row) {
-          return std::make_tuple(true, this->board[i][j]);
+          return {1, this->board[i][j]};
         }
       }
 
@@ -98,19 +99,18 @@ std::tuple<bool, int> Gomoku::get_game_status() {
           sum += this->board[i + k][j - k];
         }
         if (abs(sum) == n_in_row) {
-          return std::make_tuple(true, this->board[i][j]);
+          return {1, this->board[i][j]};
         }
       }
     }
   }
 
   if (this->has_legal_moves()) {
-    return std::make_tuple(false, 0);
+    return {0, 0};
   } else {
-    return std::make_tuple(true, 0);
+    return {1, 0};
   }
 };
-
 
 void Gomoku::display() {
   auto n = this->board.size();
