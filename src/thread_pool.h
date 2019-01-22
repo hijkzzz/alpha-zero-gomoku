@@ -16,6 +16,7 @@ public:
   using task_type = std::function<void()>;
 
   inline ThreadPool(unsigned short thread_num = 4) {
+    this->run.store(true);
     this->idl_thread_num = thread_num;
 
     for (unsigned int i = 0; i < thread_num; ++i) {

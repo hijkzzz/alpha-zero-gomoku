@@ -15,7 +15,7 @@ public:
   bool has_legal_moves();
   std::vector<int> get_legal_moves();
   void execute_move(const move_type &move);
-  std::tuple<bool, int> get_game_status();
+  std::vector<int> get_game_status();
   void display();
 
   inline unsigned int get_action_size() const { return this->n * this->n; }
