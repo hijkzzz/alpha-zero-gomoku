@@ -7,7 +7,7 @@
 #include <iostream>
 
 // thread local object pool
-#define thread_object_pool_size 10000
+#define thread_object_pool_size 1000000
 thread_local TreeNode thread_object_pool[thread_object_pool_size];
 thread_local unsigned int thread_object_pool_index = 0;
 
@@ -105,30 +105,35 @@ void TreeNode::expand(const std::vector<double> &action_priors) {
 }
 
 void TreeNode::backup(double value) {
-  this->q_sa = (this->n_visited * this->q_sa + value) / (this->n_visited + 1);
-  this->n_visited += 1;
-
+  // If it is not root, this node's parent should be updated first
   if (this->parent != nullptr) {
+    this->parent->backup(-value);
+
     // remove virtual loss
     this->virtual_loss++;
-
-    this->parent->backup(-value);
   }
+
+  this->q_sa = (this->n_visited * this->q_sa + value) / (this->n_visited + 1);
+  this->n_visited += 1;
 }
 
 double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
   auto n_visited = this->n_visited;
-  double u =
-      (c_puct * this->p_sa * sqrt(this->parent->n_visited) / (1 + n_visited));
 
+  unsigned int sum_n_visited = 0;
+  std::for_each(
+      this->parent->children.begin(), this->parent->children.end(),
+      [&sum_n_visited](TreeNode *node) { sum_n_visited += node ? node->n_visited : 0; });
+
+  double u = (c_puct * this->p_sa * sqrt(sum_n_visited) / (1 + n_visited));
   auto virtual_loss = this->virtual_loss.load() * c_virtual_loss;
 
   // free-lock tree search: if n_visited is 0, then ignore q_sa
   if (n_visited == 0) {
     return u + virtual_loss;
+  } else {
+    return this->q_sa + u + virtual_loss;
   }
-
-  return this->q_sa + u + virtual_loss;
 }
 
 // MCTS
@@ -224,6 +229,7 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
     // select
     auto action = node->select(this->c_puct, this->c_virtual_loss);
     game->execute_move(action);
+    node = node->children[action];
   }
 
   // get game status
