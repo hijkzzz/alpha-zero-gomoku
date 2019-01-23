@@ -3,8 +3,6 @@
 
 class InstanceNeuralNetwork : public VirtualNeuralNetwork {
 public:
-  ~InstanceNeuralNetwork() {}
-
   std::vector<std::vector<std::vector<double>>> infer(Gomoku *gomoku) {
     return {{{0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
               0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
@@ -37,7 +35,7 @@ int main() {
     std::cout << std::endl;
 
     unsigned int best_move = 0;
-    double best_value = 0;
+    double best_value = -DBL_MAX;
 
     for (unsigned int i = 0; i < res.size(); i++) {
       if (res[i] > best_value) {
@@ -45,6 +43,7 @@ int main() {
         best_move = i;
       }
     }
+    std::cout << best_move << ", " <<  best_value << std::endl;
 
     g->execute_move(best_move);
     m->update_with_move(best_move);

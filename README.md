@@ -65,7 +65,7 @@ TODO:
 ```
 
 ## GUI
-![](https =//github.com/hijkzzz/alpha-zero-gomoku/blob/master/assets/gomoku_gui.png)
+![](https://github.com/hijkzzz/alpha-zero-gomoku/blob/master/assets/gomoku_gui.png)
 
 
 ## References

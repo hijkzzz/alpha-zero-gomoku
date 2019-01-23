@@ -7,8 +7,8 @@
 #include <iostream>
 
 // thread local object pool
-#define thread_object_pool_size 4000000
-thread_local TreeNode thread_object_pool[thread_object_pool_size];
+#define thread_object_pool_size 2000000
+thread_local std::vector<TreeNode> thread_object_pool(thread_object_pool_size);
 thread_local unsigned int thread_object_pool_index = 0;
 
 // TreeNode

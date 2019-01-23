@@ -25,6 +25,31 @@ std::vector<int> Gomoku::get_legal_moves() {
   return legal_moves;
 };
 
+Gomoku::Gomoku(const Gomoku &object) {
+  this->board = object.board;
+  this->n = object.n;
+  this->n_in_row = object.n_in_row;
+
+  this->cur_color = object.cur_color;
+  this->last_move = object.last_move;
+}
+
+Gomoku &Gomoku::operator=(const Gomoku &object) {
+
+  if (this == &object) {
+    return *this;
+  }
+
+  this->board = object.board;
+  this->n = object.n;
+  this->n_in_row = object.n_in_row;
+
+  this->cur_color = object.cur_color;
+  this->last_move = object.last_move;
+
+  return *this;
+}
+
 bool Gomoku::has_legal_moves() {
   auto n = this->n;
 

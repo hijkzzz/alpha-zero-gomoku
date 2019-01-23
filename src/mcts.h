@@ -47,8 +47,8 @@ private:
 // SWIG callback inferface
 class VirtualNeuralNetwork {
   public:
-    virtual std::vector<std::vector<std::vector<double>>> infer(Gomoku *gomoku);
-    virtual ~VirtualNeuralNetwork();
+    virtual std::vector<std::vector<std::vector<double>>> infer(Gomoku *gomoku) = 0;
+    virtual ~VirtualNeuralNetwork() {};
 };
 
 class MCTS {
@@ -66,7 +66,7 @@ private:
 
   // variables
   TreeNode root;
-  std::shared_ptr<ThreadPool> thread_pool;
+  ThreadPool* thread_pool;
   VirtualNeuralNetwork* neural_network;
   std::mutex lock;
 
