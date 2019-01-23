@@ -12,14 +12,14 @@ public:
 };
 
 int main() {
-  auto t = std::make_shared<ThreadPool>(4);
+  auto t = std::make_shared<ThreadPool>(1);
   auto g = std::make_shared<Gomoku>(5, 3, 1);
   auto n = std::make_shared<InstanceNeuralNetwork>();
   g->execute_move(12);
   g->execute_move(13);
   g->display();
 
-  auto m = std::make_shared<MCTS>(t.get(), n.get(), 5, 10000, 0.1,
+  auto m = std::make_shared<MCTS>(t.get(), n.get(), 5, 100, 0.1,
                                   g->get_action_size());
 
   std::cout << "RUNNING" << std::endl;

@@ -14,7 +14,7 @@ class InstanceNeuralNetwork(swig.VirtualNeuralNetwork):
     def infer(self, gomoku):
         return [[[0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
               0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-              0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04], [0.5]]]
+              0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04]], [[0.5]]]
 
 
 if __name__ == "__main__":
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     g.display()
 
     n = InstanceNeuralNetwork()
-    m = swig.MCTS(t, n, 5, 1, 0.1, g.get_action_size())
+    m = swig.MCTS(t, n, 5, 100, 0.1, g.get_action_size())
 
     print(g.get_game_status())
 
