@@ -2,6 +2,7 @@
 
 import sys
 sys.path.append('../src')
+import numpy as np
 
 import swig
 
@@ -27,9 +28,13 @@ if __name__ == "__main__":
     g.display()
 
     n = InstanceNeuralNetwork()
-    m = swig.MCTS(t, n, 5, 100, 0.1, g.get_action_size())
+    m = swig.MCTS(t, n, 5, 10000, 0.1, g.get_action_size())
 
-    print(g.get_game_status())
+    while g.get_game_status()[0] == 0:
+        res = m.get_action_probs(g, 1)
+        best_move =  int(np.argmax(np.array(list(res))))
 
-    res = m.get_action_probs(g, 1)
-    print(res)
+        print(best_move)
+        g.execute_move(best_move)
+        m.update_with_move(best_move)
+        g.display()
