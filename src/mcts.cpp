@@ -7,7 +7,7 @@
 #include <iostream>
 
 // thread local object pool
-#define thread_object_pool_size 1000000
+#define thread_object_pool_size 4000000
 thread_local TreeNode thread_object_pool[thread_object_pool_size];
 thread_local unsigned int thread_object_pool_index = 0;
 
@@ -121,9 +121,10 @@ double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
   auto n_visited = this->n_visited;
 
   unsigned int sum_n_visited = 0;
-  std::for_each(
-      this->parent->children.begin(), this->parent->children.end(),
-      [&sum_n_visited](TreeNode *node) { sum_n_visited += node ? node->n_visited : 0; });
+  std::for_each(this->parent->children.begin(), this->parent->children.end(),
+                [&sum_n_visited](TreeNode *node) {
+                  sum_n_visited += node ? node->n_visited : 0;
+                });
 
   double u = (c_puct * this->p_sa * sqrt(sum_n_visited) / (1 + n_visited));
   auto virtual_loss = this->virtual_loss.load() * c_virtual_loss;
@@ -137,16 +138,15 @@ double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
 }
 
 // MCTS
-MCTS::MCTS(std::shared_ptr<ThreadPool> thread_pool,
-           function_type neural_network_infer, unsigned int c_puct,
-           unsigned int num_mcts_sims, double c_virtual_loss,
-           unsigned int action_size)
-    : neural_network_infer(neural_network_infer), c_puct(c_puct),
+MCTS::MCTS(ThreadPool *thread_pool, VirtualNeuralNetwork* neural_network,
+           unsigned int c_puct, unsigned int num_mcts_sims,
+           double c_virtual_loss, unsigned int action_size)
+    : neural_network(neural_network), c_puct(c_puct),
       num_mcts_sims(num_mcts_sims), c_virtual_loss(c_virtual_loss),
       thread_pool(thread_pool), action_size(action_size),
       root(nullptr, 1., action_size) {}
 
-void MCTS::reset(unsigned int last_action) {
+void MCTS::update_with_move(unsigned int last_action) {
   // reset the tree
   auto &children = this->root.children;
 
@@ -160,8 +160,7 @@ void MCTS::reset(unsigned int last_action) {
   }
 }
 
-std::vector<double> MCTS::get_action_probs(std::shared_ptr<const Gomoku> gomoku,
-                                           double temp) {
+std::vector<double> MCTS::get_action_probs(const Gomoku *gomoku, double temp) {
   // submit simulate tasks to thread_pool
   std::vector<std::future<void>> futures;
 
@@ -239,9 +238,15 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
   // not end
   if (!status[0]) {
     // predict action_probs and value by neural network
-    auto res = std::move(this->neural_network_infer(game));
-    std::vector<double> action_priors = std::move(res[0][0]);
-    value = res[1][0][0];
+    std::vector<double> action_priors;
+
+    {
+      std::lock_guard<std::mutex> lock(this->lock);
+      auto res = std::move(this->neural_network->infer(game.get()));
+
+      action_priors = std::move(res[0][0]);
+      value = res[1][0][0];
+    }
 
     // mask invalid actions
     auto legal_moves = game->get_legal_moves();

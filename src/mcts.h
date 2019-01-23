@@ -44,18 +44,22 @@ private:
   std::atomic<int> virtual_loss;
 };
 
+// SWIG callback inferface
+class VirtualNeuralNetwork {
+  public:
+    virtual std::vector<std::vector<std::vector<double>>> infer(Gomoku *gomoku);
+    virtual ~VirtualNeuralNetwork();
+};
+
 class MCTS {
 public:
-  using function_type = std::vector<std::vector<std::vector<double>>> (*)(
-      std::shared_ptr<Gomoku> gomoku);
-
-  MCTS(std::shared_ptr<ThreadPool> thread_pool,
-       function_type neural_network_infer, unsigned int c_puct,
+  MCTS(ThreadPool* thread_pool,
+       VirtualNeuralNetwork* neural_network, unsigned int c_puct,
        unsigned int num_mcts_sims, double c_virtual_loss,
        unsigned int action_size);
-  std::vector<double> get_action_probs(std::shared_ptr<const Gomoku> gomoku,
+  std::vector<double> get_action_probs(const Gomoku* gomoku,
                                        double temp = 1e-3);
-  void reset(unsigned int last_move);
+  void update_with_move(unsigned int last_move);
 
 private:
   void simulate(std::shared_ptr<Gomoku> game);
@@ -63,7 +67,8 @@ private:
   // variables
   TreeNode root;
   std::shared_ptr<ThreadPool> thread_pool;
-  function_type neural_network_infer;
+  VirtualNeuralNetwork* neural_network;
+  std::mutex lock;
 
   unsigned int action_size;
   unsigned int c_puct;

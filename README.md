@@ -49,15 +49,18 @@ pygame
 ## Run
 ```
 # Generate Python wrapper
-swig xxx
+cd src
+swig -c++ -python .\swig.i
 
 # Compile C/C++ source
+cd ..
 mkdir build
 cd build
 cmake --build ..
 
 # Run
 cd ../src
+TODO:
 
 ```
 
