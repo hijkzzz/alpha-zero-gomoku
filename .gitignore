@@ -4,5 +4,6 @@ __pycache__
 .vs
 build
 checkpoint
-swig_*
+swig*
+!swig.i
 *.pyd
