@@ -18,7 +18,7 @@ public:
   std::vector<int> get_legal_moves();
   void execute_move(const move_type &move);
   std::vector<int> get_game_status();
-  void display();
+  void display() const;
 
   inline unsigned int get_action_size() const { return this->n * this->n; }
   inline const board_type &get_board() const { return this->board; }

@@ -50,7 +50,7 @@ pygame
 ```
 # Generate Python wrapper
 cd src
-swig -c++ -python .\swig.i
+swig -c++ -python -threads .\swig.i
 
 # Compile Python extension
 python setup.py build_ext --inplace
