@@ -26,6 +26,7 @@ std::vector<int> Gomoku::get_legal_moves() {
 };
 
 Gomoku::Gomoku(const Gomoku &object) {
+  this->board.resize(object.board.size());
   for (unsigned int i =0; i < this->board.size(); i++) {
     this->board[i] = object.board[i];
   }
@@ -43,6 +44,7 @@ Gomoku &Gomoku::operator=(const Gomoku &object) {
     return *this;
   }
 
+  this->board.resize(object.board.size());
   for (unsigned int i =0; i < this->board.size(); i++) {
     this->board[i] = object.board[i];
   }
