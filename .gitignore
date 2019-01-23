@@ -3,7 +3,10 @@ __pycache__
 .vscode
 .vs
 build
-checkpoint
+
 swig*
 !swig.i
 *.pyd
+*.pdb
+
+checkpoint

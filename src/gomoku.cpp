@@ -26,7 +26,10 @@ std::vector<int> Gomoku::get_legal_moves() {
 };
 
 Gomoku::Gomoku(const Gomoku &object) {
-  this->board = object.board;
+  for (unsigned int i =0; i < this->board.size(); i++) {
+    this->board[i] = object.board[i];
+  }
+
   this->n = object.n;
   this->n_in_row = object.n_in_row;
 
@@ -40,7 +43,10 @@ Gomoku &Gomoku::operator=(const Gomoku &object) {
     return *this;
   }
 
-  this->board = object.board;
+  for (unsigned int i =0; i < this->board.size(); i++) {
+    this->board[i] = object.board[i];
+  }
+
   this->n = object.n;
   this->n_in_row = object.n_in_row;
 
@@ -137,7 +143,7 @@ std::vector<int> Gomoku::get_game_status() {
   }
 };
 
-void Gomoku::display() {
+void Gomoku::display() const{
   auto n = this->board.size();
 
   for (unsigned int i = 0; i < n; i++) {

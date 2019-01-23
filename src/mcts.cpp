@@ -220,6 +220,9 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
   // execute one simulation
   auto node = &this->root;
 
+  // debug
+  std::cout << "select" << std::endl;
+
   while (true) {
     if (node->get_is_leaf()) {
       break;
@@ -231,18 +234,34 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
     node = node->children[action];
   }
 
+  // debug
+  std::cout << "get status" << std::endl;
+  std::cout << "status: " << game->get_game_status()[0] << std::endl;
+
   // get game status
   auto status = game->get_game_status();
   double value = 0;
 
+
   // not end
   if (!status[0]) {
+
     // predict action_probs and value by neural network
     std::vector<double> action_priors;
 
     {
+
+      // debug
+      std::cout << "lock" << std::endl;
+
       std::lock_guard<std::mutex> lock(this->lock);
       auto res = std::move(this->neural_network->infer(game.get()));
+
+      // debug
+      std::cout << "infer" << std::endl;
+      std::for_each(res[0][0].begin(), res[0][0].end(),
+                  [](double &x) { std::cout << x << ", "; });
+      std::cout << std::endl;
 
       action_priors = std::move(res[0][0]);
       value = res[1][0][0];
@@ -278,6 +297,9 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
       }
     }
 
+    // debug
+    std::cout << "expand" << std::endl;
+
     // expand
     node->expand(action_priors);
 
@@ -286,6 +308,9 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
     auto winner = status[1];
     value = (winner == 0 ? 0 : (winner == game->get_current_color() ? 1 : -1));
   }
+
+  // debug
+  std::cout << "backup" << std::endl;
 
   // backup, -value because game->get_current_color() is next player
   node->backup(-value);

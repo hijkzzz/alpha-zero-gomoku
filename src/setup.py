@@ -2,6 +2,8 @@
 setup.py file for SWIG example
 """
 
+import sys
+
 from distutils.core import setup, Extension
 
 
