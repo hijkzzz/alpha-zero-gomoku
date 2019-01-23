@@ -4,3 +4,4 @@ __pycache__
 .vs
 build
 checkpoint
+swig_*

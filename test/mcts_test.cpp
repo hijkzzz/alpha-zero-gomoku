@@ -1,33 +1,39 @@
 #include <iostream>
 #include <mcts.h>
 
-std::vector<std::vector<std::vector<double>>>
-infer_test(std::shared_ptr<Gomoku> gomoku) {
-  return {{{0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-            0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-            0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04}},
-          {{0.5}}};
-}
+class InstanceNeuralNetwork : public VirtualNeuralNetwork {
+public:
+  ~InstanceNeuralNetwork() {}
+
+  std::vector<std::vector<std::vector<double>>> infer(Gomoku *gomoku) {
+    return {{{0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+              0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+              0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04}},
+            {{0.5}}};
+  }
+};
 
 int main() {
-  auto t = std::shared_ptr<ThreadPool>(new ThreadPool(4));
-  auto g = std::shared_ptr<Gomoku>(new Gomoku(5, 3, 1));
+  auto t = std::make_shared<ThreadPool>(4);
+  auto g = std::make_shared<Gomoku>(5, 3, 1);
+  auto n = std::make_shared<InstanceNeuralNetwork>();
   g->execute_move(12);
   g->execute_move(13);
   g->display();
 
-  auto m = std::shared_ptr<MCTS>(new MCTS(t, infer_test, 5, 10000, 0.1, 5 * 5));
+  auto m = std::make_shared<MCTS>(t.get(), n.get(), 5, 10000, 0.1,
+                                  g->get_action_size());
 
   std::cout << "RUNNING" << std::endl;
 
-  // auto res = m->get_action_probs(g, 1e-3);
+  // auto res = m->get_action_probs(g.get(), 1e-3);
   // std::for_each(res.begin(), res.end(), [](double x) { std::cout << x << ",
   // "; });
 
   while (g->get_game_status()[0] == 0) {
-    auto res = m->get_action_probs(g, 1);
+    auto res = m->get_action_probs(g.get(), 1);
     std::for_each(res.begin(), res.end(),
-                  [](double x) { std::cout << x << ", "; });
+                  [](const double &x) { std::cout << x << ", "; });
     std::cout << std::endl;
 
     unsigned int best_move = 0;
@@ -41,7 +47,7 @@ int main() {
     }
 
     g->execute_move(best_move);
-    m->reset(best_move);
+    m->update_with_move(best_move);
     g->display();
   }
 
