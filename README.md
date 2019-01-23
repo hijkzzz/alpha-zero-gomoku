@@ -36,11 +36,11 @@ A multi-threaded implementation of AlphaZero
     human_color = 1                        human player's color
 ```
 
-## Dependencies
+## Environment
 ```
 SWIG 3.0+
-CMake 3.0+
-GCC/MSVC(support C++11)
+Python 3.6+
+GCC4.8.2+/MSVC14.00
 
 pytorch 0.4+
 pygame
@@ -52,11 +52,8 @@ pygame
 cd src
 swig -c++ -python .\swig.i
 
-# Compile C/C++ source
-cd ..
-mkdir build
-cd build
-cmake --build ..
+# Compile Python extension
+python setup.py build_ext --inplace
 
 # Run
 cd ../src

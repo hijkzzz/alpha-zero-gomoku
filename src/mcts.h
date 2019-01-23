@@ -7,7 +7,6 @@
 #include <vector>
 #include <thread>
 #include <atomic>
-// #include <Python.h>
 
 #include <gomoku.h>
 #include <thread_pool.h>

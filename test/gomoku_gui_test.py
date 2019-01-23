@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-sys.path.append('..')
 sys.path.append('../src')
 
 import numpy as np
@@ -18,6 +17,6 @@ if __name__ == "__main__":
     gomoku_gui.execute_move(-1, (1, 0))
     gomoku_gui.execute_move(1, (3, 0))
     gomoku_gui.execute_move(-1, (4, 5))
-    gomoku_gui.in_turn_of_human()
+    gomoku_gui.set_is_human(True)
 
     t.join()
