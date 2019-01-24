@@ -42,4 +42,22 @@ int main() {
   // test get_game_status
   auto game_status = gomoku.get_game_status();
   std::cout << game_status[0] << ", " << game_status[1] << std::endl;
+
+  // test copy
+  auto g = std::make_shared<Gomoku>(10, 5, 1);
+  g->execute_move(12);
+  g->execute_move(13);
+  g->execute_move(14);
+  g->execute_move(15);
+  g->execute_move(16);
+  g->execute_move(17);
+  g->execute_move(18);
+  g->execute_move(19);
+  g->display();
+
+  std::vector<std::shared_ptr<Gomoku>> vec;
+  for (size_t i = 0; i < 100; i++) {
+    auto new_g = std::make_shared<Gomoku>(*g.get());
+    vec.push_back(new_g);
+  }
 }

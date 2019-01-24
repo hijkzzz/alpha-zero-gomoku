@@ -56,9 +56,9 @@ public:
        VirtualNeuralNetwork* neural_network, unsigned int c_puct,
        unsigned int num_mcts_sims, double c_virtual_loss,
        unsigned int action_size);
-  std::vector<double> get_action_probs(const Gomoku* gomoku,
+  std::vector<double> get_action_probs(Gomoku* gomoku,
                                        double temp = 1e-3);
-  void update_with_move(unsigned int last_move);
+  void update_with_move(int last_move);
 
 private:
   void simulate(std::shared_ptr<Gomoku> game);
