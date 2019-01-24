@@ -31,7 +31,7 @@ class CallbackNeuralNetwork(VirtualNeuralNetwork):
         last_move = gomoku.get_last_move()
         cur_player_color = gomoku.get_current_color()
 
-        p_batch, v_batch = self.neural_network.infer([board, last_move, cur_player_color])
+        p_batch, v_batch = self.neural_network.infer([(board, last_move, cur_player_color)])
         return [p_batch[0].tolist(), v_batch[0].tolist()]
 
 
@@ -133,12 +133,13 @@ class Leaner():
         mcts = MCTS(self.thread_pool, self.nnet_cb, self.c_puct,
                     self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
-        episode_step = 1
+        episode_step = 0
         while True:
             episode_step += 1
 
             # temperature
-            temp = self.temp if episode_step < self.explore_num else 0
+            temp = self.temp if episode_step <= self.explore_num else 0
+
             prob =  np.array(list(mcts.get_action_probs(gomoku, temp)))
 
             board = tuple_2d_to_numpy_2d(gomoku.get_board())
@@ -172,7 +173,7 @@ class Leaner():
             # GAME OVER
             if ended == 1:
                 # b, last_action, cur_player, p, v
-                return [(x[0], x[1], x[2], x[3], x[3] * winner) for x in train_examples]
+                return [(x[0], x[1], x[2], x[3], x[2] * winner) for x in train_examples]
 
     def contest(self, player1, player2, contest_num):
         """compare new and old model
@@ -195,7 +196,7 @@ class Leaner():
                 player_index = -player_index
 
                 prob = player.get_action_prob(gomoku)
-                best_move = np.argmax(np.array(list(prob)))
+                best_move = int(np.argmax(np.array(list(prob))))
                 gomoku.execute_move(best_move)
 
                 # update search tree
@@ -221,7 +222,7 @@ class Leaner():
                 player_index = -player_index
 
                 prob = player.get_action_prob(gomoku)
-                best_move = np.argmax(np.array(list(prob)))
+                best_move = int(np.argmax(np.array(list(prob))))
                 gomoku.execute_move(best_move)
 
                 # update search tree

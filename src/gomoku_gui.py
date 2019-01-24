@@ -4,14 +4,14 @@ import os
 import numpy as np
 
 class GomokuGUI():
-    def __init__(self, n, is_human=False, human_color=1, fps=30):
+    def __init__(self, n, human_color=1, fps=30):
 
         # color, white for player 1, black for player -1
         self.white = (255, 255, 255)
         self.black = (0, 0, 0)
         self.green = (0, 255, 0)
 
-        # window size
+        # screen
         self.width = 800
         self.height = 800
 
@@ -19,34 +19,24 @@ class GomokuGUI():
         self.grid_width = self.width / (self.n + 3)
         self.fps = fps
 
-        self.reset_window()
-
-        # is running
-        self.is_running = True
-
-        # human player
+        # human color
         self.human_color = human_color
-        self.is_human = is_human
-        self.human_move = None
+
+        # reset status
+        self.reset_status()
 
     def __del__(self):
         # close window
         self.is_running = False
 
-    def reset_window(self):
+    def reset_status(self):
         # reset status
         self.board = np.zeros((self.n, self.n), dtype=int)
         self.number = np.zeros((self.n, self.n), dtype=int)
         self.k = 1 # step number
 
-        self.human_move = None
-
-    def execute_move(self, color, move):
-        x, y = move
-        assert self.board[x][y] == 0
-        self.board[x][y] = color
-        self.number[x][y] = self.k
-        self.k += 1
+        self.is_human = False
+        self.human_move = -1
 
     def set_is_human(self, value=True):
         # set is human
@@ -56,7 +46,18 @@ class GomokuGUI():
         # get human move
         return self.human_move
 
+    def execute_move(self, color, move):
+        x, y = move // self.n, move % self.n
+        assert self.board[x][y] == 0
+
+        self.board[x][y] = color
+        self.number[x][y] = self.k
+        self.k += 1
+
     def loop(self):
+        # set running
+        self.is_running = True
+
         # init
         pygame.init()
         self.screen = pygame.display.set_mode((self.width, self.height))
@@ -82,6 +83,7 @@ class GomokuGUI():
                 # close window
                 if event.type == pygame.QUIT:
                     self.is_running = False
+
                 # human play
                 if self.is_human and event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_y, mouse_x = event.pos
@@ -91,8 +93,9 @@ class GomokuGUI():
                     if position[0] in range(0, self.n) and position[1] in range(0, self.n) \
                             and self.board[position[0]][position[1]] == 0:
                         self.set_is_human(False)
-                        self.execute_move(self.human_color, position)
-                        self.human_move = position
+                        self.human_move = position[0] * self.n + position[1]
+
+                        self.execute_move(self.human_color, self.human_move)
 
             # draw
             self._draw_background()

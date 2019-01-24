@@ -8,7 +8,7 @@ A multi-threaded implementation of AlphaZero
 
 ## Args
 ```
-configpy
+config.py
 
     [gomoku]
     n = 12                                 board size

@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # test data convert
     board_batch = [[[1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1]],
                    [[1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1]]]
-    last_action_batch = [None, (0, 0)]
+    last_action_batch = [-1, 0]
     cur_player_batch = [1, -1]
 
     state_batch = policy_value_net._data_convert(board_batch, last_action_batch, cur_player_batch)

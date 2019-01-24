@@ -192,12 +192,12 @@ class NeuralNetWorkWrapper():
         last_action_batch0 = torch.zeros((len(last_action_batch), 1, n, n)).float()
         cur_player_batch0 = torch.ones((len(cur_player_batch), 1, n, n)).float()
 
-        for i in range(len(cur_player_batch0)):
+        for i in range(len(cur_player_batch)):
             cur_player_batch0[i][0] *= cur_player_batch[i]
 
             last_action = last_action_batch[i]
-            if not last_action is None:
-                x, y = last_action
+            if last_action != -1:
+                x, y = last_action // self.n, last_action % self.n
                 last_action_batch0[i][0][x][y] = 1
 
         return torch.cat((player1_batch0, plater_1_batch0, last_action_batch0, cur_player_batch0), dim=1)
