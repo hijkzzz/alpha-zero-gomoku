@@ -28,6 +28,8 @@ if __name__ == "__main__":
     g.display()
 
     print(g.get_board())
+    print(g.get_last_move())
+    print(g.get_current_color())
 
     n = TestNeuralNetwork()
     m = swig.MCTS(t, n, 5, 10000, 0.1, g.get_action_size())
