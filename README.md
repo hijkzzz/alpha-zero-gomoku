@@ -70,6 +70,11 @@ python tester_test.py  # play with human
 ## GUI
 ![](https://github.com/hijkzzz/alpha-zero-gomoku/blob/master/assets/gomoku_gui.png)
 
+## TODO
+```
+Because MCTS performance is limited by GIL(python) and single policy value networks, it is necessary to implement an asynchronous policy value network pool.
+```
+
 
 ## References
 1. Mastering the Game of Go without Human Knowledge
