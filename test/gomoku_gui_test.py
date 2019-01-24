@@ -13,10 +13,10 @@ if __name__ == "__main__":
     t.start()
 
     # test
-    gomoku_gui.execute_move(1, (0, 0))
-    gomoku_gui.execute_move(-1, (1, 0))
-    gomoku_gui.execute_move(1, (3, 0))
-    gomoku_gui.execute_move(-1, (4, 5))
+    gomoku_gui.execute_move(1, 0)
+    gomoku_gui.execute_move(-1, 1)
+    gomoku_gui.execute_move(1, 2)
+    gomoku_gui.execute_move(-1, 3)
     gomoku_gui.set_is_human(True)
 
     t.join()

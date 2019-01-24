@@ -9,4 +9,5 @@ swig*
 *.pyd
 *.pdb
 
+models
 checkpoint
