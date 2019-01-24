@@ -185,7 +185,7 @@ class Leaner():
         contest_num //= 2
 
         # first half, white first
-        for i in range(contest_num):
+        for _ in range(contest_num):
             players = [player2, None, player1]
             player_index = 1
             gomoku = Gomoku(self.n, self.n_in_row, player_index)

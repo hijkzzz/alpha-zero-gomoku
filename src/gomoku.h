@@ -11,12 +11,10 @@ public:
   using board_type = std::vector<std::vector<int>>;
 
   Gomoku(unsigned int n, unsigned int n_in_row, int first_color);
-  Gomoku(const Gomoku &object);
-  Gomoku &operator=(const Gomoku &object);
 
   bool has_legal_moves();
   std::vector<int> get_legal_moves();
-  void execute_move(const move_type &move);
+  void execute_move(move_type move);
   std::vector<int> get_game_status();
   void display() const;
 

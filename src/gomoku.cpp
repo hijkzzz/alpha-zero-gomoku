@@ -5,9 +5,7 @@
 
 Gomoku::Gomoku(unsigned int n, unsigned int n_in_row, int first_color)
     : n(n), n_in_row(n_in_row), cur_color(first_color), last_move(-1) {
-  for (unsigned int i = 0; i < n; i++) {
-    this->board.emplace_back(std::vector<int>(n, 0));
-  }
+  this->board = std::vector<std::vector<int>>(n, std::vector<int>(n, 0));
 };
 
 std::vector<int> Gomoku::get_legal_moves() {
@@ -25,39 +23,6 @@ std::vector<int> Gomoku::get_legal_moves() {
   return legal_moves;
 };
 
-Gomoku::Gomoku(const Gomoku &object) {
-  this->board.resize(object.board.size());
-  for (unsigned int i =0; i < this->board.size(); i++) {
-    this->board[i] = object.board[i];
-  }
-
-  this->n = object.n;
-  this->n_in_row = object.n_in_row;
-
-  this->cur_color = object.cur_color;
-  this->last_move = object.last_move;
-}
-
-Gomoku &Gomoku::operator=(const Gomoku &object) {
-
-  if (this == &object) {
-    return *this;
-  }
-
-  this->board.resize(object.board.size());
-  for (unsigned int i =0; i < this->board.size(); i++) {
-    this->board[i] = object.board[i];
-  }
-
-  this->n = object.n;
-  this->n_in_row = object.n_in_row;
-
-  this->cur_color = object.cur_color;
-  this->last_move = object.last_move;
-
-  return *this;
-}
-
 bool Gomoku::has_legal_moves() {
   auto n = this->n;
 
@@ -71,7 +36,7 @@ bool Gomoku::has_legal_moves() {
   return false;
 };
 
-void Gomoku::execute_move(const move_type &move) {
+void Gomoku::execute_move(move_type move) {
   auto i = move / this->n;
   auto j = move % this->n;
 
@@ -145,7 +110,7 @@ std::vector<int> Gomoku::get_game_status() {
   }
 };
 
-void Gomoku::display() const{
+void Gomoku::display() const {
   auto n = this->board.size();
 
   for (unsigned int i = 0; i < n; i++) {

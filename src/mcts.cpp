@@ -7,7 +7,7 @@
 #include <iostream>
 
 // thread local object pool
-#define thread_object_pool_size 2000000
+#define thread_object_pool_size 1000000
 thread_local std::vector<TreeNode> thread_object_pool(thread_object_pool_size);
 thread_local unsigned int thread_object_pool_index = 0;
 
@@ -93,8 +93,8 @@ void TreeNode::expand(const std::vector<double> &action_priors) {
 
       new_node->parent = this;
       new_node->p_sa = action_priors[i];
-      new_node->children =
-          std::move(std::vector<TreeNode *>(action_size, nullptr));
+      new_node->children = std::vector<TreeNode *>(action_size, nullptr);
+      new_node->is_leaf.store(true);
 
       this->children[i] = new_node;
     }
@@ -138,7 +138,7 @@ double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
 }
 
 // MCTS
-MCTS::MCTS(ThreadPool *thread_pool, VirtualNeuralNetwork* neural_network,
+MCTS::MCTS(ThreadPool *thread_pool, VirtualNeuralNetwork *neural_network,
            unsigned int c_puct, unsigned int num_mcts_sims,
            double c_virtual_loss, unsigned int action_size)
     : neural_network(neural_network), c_puct(c_puct),
@@ -146,12 +146,12 @@ MCTS::MCTS(ThreadPool *thread_pool, VirtualNeuralNetwork* neural_network,
       thread_pool(thread_pool), action_size(action_size),
       root(nullptr, 1., action_size) {}
 
-void MCTS::update_with_move(unsigned int last_action) {
+void MCTS::update_with_move(int last_action) {
   // reset the tree
   auto &children = this->root.children;
 
   // reuse the child tree
-  if (children[last_action] != nullptr) {
+  if (last_action >= 0 && children[last_action] != nullptr) {
     this->root = *children[last_action];
     this->root.parent = nullptr;
 
@@ -160,7 +160,7 @@ void MCTS::update_with_move(unsigned int last_action) {
   }
 }
 
-std::vector<double> MCTS::get_action_probs(const Gomoku *gomoku, double temp) {
+std::vector<double> MCTS::get_action_probs(Gomoku *gomoku, double temp) {
   // submit simulate tasks to thread_pool
   std::vector<std::future<void>> futures;
 
