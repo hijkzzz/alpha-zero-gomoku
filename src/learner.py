@@ -195,13 +195,13 @@ class Leaner():
                 player =  players[player_index + 1]
                 player_index = -player_index
 
-                prob = player.get_action_prob(gomoku)
+                prob = player.get_action_probs(gomoku)
                 best_move = int(np.argmax(np.array(list(prob))))
                 gomoku.execute_move(best_move)
 
-                # update search tree
-                player1.update_with_move(best_move)
-                player2.update_with_move(best_move)
+                # reset search tree
+                player1.update_with_move(-1)
+                player2.update_with_move(-1)
 
             if winner == 1:
                 one_won += 1
@@ -221,13 +221,13 @@ class Leaner():
                 player =  players[player_index + 1]
                 player_index = -player_index
 
-                prob = player.get_action_prob(gomoku)
+                prob = player.get_action_probs(gomoku)
                 best_move = int(np.argmax(np.array(list(prob))))
                 gomoku.execute_move(best_move)
 
-                # update search tree
-                player1.update_with_move(best_move)
-                player2.update_with_move(best_move)
+                # reset search tree
+                player1.update_with_move(-1)
+                player2.update_with_move(-1)
 
             if winner == 1:
                 one_won += 1
