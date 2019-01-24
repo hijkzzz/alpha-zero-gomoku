@@ -36,45 +36,48 @@ class CallbackNeuralNetwork(VirtualNeuralNetwork):
 
 
 class Leaner():
-    def __init__(self, args):
+    def __init__(self, config):
+        # config see README.md
         # gomoku
-        self.n = args.n
-        self.n_in_row = args.n_in_row
-        self.gomoku_gui = GomokuGUI(args.n)
+        self.n = config['n']
+        self.n_in_row = config['n_in_row']
+        self.gomoku_gui = GomokuGUI(config['n'])
         self.action_size = self.n ** 2
 
         # train
-        self.num_iters = args.num_iters
-        self.num_eps = args.num_eps
-        self.check_freq = args.check_freq
-        self.contest_num = args.contest_num
-        self.dirichlet_alpha = args.dirichlet_alpha
-        self.temp = args.temp
-        self.update_threshold = args.update_threshold
-        self.explore_num = args.explore_num
+        self.num_iters = config['num_iters']
+        self.num_eps = config['num_eps']
+        self.check_freq = config['check_freq']
+        self.contest_num = config['contest_num']
+        self.dirichlet_alpha = config['dirichlet_alpha']
+        self.temp = config['temp']
+        self.update_threshold = config['update_threshold']
+        self.explore_num = config['explore_num']
 
-        self.examples_buffer = deque([], maxlen=args.examples_buffer_max_len)
+        self.examples_buffer = deque([], maxlen=config['examples_buffer_max_len'])
 
         # neural network
-        self.batch_size = args.batch_size
+        self.batch_size = config['batch_size']
 
-        self.nnet = NeuralNetWorkWrapper(args.lr, args.l2, args.kl_targ, args.epochs,
-                                         args.num_channels, args.n, self.action_size)
-        self.nnet_best = NeuralNetWorkWrapper(args.lr, args.l2, args.kl_targ,
-                                              args.epochs, args.num_channels, args.n, self.action_size)
+        self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'], config['kl_targ'], config['epochs'],
+                                         config['num_channels'], config['n'], self.action_size)
+        self.nnet_best = NeuralNetWorkWrapper(config['lr'], config['l2'], config['kl_targ'],
+                                              config['epochs'], config['num_channels'], config['n'], self.action_size)
 
         # add callbacks for MCTS
         self.nnet_cb = CallbackNeuralNetwork(self.nnet)
         self.nnet_best_cb = CallbackNeuralNetwork(self.nnet_best)
 
         # mcts
-        self.num_mcts_sims = args.num_mcts_sims
-        self.c_puct = args.c_puct
-        self.c_virtual_loss = args.c_virtual_loss
+        self.num_mcts_sims = config['num_mcts_sims']
+        self.c_puct = config['c_puct']
+        self.c_virtual_loss = config['c_virtual_loss']
 
-        self.thread_pool = ThreadPool(args.thread_pool_size)
+        self.thread_pool = ThreadPool(config['thread_pool_size'])
 
     def learn(self):
+        # train the model by self play
+
         self.nnet.save_model(filename="best_checkpoint")
 
         for i in range(1, self.num_iters + 1):
@@ -130,12 +133,12 @@ class Leaner():
         mcts = MCTS(self.thread_pool, self.nnet_cb, self.c_puct,
                     self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
-        episode_step = 0
+        episode_step = 1
         while True:
             episode_step += 1
 
             # temperature
-            temp = self.temp if episode_step <= self.explore_num else 0
+            temp = self.temp if episode_step < self.explore_num else 0
             prob =  np.array(list(mcts.get_action_probs(gomoku, temp)))
 
             board = tuple_2d_to_numpy_2d(gomoku.get_board())
@@ -171,10 +174,66 @@ class Leaner():
                 # b, last_action, cur_player, p, v
                 return [(x[0], x[1], x[2], x[3], x[3] * winner) for x in train_examples]
 
-    def contest(self, mcts_player1, mcts_player2, contest_num):
+    def contest(self, player1, player2, contest_num):
+        """compare new and old model
+           Args: player1, player2 is MCTS object
+           Return: one_won, two_won, draws
+        """
+
         one_won, two_won, draws = 0, 0, 0
+        contest_num //= 2
 
+        # first half, white first
+        for i in range(contest_num):
+            players = [player2, None, player1]
+            player_index = 1
+            gomoku = Gomoku(self.n, self.n_in_row, player_index)
 
+            ended, winner = gomoku.get_game_status()
+            while ended == 0:
+                player =  players[player_index + 1]
+                player_index = -player_index
+
+                prob = player.get_action_prob(gomoku)
+                best_move = np.argmax(np.array(list(prob)))
+                gomoku.execute_move(best_move)
+
+                # update search tree
+                player1.update_with_move(best_move)
+                player2.update_with_move(best_move)
+
+            if winner == 1:
+                one_won += 1
+            elif winner == -1:
+                two_won += 1
+            else:
+                draws += 1
+
+        # second half, black first
+        for i in range(contest_num):
+            players = [player2, None, player1]
+            player_index = -1
+            gomoku = Gomoku(self.n, self.n_in_row, player_index)
+
+            ended, winner = gomoku.get_game_status()
+            while ended == 0:
+                player =  players[player_index + 1]
+                player_index = -player_index
+
+                prob = player.get_action_prob(gomoku)
+                best_move = np.argmax(np.array(list(prob)))
+                gomoku.execute_move(best_move)
+
+                # update search tree
+                player1.update_with_move(best_move)
+                player2.update_with_move(best_move)
+
+            if winner == 1:
+                one_won += 1
+            elif winner == -1:
+                two_won += 1
+            else:
+                draws += 1
 
         return one_won, two_won, draws
 

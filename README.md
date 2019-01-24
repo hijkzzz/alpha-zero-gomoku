@@ -1,14 +1,21 @@
 # AlphaZero Gomoku
 A multi-threaded implementation of AlphaZero
 
+## Features
+* free lock parallel MCTS(only atomic variable)
+* Gomoku and MCTS are written in C++11
+* swig wrap python extension
+
 ## Args
 ```
+config.ini
+
     ;[gomoku]
     n = 12                                 board size
     nir = 5                                n in row
 
     ;[mcts]
-    thread_pool_size = 4                    mcts threads number
+    thread_pool_size = 4                   C++ threads number
     num_mcts_sims = 400                    mcts simulation times
     c_puct = 5                             PUCT coeff
     c_virtual_loss = 0.1                   virtual loss coeff
@@ -40,7 +47,7 @@ A multi-threaded implementation of AlphaZero
 ```
 SWIG 3.0+
 Python 3.6+
-GCC4.8.2+/MSVC14.00+
+GCC4.8.2+/MSVC14.00+(support C++11 and compatible with Python3)
 
 pytorch 0.4+
 pygame
@@ -56,9 +63,9 @@ swig -c++ -python -threads .\swig.i
 python setup.py build_ext --inplace
 
 # Run
-cd ../src
-TODO:
-
+cd ../test
+python learner_test.py # train model
+python tester_test.py  # play with human
 ```
 
 ## GUI
