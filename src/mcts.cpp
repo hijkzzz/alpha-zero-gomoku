@@ -7,7 +7,7 @@
 #include <iostream>
 
 // thread local object pool
-#define thread_object_pool_size 5000000
+#define thread_object_pool_size 2000000
 thread_local std::vector<TreeNode> thread_object_pool(thread_object_pool_size);
 thread_local unsigned int thread_object_pool_index = 0;
 
@@ -242,7 +242,7 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
     std::vector<double> action_priors(this->action_size, 0);
 
     {
-      std::lock_guard<std::mutex> lock(this->lock);
+      // std::lock_guard<std::mutex> lock(this->lock);
       auto res = std::move(this->neural_network->infer(game.get()));
 
       action_priors.assign(res[0].begin(), res[0].end());
