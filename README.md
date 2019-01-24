@@ -8,19 +8,19 @@ A multi-threaded implementation of AlphaZero
 
 ## Args
 ```
-config.ini
+configpy
 
-    ;[gomoku]
+    [gomoku]
     n = 12                                 board size
     nir = 5                                n in row
 
-    ;[mcts]
+    [mcts]
     thread_pool_size = 4                   C++ threads number
     num_mcts_sims = 400                    mcts simulation times
     c_puct = 5                             PUCT coeff
-    c_virtual_loss = 0.1                   virtual loss coeff
+    c_virtual_loss = 0.1                   virtual loss coeff(see [Parallel MCTS](#References))
 
-    ;[neural_network]
+    [neural_network]
     lr = 0.002                             learning rate
     l2 = 0.0002                            L2
     num_channels = 128                     convolution neural network channel size
@@ -28,7 +28,7 @@ config.ini
     batch_size = 512                       batch size
     kl_targ = 0.04                         threshold of KL divergence
 
-    ;[train]
+    [train]
     num_iters = 100000                     train iterations
     num_eps = 1                            self play times in per iter
     explore_num  = 2                       explore step in a game
@@ -39,19 +39,18 @@ config.ini
     check_freq  = 50                       test model frequency
     examples_buffer_max_len = 10000        max length of examples buffer
 
-    ;[test]
+    [test]
     human_color = 1                        human player's color
 ```
 
 ## Environment
-```
-SWIG 3.0+
-Python 3.6+
-GCC4.8.2+/MSVC14.00+(support C++11 and compatible with Python3)
 
-pytorch 0.4+
-pygame
-```
+* SWIG 3.0+
+* Python 3.6+
+* GCC4.8.2+/MSVC14.00+(support C++11 and compatible with Python3)
+* pytorch 0.4+
+* pygame
+
 
 ## Run
 ```
@@ -73,9 +72,9 @@ python tester_test.py  # play with human
 
 
 ## References
-* Mastering the Game of Go without Human Knowledge
-* Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm
-* Parallel Monte-Carlo Tree Search
-* A Lock-free Multithreaded Monte-Carlo Tree Search Algorithm
-* On the Scalability of Parallel UCT
-* github.com/suragnair/alpha-zero-general
+1. Mastering the Game of Go without Human Knowledge
+2. Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm
+3. Parallel Monte-Carlo Tree Search
+4. A Lock-free Multithreaded Monte-Carlo Tree Search Algorithm
+5. On the Scalability of Parallel UCT
+6. github.com/suragnair/alpha-zero-general
