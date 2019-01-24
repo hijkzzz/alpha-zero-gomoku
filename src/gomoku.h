@@ -21,7 +21,7 @@ public:
   void display() const;
 
   inline unsigned int get_action_size() const { return this->n * this->n; }
-  inline const board_type &get_board() const { return this->board; }
+  inline board_type get_board() const { return this->board; }
   inline move_type get_last_move() const { return this->last_move; }
   inline int get_current_color() const { return this->cur_color; }
   inline unsigned int get_n() const { return this->n; }

@@ -1,20 +1,20 @@
 #include <iostream>
 #include <mcts.h>
 
-class InstanceNeuralNetwork : public VirtualNeuralNetwork {
+class TestNeuralNetwork : public VirtualNeuralNetwork {
 public:
-  std::vector<std::vector<std::vector<double>>> infer(Gomoku *gomoku) {
-    return {{{0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+  std::vector<std::vector<double>> infer(Gomoku *gomoku) {
+    return {{0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
               0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-              0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04}},
-            {{0.5}}};
+              0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04},
+            {0.5}};
   }
 };
 
 int main() {
   auto t = std::make_shared<ThreadPool>(1);
   auto g = std::make_shared<Gomoku>(5, 3, 1);
-  auto n = std::make_shared<InstanceNeuralNetwork>();
+  auto n = std::make_shared<TestNeuralNetwork>();
   g->execute_move(12);
   g->execute_move(13);
   g->display();

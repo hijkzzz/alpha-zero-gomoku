@@ -15,7 +15,7 @@ class NeuralNetWork(nn.Module):
     """Policy and Value Network
     """
 
-    def __init__(self, num_channels, n):
+    def __init__(self, num_channels, n, action_size):
         super(NeuralNetWork, self).__init__()
 
         # n
@@ -30,7 +30,7 @@ class NeuralNetWork(nn.Module):
 
         self.pi_conv = nn.Sequential(
             nn.Conv2d(num_channels, 4, kernel_size=1, padding=0), nn.ReLU())
-        self.pi_fc = nn.Sequential(nn.Linear(4 * n ** 2, n ** 2), nn.ReLU(), nn.LogSoftmax(dim=1))
+        self.pi_fc = nn.Sequential(nn.Linear(4 * n ** 2, action_size), nn.ReLU(), nn.LogSoftmax(dim=1))
 
         self.v_conv = nn.Sequential(
             nn.Conv2d(num_channels, 2, kernel_size=1, padding=0), nn.ReLU())
@@ -79,19 +79,18 @@ class NeuralNetWorkWrapper():
     """train and predict
     """
 
-    def __init__(self, lr, l2, batch_size, kl_targ, epochs, num_channels, n):
+    def __init__(self, lr, l2, kl_targ, epochs, num_channels, n, action_size):
         """ init
         """
         self.lr = lr
         self.l2 = l2
-        self.batch_size = batch_size
         self.kl_targ = kl_targ
         self.epochs = epochs
         self.num_channels = num_channels
         self.n = n
 
         self.cuda = torch.cuda.is_available()
-        self.neural_network = NeuralNetWork(num_channels, n)
+        self.neural_network = NeuralNetWork(num_channels, n, action_size)
 
         if self.cuda:
             self.neural_network.cuda()

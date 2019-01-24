@@ -6,16 +6,16 @@ import numpy as np
 
 import swig
 
-class InstanceNeuralNetwork(swig.VirtualNeuralNetwork):
+class TestNeuralNetwork(swig.VirtualNeuralNetwork):
     # Define Python class 'constructor'
     def __init__(self):
         swig.VirtualNeuralNetwork.__init__(self)
 
     # Override C++ method
     def infer(self, gomoku):
-        return [[[0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+        return [[0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
               0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-              0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04]], [[0.5]]]
+              0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04], [0.5]]
 
 
 if __name__ == "__main__":
@@ -27,7 +27,9 @@ if __name__ == "__main__":
     g.execute_move(13)
     g.display()
 
-    n = InstanceNeuralNetwork()
+    print(g.get_board())
+
+    n = TestNeuralNetwork()
     m = swig.MCTS(t, n, 5, 10000, 0.1, g.get_action_size())
 
     while g.get_game_status()[0] == 0:

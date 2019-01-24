@@ -245,8 +245,8 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
       std::lock_guard<std::mutex> lock(this->lock);
       auto res = std::move(this->neural_network->infer(game.get()));
 
-      action_priors.assign(res[0][0].begin(), res[0][0].end());
-      value = res[1][0][0];
+      action_priors.assign(res[0].begin(), res[0].end());
+      value = res[1][0];
     }
 
     // mask invalid actions
