@@ -9,8 +9,9 @@
 %include "std_vector.i"
 namespace std {
   %template(IntVector) vector<int>;
+  %template(IntVectorVector) vector<int>;
   %template(DoubleVector) vector<double>;
-  %template(DoubleVectorVectorVector) vector<vector<vector<double>>>;
+  %template(DoubleVectorVector) vector<vector<double>>;
 }
 
 %feature("director") VirtualNeuralNetwork;

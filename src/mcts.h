@@ -46,7 +46,7 @@ private:
 // SWIG callback inferface
 class VirtualNeuralNetwork {
   public:
-    virtual std::vector<std::vector<std::vector<double>>> infer(Gomoku *gomoku) = 0;
+    virtual std::vector<std::vector<double>> infer(Gomoku *gomoku) = 0;
     virtual ~VirtualNeuralNetwork() {};
 };
 

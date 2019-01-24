@@ -2,21 +2,21 @@
 import numpy as np
 import sys
 sys.path.append('../src')
+
 import neural_network
 import torch
-
 
 
 if __name__ == "__main__":
     lr = 0.002
     l2 = 0.0002
     epochs = 5
-    batch_size = 512
     kl_targ = 0.04
     num_channels = 128
     n = 5
+    action_size = n ** 2
 
-    policy_value_net = neural_network.NeuralNetWorkWrapper(lr, l2, batch_size, kl_targ, epochs, num_channels, n)
+    policy_value_net = neural_network.NeuralNetWorkWrapper(lr, l2, kl_targ, epochs, num_channels, n, action_size)
 
     # test data convert
     board_batch = [[[1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1]],
