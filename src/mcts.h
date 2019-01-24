@@ -67,7 +67,7 @@ private:
   TreeNode root;
   ThreadPool* thread_pool;
   VirtualNeuralNetwork* neural_network;
-  std::mutex lock;
+  // std::mutex lock;
 
   unsigned int action_size;
   unsigned int c_puct;
