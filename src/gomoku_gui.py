@@ -99,10 +99,10 @@ class GomokuGUI():
 
                     if position[0] in range(0, self.n) and position[1] in range(0, self.n) \
                             and self.board[position[0]][position[1]] == 0:
-                        self.set_is_human(False)
                         self.human_move = position[0] * self.n + position[1]
-
                         self.execute_move(self.human_color, self.human_move)
+                        self.set_is_human(False)
+
 
             # draw
             self._draw_background()

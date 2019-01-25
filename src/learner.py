@@ -182,7 +182,7 @@ class Leaner():
 
     def contest(self, player1, player2, contest_num):
         """compare new and old model
-           Args: player1, player2 is MCTS object
+           Args: player1, player2 is white/balck player
            Return: one_won, two_won, draws
         """
 
@@ -271,14 +271,14 @@ class Leaner():
 
             # execute move
             if player == "alpha":
-                prob = player.get_action_probs(gomoku)
+                prob = mcts_best.get_action_probs(gomoku)
                 best_move = int(np.argmax(np.array(list(prob))))
                 self.gomoku_gui.execute_move(player_index, best_move)
             else:
                 self.gomoku_gui.set_is_human(True)
                 # wait human action
                 while self.gomoku_gui.get_is_human():
-                    time.sleep(0.1)
+                    time.sleep(0.01)
                 best_move = self.gomoku_gui.get_human_move()
 
             # update game status
