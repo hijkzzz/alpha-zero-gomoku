@@ -19,7 +19,7 @@ public:
 };
 
 int main() {
-  auto t = std::make_shared<ThreadPool>(4);
+  auto t = std::make_shared<ThreadPool>(8);
   auto g = std::make_shared<Gomoku>(10, 5, 1);
   auto n = std::make_shared<TestNeuralNetwork>();
   g->execute_move(12);
@@ -61,7 +61,7 @@ int main() {
   // }
 
   // memory test
-  auto m = std::make_shared<MCTS>(t.get(), n.get(), 5, 1500, 0.1,
+  auto m = std::make_shared<MCTS>(t.get(), n.get(), 5, 40000, 0.1,
                       g->get_action_size());
 
   while (true) {

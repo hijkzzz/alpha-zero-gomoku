@@ -27,13 +27,13 @@ public:
   void backup(double leaf_value);
 
   double get_value(double c_puct, double c_virtual_loss) const;
-  inline int get_is_leaf() const { return this->is_leaf.load(); }
+  inline bool get_is_leaf() const { return this->is_leaf; }
 
 private:
   // store tree
   TreeNode *parent;
   std::vector<TreeNode *> children;
-  std::atomic<int> is_leaf;
+  bool is_leaf;
 
   // non lock
   unsigned int n_visited;
