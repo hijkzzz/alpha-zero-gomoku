@@ -117,10 +117,11 @@ class Leaner():
                 print("NEW/PREV WINS : %d / %d ; DRAWS : %d" % (one_won, two_won, draws))
 
                 if one_won + two_won > 0 and float(one_won) / (one_won + two_won) > self.update_threshold:
-                    print('REJECTING NEW MODEL')
-                else:
                     print('ACCEPTING NEW MODEL')
                     self.nnet.save_model(filename="best_checkpoint")
+                else:
+                    print('REJECTING NEW MODEL')
+
 
         t.join()
 
@@ -156,16 +157,13 @@ class Leaner():
                 train_examples.append([b, last_action, cur_player, p])
 
             # Dirichlet noise
-            valid_action_num = 0
-            for p in prob:
-                if not math.fabs(p - 0) < 1e-6:
-                    valid_action_num += 1
-            noise = 0.25 * np.random.dirichlet(self.dirichlet_alpha * np.ones(valid_action_num))
+            legal_moves = list(gomoku.get_legal_moves())
+            noise = 0.25 * np.random.dirichlet(self.dirichlet_alpha * np.ones(np.count_nonzero(legal_moves)))
 
             prob_noise = 0.75 * prob
             j = 0
-            for i, p in enumerate(prob_noise):
-                if not math.fabs(p - 0) < 1e-6:
+            for i in range(len(prob_noise)):
+                if legal_moves[i] == 1:
                     prob_noise[i] += noise[j]
                     j += 1
             prob_noise /= np.sum(prob_noise)
