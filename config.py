@@ -25,7 +25,7 @@ config = {
     'dirichlet_alpha': 0.3,
     'update_threshold': 0.55,
     'contest_num': 10,
-    'check_freq': 1,
+    'check_freq': 50,
     'examples_buffer_max_len': 10000,
 
     # test
