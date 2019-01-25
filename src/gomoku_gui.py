@@ -29,8 +29,8 @@ class GomokuGUI():
         # close window
         self.is_running = False
 
+    # reset status
     def reset_status(self):
-        # reset status
         self.board = np.zeros((self.n, self.n), dtype=int)
         self.number = np.zeros((self.n, self.n), dtype=int)
         self.k = 1 # step number
@@ -38,14 +38,20 @@ class GomokuGUI():
         self.is_human = False
         self.human_move = -1
 
+    # human play
     def set_is_human(self, value=True):
-        # set is human
         self.is_human = value
 
+    def get_is_human(self):
+        return self.is_human
+
     def get_human_move(self):
-        # get human move
         return self.human_move
 
+    def get_human_color(self):
+        return self.human_color
+
+    # execute move
     def execute_move(self, color, move):
         x, y = move // self.n, move % self.n
         assert self.board[x][y] == 0
@@ -54,6 +60,7 @@ class GomokuGUI():
         self.number[x][y] = self.k
         self.k += 1
 
+    # main loop
     def loop(self):
         # set running
         self.is_running = True

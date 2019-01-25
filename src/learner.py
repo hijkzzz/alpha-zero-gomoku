@@ -6,8 +6,8 @@ import time
 import math
 
 from neural_network import NeuralNetWorkWrapper
-from gomoku_gui import GomokuGUI
 from swig import MCTS, ThreadPool, Gomoku, VirtualNeuralNetwork
+from gomoku_gui import GomokuGUI
 
 
 def tuple_2d_to_numpy_2d(tuple_2d):
@@ -17,6 +17,7 @@ def tuple_2d_to_numpy_2d(tuple_2d):
     for i, tuple_1d in enumerate(tuple_2d):
         res[i] = list(tuple_1d)
     return np.array(res)
+
 
 class CallbackNeuralNetwork(VirtualNeuralNetwork):
     # for swig callback inferface
@@ -41,7 +42,7 @@ class Leaner():
         # gomoku
         self.n = config['n']
         self.n_in_row = config['n_in_row']
-        self.gomoku_gui = GomokuGUI(config['n'])
+        self.gomoku_gui = GomokuGUI(config['n'], config['human_color'])
         self.action_size = self.n ** 2
 
         # train
@@ -77,6 +78,8 @@ class Leaner():
 
     def learn(self):
         # train the model by self play
+        t = threading.Thread(target=self.gomoku_gui.loop)
+        t.start()
 
         self.nnet.save_model(filename="best_checkpoint")
 
@@ -119,6 +122,8 @@ class Leaner():
                     print('ACCEPTING NEW MODEL')
                     self.nnet.save_model(filename="best_checkpoint")
 
+        t.join()
+
     def self_play(self, first_color):
         """
         This function executes one episode of self-play, starting with player 1.
@@ -140,7 +145,7 @@ class Leaner():
             # temperature
             temp = self.temp if episode_step <= self.explore_num else 0
 
-            prob =  np.array(list(mcts.get_action_probs(gomoku, temp)))
+            prob = np.array(list(mcts.get_action_probs(gomoku, temp)))
 
             board = tuple_2d_to_numpy_2d(gomoku.get_board())
             last_action = gomoku.get_last_move()
@@ -182,52 +187,14 @@ class Leaner():
         """
 
         one_won, two_won, draws = 0, 0, 0
-        contest_num //= 2
 
-        # first half, white first
-        for _ in range(contest_num):
-            players = [player2, None, player1]
-            player_index = 1
-            gomoku = Gomoku(self.n, self.n_in_row, player_index)
-
-            ended, winner = gomoku.get_game_status()
-            while ended == 0:
-                player =  players[player_index + 1]
-                player_index = -player_index
-
-                prob = player.get_action_probs(gomoku)
-                best_move = int(np.argmax(np.array(list(prob))))
-                gomoku.execute_move(best_move)
-
-                # reset search tree
-                player1.update_with_move(-1)
-                player2.update_with_move(-1)
-
-            if winner == 1:
-                one_won += 1
-            elif winner == -1:
-                two_won += 1
-            else:
-                draws += 1
-
-        # second half, black first
         for i in range(contest_num):
-            players = [player2, None, player1]
-            player_index = -1
-            gomoku = Gomoku(self.n, self.n_in_row, player_index)
-
-            ended, winner = gomoku.get_game_status()
-            while ended == 0:
-                player =  players[player_index + 1]
-                player_index = -player_index
-
-                prob = player.get_action_probs(gomoku)
-                best_move = int(np.argmax(np.array(list(prob))))
-                gomoku.execute_move(best_move)
-
-                # reset search tree
-                player1.update_with_move(-1)
-                player2.update_with_move(-1)
+            if i < contest_num // 2:
+                # first half, white first
+                winner = self._contest(player1, player2, 1)
+            else:
+                # second half, black first
+                winner = self._contest(player1, player2, -1)
 
             if winner == 1:
                 one_won += 1
@@ -237,6 +204,33 @@ class Leaner():
                 draws += 1
 
         return one_won, two_won, draws
+
+    def _contest(self, player1, player2, first_player):
+        # old model play with new model
+
+        players = [player2, None, player1]
+        player_index = first_player
+        gomoku = Gomoku(self.n, self.n_in_row, first_player)
+
+        ended, winner = 0, 0
+        while ended == 0:
+            player = players[player_index + 1]
+
+            # execute best move
+            prob = player.get_action_probs(gomoku)
+            best_move = int(np.argmax(np.array(list(prob))))
+            gomoku.execute_move(best_move)
+            self.gomoku_gui.execute_move(player_index, best_move)
+
+            # update search tree
+            player1.update_with_move(best_move)
+            player2.update_with_move(best_move)
+
+            # next player
+            player_index = -player_index
+            ended, winner = gomoku.get_game_status()
+
+        return winner
 
     def get_symmetries(self, board, pi):
         # mirror, rotational
@@ -254,3 +248,49 @@ class Leaner():
                     newPi = np.fliplr(newPi)
                 l += [(newB, newPi.ravel())]
         return l
+
+    def play_with_human(self, human_first=True, checkpoint_name="best_checkpoint"):
+        t = threading.Thread(target=self.gomoku_gui.loop)
+        t.start()
+
+        # load best model
+        mcts_best = MCTS(self.thread_pool, self.nnet_best_cb, self.c_puct,
+                    self.num_mcts_sims * 2, self.c_virtual_loss, self.action_size)
+        self.nnet_best.load_model(filename=checkpoint_name)
+
+        # create gomoku game
+        human_color = self.gomoku_gui.get_human_color()
+        gomoku = Gomoku(self.n, self.n_in_row, human_color if human_first else -human_color)
+
+        players = ["alpha", None, "human"] if human_color == 1 else ["human", None, "alpha"]
+        player_index = human_color if human_first else -human_color
+
+        ended, winner = 0, 0
+        while ended == 0:
+            player = players[player_index + 1]
+
+            # execute move
+            if player == "alpha":
+                prob = player.get_action_probs(gomoku)
+                best_move = int(np.argmax(np.array(list(prob))))
+                self.gomoku_gui.execute_move(player_index, best_move)
+            else:
+                self.gomoku_gui.set_is_human(True)
+                # wait human action
+                while self.gomoku_gui.get_is_human():
+                    time.sleep(0.1)
+                best_move = self.gomoku_gui.get_human_move()
+
+            # update game status
+            gomoku.execute_move(best_move)
+
+            # update mcts
+            mcts_best.update_with_move(best_move)
+
+            # next player
+            player_index = -player_index
+            ended, winner = gomoku.get_game_status()
+
+        print("human win" if winner == human_color else "alpha win")
+
+        t.join()

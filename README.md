@@ -2,8 +2,8 @@
 A multi-threaded implementation of AlphaZero
 
 ## Features
-* free lock parallel MCTS(only atomic variable)
-* Gomoku and MCTS are written in C++11
+* free lock parallel MCTS(only one atomic variable)
+* Gomoku and MCTS are written in C++
 * swig wrap python extension
 
 ## Args
@@ -47,7 +47,7 @@ config.py
 
 * SWIG 3.0+
 * Python 3.6+
-* GCC4.8.2+/MSVC14.00+(support C++11 and compatible with Python3)
+* GCC4.8.2+ for linux/MSVC14.00+ for windows (support C++11 and compatible with Python3.6+)
 * pytorch 0.4+
 * pygame
 
@@ -63,8 +63,8 @@ python setup.py build_ext --inplace
 
 # Run
 cd ../test
-python learner_test.py # train model
-python tester_test.py  # play with human
+python learner_test.py train # train model
+python learner_test.py play  # play with human
 ```
 
 ## GUI
@@ -72,13 +72,13 @@ python tester_test.py  # play with human
 
 ## TODO
 ```
-Because MCTS performance is limited by GIL(python) and policy value networks,
+Because parallel MCTS's performance is limited by GIL(python) and policy value network,
 it is necessary to implement an asynchronous policy value network server.
 
-                  Parameter synchronization
-     ___________________________________________________
-    |                                                   |
-    |    self play data                    predict      ↓
+                       Parameter synchronization
+     __________________________________________________________
+    |                                                          |
+    |    self play data                    predict             ↓
 Trainer ←--------------- parallel MCTS ←----------- Policy Value Networks(server)
 ```
 
