@@ -20,7 +20,7 @@ TreeNode::TreeNode(
   // struct
   this->parent = node.parent;
   this->children = node.children;
-  this->is_leaf.store(node.is_leaf.load());
+  this->is_leaf = node.is_leaf;
 
   this->n_visited = node.n_visited;
   this->p_sa = node.p_sa;
@@ -30,7 +30,7 @@ TreeNode::TreeNode(
 }
 
 TreeNode::TreeNode(TreeNode *parent, double p_sa, unsigned int action_size)
-    : parent(parent), p_sa(p_sa), children(action_size, nullptr), is_leaf(1),
+    : parent(parent), p_sa(p_sa), children(action_size, nullptr), is_leaf(true),
       virtual_loss(0), q_sa(0), n_visited(0) {}
 
 TreeNode &TreeNode::operator=(const TreeNode &node) {
@@ -41,7 +41,7 @@ TreeNode &TreeNode::operator=(const TreeNode &node) {
   // struct
   this->parent = node.parent;
   this->children = node.children;
-  this->is_leaf.store(node.is_leaf.load());
+  this->is_leaf = node.is_leaf;
 
   this->n_visited = node.n_visited;
   this->p_sa = node.p_sa;
@@ -94,14 +94,14 @@ void TreeNode::expand(const std::vector<double> &action_priors) {
       new_node->parent = this;
       new_node->p_sa = action_priors[i];
       new_node->children = std::vector<TreeNode *>(action_size, nullptr);
-      new_node->is_leaf.store(true);
+      new_node->is_leaf = true;
 
       this->children[i] = new_node;
     }
   }
 
   // expand, not leaf
-  this->is_leaf.store(0);
+  this->is_leaf = false;
 }
 
 void TreeNode::backup(double value) {

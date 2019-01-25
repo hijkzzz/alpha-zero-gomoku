@@ -72,9 +72,15 @@ python tester_test.py  # play with human
 
 ## TODO
 ```
-Because MCTS performance is limited by GIL(python) and single policy value networks, it is necessary to implement an asynchronous policy value network pool.
-```
+Because MCTS performance is limited by GIL(python) and policy value networks,
+it is necessary to implement an asynchronous policy value network server.
 
+                  Parameter synchronization
+     ___________________________________________________
+    |                                                   |
+    |    self play data                    predict      ↓
+Trainer ←--------------- parallel MCTS ←----------- Policy Value Networks(server)
+```
 
 ## References
 1. Mastering the Game of Go without Human Knowledge
