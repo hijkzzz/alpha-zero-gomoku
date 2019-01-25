@@ -120,13 +120,7 @@ void TreeNode::backup(double value) {
 double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
   auto n_visited = this->n_visited;
 
-  unsigned int sum_n_visited = 0;
-  std::for_each(this->parent->children.begin(), this->parent->children.end(),
-                [&sum_n_visited](TreeNode *node) {
-                  sum_n_visited += node ? node->n_visited : 0;
-                });
-
-  double u = (c_puct * this->p_sa * sqrt(sum_n_visited) / (1 + n_visited));
+  double u = (c_puct * this->p_sa * sqrt(this->parent->n_visited) / (1 + n_visited));
   auto virtual_loss = this->virtual_loss.load() * c_virtual_loss;
 
   // free-lock tree search: if n_visited is 0, then ignore q_sa
