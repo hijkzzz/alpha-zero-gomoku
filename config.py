@@ -4,7 +4,7 @@ config = {
     'n_in_row': 5,
 
     # mcts
-    'thread_pool_size': 8,
+    'thread_pool_size': 4,
     'num_mcts_sims': 400,
     'c_puct': 5,
     'c_virtual_loss': 0.1,
