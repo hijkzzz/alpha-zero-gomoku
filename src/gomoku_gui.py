@@ -4,7 +4,7 @@ import os
 import numpy as np
 
 class GomokuGUI():
-    def __init__(self, n, human_color=1, fps=30):
+    def __init__(self, n, human_color=1, fps=10):
 
         # color, white for player 1, black for player -1
         self.white = (255, 255, 255)
