@@ -6,19 +6,31 @@ int main() {
   Gomoku gomoku(10, 5, 1);
 
   // test execute_move
-  gomoku.execute_move(10 * 0 + 4);
-  gomoku.execute_move(10 * 6 + 1);
-
-  gomoku.execute_move(10 * 1 + 3);
-  gomoku.execute_move(10 * 6 + 2);
-
-  gomoku.execute_move(10 * 2 + 2);
-  gomoku.execute_move(10 * 6 + 3);
-
-  gomoku.execute_move(10 * 3 + 1);
-  gomoku.execute_move(10 * 6 + 4);
-
-  gomoku.execute_move(10 * 4 + 0);
+  gomoku.execute_move(3);
+  gomoku.execute_move(4);
+  gomoku.execute_move(6);
+  gomoku.execute_move(23);
+  gomoku.execute_move(8);
+  gomoku.execute_move(9);
+  gomoku.execute_move(78);
+  gomoku.execute_move(0);
+  gomoku.execute_move(17);
+  gomoku.execute_move(7);
+  gomoku.execute_move(19);
+  gomoku.execute_move(67);
+  gomoku.execute_move(60);
+  gomoku.execute_move(14);
+  gomoku.execute_move(11);
+  gomoku.execute_move(2);
+  gomoku.execute_move(99);
+  gomoku.execute_move(10);
+  gomoku.execute_move(1);
+  gomoku.execute_move(5);
+  gomoku.execute_move(18);
+  gomoku.execute_move(12);
+  gomoku.execute_move(15);
+  gomoku.execute_move(24);
+  gomoku.execute_move(16);
 
   // test display
   gomoku.display();
@@ -37,27 +49,9 @@ int main() {
   for (unsigned int i = 0; i < legal_moves.size(); i++) {
     std::cout << legal_moves[i] << ", ";
   }
-  std::cout << legal_moves.size() << std::endl;
+  std::cout << std::endl;
 
   // test get_game_status
   auto game_status = gomoku.get_game_status();
   std::cout << game_status[0] << ", " << game_status[1] << std::endl;
-
-  // test copy
-  auto g = std::make_shared<Gomoku>(10, 5, 1);
-  g->execute_move(12);
-  g->execute_move(13);
-  g->execute_move(14);
-  g->execute_move(15);
-  g->execute_move(16);
-  g->execute_move(17);
-  g->execute_move(18);
-  g->execute_move(19);
-  g->display();
-
-  std::vector<std::shared_ptr<Gomoku>> vec;
-  for (size_t i = 0; i < 100; i++) {
-    auto new_g = std::make_shared<Gomoku>(*g.get());
-    vec.push_back(new_g);
-  }
 }

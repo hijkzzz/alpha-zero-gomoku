@@ -211,16 +211,23 @@ class Leaner():
         players = [player2, None, player1]
         player_index = first_player
         gomoku = Gomoku(self.n, self.n_in_row, first_player)
+        self.gomoku_gui.reset_status()
 
-        ended, winner = 0, 0
-        while ended == 0:
+        while True:
             player = players[player_index + 1]
 
-            # execute best move
+            # select best move
             prob = player.get_action_probs(gomoku)
             best_move = int(np.argmax(np.array(list(prob))))
+
+            # execute move
             gomoku.execute_move(best_move)
             self.gomoku_gui.execute_move(player_index, best_move)
+
+            # check game status
+            ended, winner = gomoku.get_game_status()
+            if ended == 1:
+                return winner
 
             # update search tree
             player1.update_with_move(best_move)
@@ -228,9 +235,7 @@ class Leaner():
 
             # next player
             player_index = -player_index
-            ended, winner = gomoku.get_game_status()
 
-        return winner
 
     def get_symmetries(self, board, pi):
         # mirror, rotational
@@ -265,11 +270,10 @@ class Leaner():
         players = ["alpha", None, "human"] if human_color == 1 else ["human", None, "alpha"]
         player_index = human_color if human_first else -human_color
 
-        ended, winner = 0, 0
-        while ended == 0:
+        while True:
             player = players[player_index + 1]
 
-            # execute move
+            # select move
             if player == "alpha":
                 prob = mcts_best.get_action_probs(gomoku)
                 best_move = int(np.argmax(np.array(list(prob))))
@@ -281,15 +285,19 @@ class Leaner():
                     time.sleep(0.01)
                 best_move = self.gomoku_gui.get_human_move()
 
-            # update game status
+            # execute move
             gomoku.execute_move(best_move)
 
-            # update mcts
+            # check game status
+            ended, winner = gomoku.get_game_status()
+            if ended == 1:
+                break
+
+            # update tree search
             mcts_best.update_with_move(best_move)
 
             # next player
             player_index = -player_index
-            ended, winner = gomoku.get_game_status()
 
         print("human win" if winner == human_color else "alpha win")
 

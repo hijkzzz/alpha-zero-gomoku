@@ -71,16 +71,10 @@ python learner_test.py play  # play with human
 ![](https://github.com/hijkzzz/alpha-zero-gomoku/blob/master/assets/gomoku_gui.png)
 
 ## TODO
-```
-Because parallel MCTS's performance is limited by GIL(python) and policy value network,
-it is necessary to implement an asynchronous policy value network server.
+* a prediction Queue for Policy Value Network
 
-                       Parameter synchronization
-     __________________________________________________________
-    |                                                          |
-    |    self play data                    predict             ↓
-Trainer ←--------------- parallel MCTS ←----------- Policy Value Networks(server)
-```
+## Notice
+* If your computer is out of memory, reduce the number of threads or pre-allocated tree nodes(mcts.cpp, #define thread_object_pool_size) for each thread.
 
 ## References
 1. Mastering the Game of Go without Human Knowledge
