@@ -7,7 +7,7 @@ config = {
     'thread_pool_size': 4,
     'num_mcts_sims': 400,
     'c_puct': 5,
-    'c_virtual_loss': 0.1,
+    'c_virtual_loss': 0.5,
 
     # neural_network
     'lr': 0.002,
