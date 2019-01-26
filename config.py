@@ -12,7 +12,7 @@ config = {
     # neural_network
     'lr': 0.002,
     'l2': 0.0002,
-    'num_channels': 256,
+    'num_channels': 128,
     'epochs': 5,
     'batch_size': 512,
     'kl_targ': 0.04,
