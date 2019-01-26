@@ -1,6 +1,6 @@
 config = {
     # gomoku
-    'n': 10,
+    'n': 8,
     'n_in_row': 5,
 
     # mcts

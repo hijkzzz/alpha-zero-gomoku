@@ -103,12 +103,11 @@ class NeuralNetWorkWrapper():
         # extract train data
         board_batch, last_action_batch, cur_player_batch, p_batch, v_batch = list(zip(*example_batch))
 
-        state_batch = self._data_convert(board_batch, last_action_batch, cur_player_batch)
+        state_batch = self._data_convert(board_batch, last_action_batch, cur_player_batch, self.cuda)
         p_batch = torch.Tensor(p_batch)
         v_batch = torch.Tensor(v_batch).unsqueeze(1)
 
         if self.cuda:
-            state_batch = state_batch.cuda()
             p_batch = p_batch.cuda()
             v_batch = v_batch.cuda()
 
@@ -151,18 +150,15 @@ class NeuralNetWorkWrapper():
 
         self.set_learning_rate(self.lr)
 
-
     def infer(self, feature_batch):
         """predict p and v by raw input
            return numpy
         """
         board_batch, last_action_batch, cur_player_batch = list(zip(*feature_batch))
-        states = self._data_convert(board_batch, last_action_batch, cur_player_batch)
-        if self.cuda:
-            states = states.cuda()
+        states = self._data_convert(board_batch, last_action_batch, cur_player_batch, self.cuda)
 
         self.neural_network.eval()
-        log_ps, vs  = self.neural_network(states)
+        log_ps, vs = self.neural_network(states)
 
         return np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy()
 
@@ -172,22 +168,25 @@ class NeuralNetWorkWrapper():
         """
 
         self.neural_network.eval()
-        log_ps, vs  = self.neural_network(state_batch)
+        log_ps, vs = self.neural_network(state_batch)
 
         return np.exp(log_ps.cpu().detach().numpy()), vs.cpu().detach().numpy()
 
-    def _data_convert(self, board_batch, last_action_batch, cur_player_batch):
+    def _data_convert(self, board_batch, last_action_batch, cur_player_batch, cuda=False):
         """convert data format
            return tensor
         """
         n = self.n
 
-        board_batch = torch.Tensor(board_batch).unsqueeze(1)
-
+        board_batch = torch.Tensor(board_batch).cuda().unsqueeze(1) \
+            if cuda else torch.Tensor(board_batch).unsqueeze(1)
         player1_batch0 = (board_batch > 0).float()
-        plater_1_batch0 = (board_batch < 0).float()
-        last_action_batch0 = torch.zeros((len(last_action_batch), 1, n, n)).float()
-        cur_player_batch0 = torch.ones((len(cur_player_batch), 1, n, n)).float()
+        player_1_batch0 = (board_batch < 0).float()
+
+        last_action_batch0 = torch.zeros((len(last_action_batch), 1, n, n)).cuda().float() \
+            if cuda else torch.zeros((len(last_action_batch), 1, n, n)).float()
+        cur_player_batch0 = torch.ones((len(cur_player_batch), 1, n, n)).cuda().float() \
+            if cuda else  torch.ones((len(cur_player_batch), 1, n, n)).float()
 
         for i in range(len(cur_player_batch)):
             cur_player_batch0[i][0] *= cur_player_batch[i]
@@ -197,7 +196,7 @@ class NeuralNetWorkWrapper():
                 x, y = last_action // self.n, last_action % self.n
                 last_action_batch0[i][0][x][y] = 1
 
-        return torch.cat((player1_batch0, plater_1_batch0, last_action_batch0, cur_player_batch0), dim=1)
+        return torch.cat((player1_batch0, player_1_batch0, last_action_batch0, cur_player_batch0), dim=1)
 
     def set_learning_rate(self, lr):
         """set learning rate
