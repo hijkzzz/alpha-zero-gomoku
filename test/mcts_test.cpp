@@ -4,16 +4,18 @@
 class TestNeuralNetwork : public VirtualNeuralNetwork {
 public:
   std::vector<std::vector<double>> infer(Gomoku *gomoku) {
-    return {{0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-             0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-             0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-             0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-             0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-             0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-             0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-             0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-             0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-             0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,},
+    return {{
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
+            },
             {0.}};
   }
 };
@@ -30,13 +32,16 @@ int main() {
   g->execute_move(17);
   g->execute_move(18);
   g->execute_move(19);
-  // g->display();
+  g->display();
+
+  auto m = std::make_shared<MCTS>(t.get(), n.get(), 5, 400, 0.5,
+                                  g->get_action_size());
 
   std::cout << "RUNNING" << std::endl;
 
-  // auto res = m->get_action_probs(g.get(), 1e-3);
-  // std::for_each(res.begin(), res.end(), [](double x) { std::cout << x << ",
-  // "; });
+  auto res = m->get_action_probs(g.get(), 1);
+  std::for_each(res.begin(), res.end(),
+                [](double x) { std::cout << x << ", "; });
 
   // while (g->get_game_status()[0] == 0) {
   //   auto res = m->get_action_probs(g.get(), 1);
@@ -61,18 +66,16 @@ int main() {
   // }
 
   // memory test
-  auto m = std::make_shared<MCTS>(t.get(), n.get(), 5, 800, 0.1,
-                      g->get_action_size());
 
-  while (true) {
-    auto res = m->get_action_probs(g.get(), 1);
-    std::for_each(res.begin(), res.end(),
-                  [](double x) { std::cout << x << ","; });
-    std::cout << std::endl;
-    m->update_with_move(-1);
+  // while (true) {
+  //   auto res = m->get_action_probs(g.get(), 1);
+  //   std::for_each(res.begin(), res.end(),
+  //                 [](double x) { std::cout << x << ","; });
+  //   std::cout << std::endl;
+  //   m->update_with_move(-1);
 
-    break;
-  }
+  //   break;
+  // }
 
   return 0;
 }
