@@ -5,17 +5,17 @@ config = {
 
     # mcts
     'thread_pool_size': 4,
-    'num_mcts_sims': 400,
+    'num_mcts_sims': 800,
     'c_puct': 5,
     'c_virtual_loss': 0.5,
 
     # neural_network
     'lr': 0.001,
     'l2': 0.0002,
-    'num_channels': 128,
+    'num_channels': 256,
     'epochs': 5,
     'batch_size': 512,
-    'kl_targ': 0.02,
+    'kl_targ': 0.04,
 
     # train
     'num_iters': 100000,
