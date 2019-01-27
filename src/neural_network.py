@@ -129,7 +129,7 @@ class NeuralNetWorkWrapper():
             self.optim.step()
 
             # calculate KL divergence
-            new_p, new_v = self._infer(state_batch)
+            new_p, _ = self._infer(state_batch)
 
             kl = np.mean(np.sum(old_p * (
                 np.log(old_p + 1e-10) - np.log(new_p + 1e-10)),
@@ -143,12 +143,12 @@ class NeuralNetWorkWrapper():
         print("LOSS :: {}, LR :: {},  KL :: {}".format(loss.item(), self.lr, kl))
 
         # adaptively adjust the learning rate
-        if kl > self.kl_targ * 2 and self.lr > 0.0005:
-            self.lr /= 1.5
-        elif kl < self.kl_targ / 2 and self.lr < 0.1:
-            self.lr *= 1.5
+        # if kl > self.kl_targ * 2 and self.lr > 0.0005:
+        #     self.lr /= 1.5
+        # elif kl < self.kl_targ / 2 and self.lr < 0.1:
+        #     self.lr *= 1.5
 
-        self.set_learning_rate(self.lr)
+        # self.set_learning_rate(self.lr)
 
     def infer(self, feature_batch):
         """predict p and v by raw input
