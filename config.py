@@ -1,6 +1,6 @@
 config = {
     # gomoku
-    'n': 8,
+    'n': 10,
     'n_in_row': 5,
 
     # mcts
@@ -10,12 +10,12 @@ config = {
     'c_virtual_loss': 0.5,
 
     # neural_network
-    'lr': 0.002,
+    'lr': 0.001,
     'l2': 0.0002,
     'num_channels': 128,
     'epochs': 5,
     'batch_size': 512,
-    'kl_targ': 0.04,
+    'kl_targ': 0.02,
 
     # train
     'num_iters': 100000,
