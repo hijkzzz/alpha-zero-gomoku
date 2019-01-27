@@ -140,12 +140,12 @@ class NeuralNetWorkWrapper():
             if kl > self.kl_targ * 4:
                 break
 
-        print("LOSS :: {}, LR :: {}, KL :: {}".format(loss.item(), self.lr, kl))
+        print("LOSS :: {}, LR :: {},  KL :: {}".format(loss.item(), self.lr, kl))
 
         # adaptively adjust the learning rate
-        if kl > self.kl_targ * 2 and self.lr > 0.001:
+        if kl > self.kl_targ * 2 and self.lr > 0.0005:
             self.lr /= 1.5
-        elif kl < self.kl_targ / 2 and self.lr < 0.2:
+        elif kl < self.kl_targ / 2 and self.lr < 0.1:
             self.lr *= 1.5
 
         self.set_learning_rate(self.lr)
