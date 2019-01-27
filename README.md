@@ -11,22 +11,22 @@ A multi-threaded implementation of AlphaZero
 config.py
 
     [gomoku]
-    n = 12                                 board size
+    n = 8                                 board size
     nir = 5                                n in row
 
     [mcts]
     thread_pool_size = 4                   C++ threads number
     num_mcts_sims = 400                    mcts simulation times
     c_puct = 5                             PUCT coeff
-    c_virtual_loss = 0.1                   virtual loss coeff(see [Parallel MCTS](#References))
+    c_virtual_loss = 0.5                   virtual loss coeff(see [Parallel MCTS](#References))
 
     [neural_network]
-    lr = 0.002                             learning rate
+    lr = 0.001                             learning rate
     l2 = 0.0002                            L2
     num_channels = 128                     convolution neural network channel size
     epochs = 5                             train epochs
     batch_size = 512                       batch size
-    kl_targ = 0.04                         threshold of KL divergence
+    kl_targ = 0.03                         threshold of KL divergence
 
     [train]
     num_iters = 100000                     train iterations
