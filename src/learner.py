@@ -4,6 +4,7 @@ from collections import deque
 import threading
 import time
 import math
+import os
 
 from neural_network import NeuralNetWorkWrapper
 from swig import MCTS, ThreadPool, Gomoku, VirtualNeuralNetwork
@@ -80,6 +81,10 @@ class Leaner():
         # train the model by self play
         t = threading.Thread(target=self.gomoku_gui.loop)
         t.start()
+
+        if os.path.exists('./models/checkpoint'):
+            print("loading checkpoint...")
+            self.nnet.load_model(filename="checkpoint")
 
         self.nnet.save_model(filename="best_checkpoint")
 

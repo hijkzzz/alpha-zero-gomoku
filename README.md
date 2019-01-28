@@ -18,15 +18,15 @@ config.py
     thread_pool_size = 4                   C++ threads number
     num_mcts_sims = 400                    mcts simulation times
     c_puct = 5                             PUCT coeff
-    c_virtual_loss = 0.5                   virtual loss coeff(see [Parallel MCTS](#References))
+    c_virtual_loss = 1                     virtual loss coeff(see [Parallel MCTS](#References))
 
     [neural_network]
     lr = 0.001                             learning rate
-    l2 = 0.0002                            L2
+    l2 = 0.0001                            L2
     num_channels = 128                     convolution neural network channel size
     epochs = 5                             train epochs
     batch_size = 512                       batch size
-    kl_targ = 0.03                         threshold of KL divergence
+    kl_targ = 0.02                         threshold of KL divergence
 
     [train]
     num_iters = 100000                     train iterations
@@ -37,7 +37,7 @@ config.py
     update_threshold = 0.55                update model threshold
     contest_num = 10                       new/old model compare times
     check_freq  = 50                       test model frequency
-    examples_buffer_max_len = 10000        max length of examples buffer
+    examples_buffer_max_len = 20000        max length of examples buffer
 
     [test]
     human_color = 1                        human player's color
