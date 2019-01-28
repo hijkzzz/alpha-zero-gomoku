@@ -137,7 +137,7 @@ class NeuralNetWorkWrapper():
             )
 
             # early stopping if D_KL diverges badly
-            if kl > self.kl_targ * 4:
+            if kl > self.kl_targ * 2:
                 break
 
         print("LOSS :: {}, LR :: {},  KL :: {}".format(loss.item(), self.lr, kl))
