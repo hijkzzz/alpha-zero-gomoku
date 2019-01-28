@@ -6,8 +6,8 @@ config = {
     # mcts
     'thread_pool_size': 4,
     'num_mcts_sims': 400,
-    'c_puct': 5,
-    'c_virtual_loss': 0.5,
+    'c_puct': 3,
+    'c_virtual_loss': 1,
 
     # neural_network
     'lr': 0.001,
@@ -15,18 +15,18 @@ config = {
     'num_channels': 128,
     'epochs': 5,
     'batch_size': 512,
-    'kl_targ': 0.03,
+    'kl_targ': 0.02,
 
     # train
     'num_iters': 100000,
     'num_eps': 1,
     'explore_num': 2,
     'temp': 1,
-    'dirichlet_alpha': 0.3,
+    'dirichlet_alpha': 0.2,
     'update_threshold': 0.55,
     'contest_num': 10,
     'check_freq': 50,
-    'examples_buffer_max_len': 20000,
+    'examples_buffer_max_len': 30000,
 
     # test
     'human_color': 1
