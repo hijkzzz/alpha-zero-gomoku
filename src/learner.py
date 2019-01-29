@@ -79,8 +79,8 @@ class Leaner():
 
     def learn(self):
         # train the model by self play
-        t = threading.Thread(target=self.gomoku_gui.loop)
-        t.start()
+        # t = threading.Thread(target=self.gomoku_gui.loop)
+        # t.start()
 
         if os.path.exists('./models/checkpoint'):
             print("loading checkpoint...")
@@ -128,7 +128,7 @@ class Leaner():
                     print('REJECTING NEW MODEL')
 
 
-        t.join()
+        # t.join()
 
     def self_play(self, first_color):
         """
@@ -214,7 +214,7 @@ class Leaner():
         players = [player2, None, player1]
         player_index = first_player
         gomoku = Gomoku(self.n, self.n_in_row, first_player)
-        self.gomoku_gui.reset_status()
+        # self.gomoku_gui.reset_status()
 
         while True:
             player = players[player_index + 1]
@@ -225,7 +225,7 @@ class Leaner():
 
             # execute move
             gomoku.execute_move(best_move)
-            self.gomoku_gui.execute_move(player_index, best_move)
+            # self.gomoku_gui.execute_move(player_index, best_move)
 
             # check game status
             ended, winner = gomoku.get_game_status()
