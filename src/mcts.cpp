@@ -16,7 +16,7 @@ TreeNode::TreeNode()
     : is_leaf(1), virtual_loss(0), q_sa(0), p_sa(0), n_visited(0) {}
 
 TreeNode::TreeNode(
-    const TreeNode &node) { // because automic<>, define copy function
+    const TreeNode &node) {  // because automic<>, define copy function
   // struct
   this->parent = node.parent;
   this->children = node.children;
@@ -30,8 +30,13 @@ TreeNode::TreeNode(
 }
 
 TreeNode::TreeNode(TreeNode *parent, double p_sa, unsigned int action_size)
-    : parent(parent), p_sa(p_sa), children(action_size, nullptr), is_leaf(true),
-      virtual_loss(0), q_sa(0), n_visited(0) {}
+    : parent(parent),
+      p_sa(p_sa),
+      children(action_size, nullptr),
+      is_leaf(true),
+      virtual_loss(0),
+      q_sa(0),
+      n_visited(0) {}
 
 TreeNode &TreeNode::operator=(const TreeNode &node) {
   if (this == &node) {
@@ -108,9 +113,6 @@ void TreeNode::backup(double value) {
   // If it is not root, this node's parent should be updated first
   if (this->parent != nullptr) {
     this->parent->backup(-value);
-
-    // remove virtual loss
-    this->virtual_loss++;
   }
 
   this->q_sa = (this->n_visited * this->q_sa + value) / (this->n_visited + 1);
@@ -130,8 +132,10 @@ double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
 
   // free-lock tree search: if n_visited is 0, then ignore q_sa
   if (n_visited == 0) {
-    return u + virtual_loss;
+    return u;
   } else {
+    double virtual_loss =
+        c_virtual_loss * this->virtual_loss.load() / n_visited;
     return this->q_sa + u + virtual_loss;
   }
 }
@@ -140,9 +144,12 @@ double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
 MCTS::MCTS(ThreadPool *thread_pool, VirtualNeuralNetwork *neural_network,
            unsigned int c_puct, unsigned int num_mcts_sims,
            double c_virtual_loss, unsigned int action_size)
-    : neural_network(neural_network), c_puct(c_puct),
-      num_mcts_sims(num_mcts_sims), c_virtual_loss(c_virtual_loss),
-      thread_pool(thread_pool), action_size(action_size),
+    : neural_network(neural_network),
+      c_puct(c_puct),
+      num_mcts_sims(num_mcts_sims),
+      c_virtual_loss(c_virtual_loss),
+      thread_pool(thread_pool),
+      action_size(action_size),
       root(nullptr, 1., action_size) {}
 
 void MCTS::update_with_move(int last_action) {
@@ -236,7 +243,6 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
 
   // not end
   if (!status[0]) {
-
     // predict action_probs and value by neural network
     std::vector<double> action_priors(this->action_size, 0);
 
@@ -244,7 +250,7 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
       // std::lock_guard<std::mutex> lock(this->lock);
       auto res = std::move(this->neural_network->infer(game.get()));
 
-      action_priors.assign(res[0].begin(), res[0].end());
+      action_priors = std::move(res[0]);
       value = res[1][0];
     }
 
