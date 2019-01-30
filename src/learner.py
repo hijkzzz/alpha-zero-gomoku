@@ -148,20 +148,11 @@ class Leaner():
         while True:
             episode_step += 1
 
-            # temperature
+            # prob
             temp = self.temp if episode_step <= self.explore_num else 0
-
             prob = np.array(list(mcts.get_action_probs(gomoku, temp)))
 
-            board = tuple_2d_to_numpy_2d(gomoku.get_board())
-            last_action = gomoku.get_last_move()
-            cur_player = gomoku.get_current_color()
-
-            sym = self.get_symmetries(board, prob)
-            for b, p in sym:
-                train_examples.append([b, last_action, cur_player, p])
-
-            # Dirichlet noise
+            # dirichlet noise
             legal_moves = list(gomoku.get_legal_moves())
             noise = 0.25 * np.random.dirichlet(self.dirichlet_alpha * np.ones(np.count_nonzero(legal_moves)))
 
@@ -174,11 +165,21 @@ class Leaner():
             prob_noise /= np.sum(prob_noise)
             action = np.random.choice(len(prob_noise), p=prob_noise)
 
+            # execute move
             gomoku.execute_move(action)
             mcts.update_with_move(action)
-            ended, winner = gomoku.get_game_status()
 
-            # GAME OVER
+            # generate sample
+            board = tuple_2d_to_numpy_2d(gomoku.get_board())
+            last_action = gomoku.get_last_move()
+            cur_player = gomoku.get_current_color()
+
+            sym = self.get_symmetries(board, prob)
+            for b, p in sym:
+                train_examples.append([b, last_action, cur_player, p])
+
+            # is ended
+            ended, winner = gomoku.get_game_status()
             if ended == 1:
                 # b, last_action, cur_player, p, v
                 return [(x[0], x[1], x[2], x[3], x[2] * winner) for x in train_examples]
@@ -214,7 +215,6 @@ class Leaner():
         players = [player2, None, player1]
         player_index = first_player
         gomoku = Gomoku(self.n, self.n_in_row, first_player)
-        # self.gomoku_gui.reset_status()
 
         while True:
             player = players[player_index + 1]
@@ -225,7 +225,6 @@ class Leaner():
 
             # execute move
             gomoku.execute_move(best_move)
-            # self.gomoku_gui.execute_move(player_index, best_move)
 
             # check game status
             ended, winner = gomoku.get_game_status()
@@ -238,7 +237,6 @@ class Leaner():
 
             # next player
             player_index = -player_index
-
 
     def get_symmetries(self, board, pi):
         # mirror, rotational
