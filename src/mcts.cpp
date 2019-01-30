@@ -246,13 +246,9 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
     // predict action_probs and value by neural network
     std::vector<double> action_priors(this->action_size, 0);
 
-    {
-      // std::lock_guard<std::mutex> lock(this->lock);
-      auto res = std::move(this->neural_network->infer(game.get()));
-
-      action_priors = std::move(res[0]);
-      value = res[1][0];
-    }
+    auto res = std::move(this->neural_network->infer(game.get()));
+    action_priors = std::move(res[0]);
+    value = res[1][0];
 
     // mask invalid actions
     auto legal_moves = game->get_legal_moves();

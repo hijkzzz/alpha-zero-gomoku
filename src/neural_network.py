@@ -137,18 +137,11 @@ class NeuralNetWorkWrapper():
             )
 
             # early stopping if D_KL diverges badly
-            if kl > self.kl_targ * 2:
+            if kl > self.kl_targ:
                 break
 
-        print("LOSS :: {}, LR :: {},  KL :: {}".format(loss.item(), self.lr, kl))
+        print("LOSS :: {},  KL :: {}".format(loss.item(), kl))
 
-        # adaptively adjust the learning rate
-        # if kl > self.kl_targ * 2 and self.lr > 0.0005:
-        #     self.lr /= 1.5
-        # elif kl < self.kl_targ / 2 and self.lr < 0.1:
-        #     self.lr *= 1.5
-
-        # self.set_learning_rate(self.lr)
 
     def infer(self, feature_batch):
         """predict p and v by raw input
