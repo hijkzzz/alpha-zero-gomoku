@@ -1,11 +1,11 @@
 config = {
     # gomoku
-    'n': 10,
-    'n_in_row': 5,
+    'n': 8,
+    'n_in_row': 4,
 
     # mcts
     'thread_pool_size': 4,
-    'num_mcts_sims': 800,
+    'num_mcts_sims': 400,
     'c_puct': 3,
     'c_virtual_loss': 1,
 

@@ -11,12 +11,12 @@ A multi-threaded implementation of AlphaZero
 config.py
 
     [gomoku]
-    n = 10                                 board size
-    nir = 5                                n in row
+    n = 8                                 board size
+    nir = 4                               n in row
 
     [mcts]
     thread_pool_size = 4                   C++ threads number
-    num_mcts_sims = 800                    mcts simulation times
+    num_mcts_sims = 400                    mcts simulation times
     c_puct = 3                             PUCT coeff
     c_virtual_loss = 1                     virtual loss coeff(see [Parallel MCTS](#References))
 
@@ -31,9 +31,9 @@ config.py
     [train]
     num_iters = 100000                     train iterations
     num_eps = 1                            self play times in per iter
-    explore_num  = 2                       explore step in a game
+    explore_num  = 0                       explore step in a game
     temp  = 1                              temperature
-    dirichlet_alpha  = 0.3                 action noise in self play games
+    dirichlet_alpha  = 0.1                 action noise in self play games
     update_threshold = 0.55                update model threshold
     contest_num = 10                       new/old model compare times
     check_freq  = 50                       test model frequency
