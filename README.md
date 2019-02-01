@@ -15,10 +15,10 @@ config.py
     nir = 4                               n in row
 
     [mcts]
-    thread_pool_size = 4                   C++ threads number
+    thread_pool_size = 4                   MCTS threads number
     num_mcts_sims = 400                    mcts simulation times
     c_puct = 3                             PUCT coeff
-    c_virtual_loss = 1                     virtual loss coeff(see [Parallel MCTS](#References))
+    c_virtual_loss = 1                     virtual loss coeff
 
     [neural_network]
     lr = 0.001                             learning rate
