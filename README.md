@@ -71,15 +71,14 @@ python learner_test.py play  # play with human
 ![](https://github.com/hijkzzz/alpha-zero-gomoku/blob/master/assets/gomoku_gui.png)
 
 ## TODO
-* Policy Value Network Pool with Task Queue(The performance of the parallel MCTS is limited by single neural network)
+* Policy Value Network with Task Queue(The performance of the parallel MCTS is limited by Python GIL and neural network)
 
 ## Notice
-* If your computer is out of memory, reduce the number of threads or pre-allocated tree nodes(mcts.cpp, #define thread_object_pool_size) for each thread.
+* If your computer is out of memory, reduce the number of pre-allocated tree nodes(#define thread_object_pool_size in mcts.cpp).
 
 ## References
 1. Mastering the Game of Go without Human Knowledge
 2. Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm
 3. Parallel Monte-Carlo Tree Search
 4. A Lock-free Multithreaded Monte-Carlo Tree Search Algorithm
-5. On the Scalability of Parallel UCT
-6. github.com/suragnair/alpha-zero-general
+5. github.com/suragnair/alpha-zero-general
