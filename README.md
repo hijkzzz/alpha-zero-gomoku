@@ -71,7 +71,7 @@ python learner_test.py play  # play with human
 ![](https://github.com/hijkzzz/alpha-zero-gomoku/blob/master/assets/gomoku_gui.png)
 
 ## TODO
-* Policy Value Network with Task Queue(The performance of the parallel MCTS is limited by Python GIL and neural network)
+* Policy Value Network with Task Queue(The performance of the parallel MCTS is limited by Python GIL and neural network
 
 ## Notice
 * If your computer is out of memory, reduce the number of pre-allocated tree nodes(#define thread_object_pool_size in mcts.cpp).
