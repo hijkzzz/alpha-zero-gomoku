@@ -9,7 +9,7 @@ from distutils.core import setup, Extension
 
 swig_module = Extension('_swig',
                            include_dirs=['.'],
-                           sources=['swig_wrap.cxx', 'mcts.cpp', 'gomoku.cpp'],
+                           sources=['swig_wrap.cxx', 'mcts.cpp', 'gomoku.cpp', 'lib_torch.cpp'],
                            )
 
 setup(name='swig',

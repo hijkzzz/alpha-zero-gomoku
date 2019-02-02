@@ -1,12 +1,12 @@
 #include <math.h>
-#include <gomoku.h>
-
 #include <iostream>
+
+#include <gomoku.h>
 
 Gomoku::Gomoku(unsigned int n, unsigned int n_in_row, int first_color)
     : n(n), n_in_row(n_in_row), cur_color(first_color), last_move(-1) {
   this->board = std::vector<std::vector<int>>(n, std::vector<int>(n, 0));
-};
+}
 
 std::vector<int> Gomoku::get_legal_moves() {
   auto n = this->n;
@@ -21,7 +21,7 @@ std::vector<int> Gomoku::get_legal_moves() {
   }
 
   return legal_moves;
-};
+}
 
 bool Gomoku::has_legal_moves() {
   auto n = this->n;
@@ -34,7 +34,7 @@ bool Gomoku::has_legal_moves() {
     }
   }
   return false;
-};
+}
 
 void Gomoku::execute_move(move_type move) {
   auto i = move / this->n;
@@ -48,7 +48,7 @@ void Gomoku::execute_move(move_type move) {
   this->last_move = move;
   // change player
   this->cur_color = -this->cur_color;
-};
+}
 
 std::vector<int> Gomoku::get_game_status() {
   // return (is ended, winner)
@@ -108,7 +108,7 @@ std::vector<int> Gomoku::get_game_status() {
   } else {
     return {1, 0};
   }
-};
+}
 
 void Gomoku::display() const {
   auto n = this->board.size();

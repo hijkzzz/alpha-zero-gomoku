@@ -47,3 +47,6 @@ if __name__ == "__main__":
 
     # test infer
     print('infer \n', policy_value_net.infer(list(zip(board_batch, last_action_batch, cur_player_batch))))
+
+    #save model
+    neural_network.NeuralNetWorkWrapper(lr, l2, kl_targ, epochs, 256, 10, 100).save_model()

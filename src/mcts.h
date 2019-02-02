@@ -1,6 +1,4 @@
-
-#if !defined(__MCTS__)
-#define __MCTS__
+#pragma once
 
 #include <unordered_map>
 #include <string>
@@ -10,9 +8,10 @@
 
 #include <gomoku.h>
 #include <thread_pool.h>
+#include <libtorch.h>
 
 class TreeNode {
-public:
+ public:
   // friend class can access private variables
   friend class MCTS;
 
@@ -29,49 +28,38 @@ public:
   double get_value(double c_puct, double c_virtual_loss) const;
   inline bool get_is_leaf() const { return this->is_leaf; }
 
-private:
+ private:
   // store tree
   TreeNode *parent;
   std::vector<TreeNode *> children;
   bool is_leaf;
+  std::mutex lock;
 
-  // non lock
-  unsigned int n_visited;
+  std::atomic<int> n_visited;
   double p_sa;
   double q_sa;
-
   std::atomic<int> virtual_loss;
 };
 
-// SWIG callback inferface
-class VirtualNeuralNetwork {
-  public:
-    virtual std::vector<std::vector<double>> infer(Gomoku *gomoku) = 0;
-    virtual ~VirtualNeuralNetwork() {};
-};
-
 class MCTS {
-public:
-  MCTS(ThreadPool* thread_pool,
-       VirtualNeuralNetwork* neural_network, unsigned int c_puct,
+ public:
+  MCTS(std::string model_path, unsigned int thread_num, unsigned int c_puct,
        unsigned int num_mcts_sims, double c_virtual_loss,
        unsigned int action_size);
-  std::vector<double> get_action_probs(Gomoku* gomoku,
-                                       double temp = 1e-3);
+  std::vector<double> get_action_probs(Gomoku *gomoku, double temp = 1e-3);
   void update_with_move(int last_move);
+  static void tree_deleter(TreeNode * t);
 
-private:
+ private:
   void simulate(std::shared_ptr<Gomoku> game);
 
   // variables
-  TreeNode root;
-  ThreadPool* thread_pool;
-  VirtualNeuralNetwork* neural_network;
+  std::unique_ptr<TreeNode, decltype(MCTS::tree_deleter)*> root;
+  std::unique_ptr<ThreadPool> thread_pool;
+  std::unique_ptr<NeuralNetwork> neural_network;
 
   unsigned int action_size;
   unsigned int c_puct;
   unsigned int num_mcts_sims;
   double c_virtual_loss;
 };
-
-#endif // __MCTS__

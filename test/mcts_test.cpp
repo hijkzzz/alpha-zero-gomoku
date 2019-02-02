@@ -1,47 +1,28 @@
 #include <iostream>
 #include <mcts.h>
 
-class TestNeuralNetwork : public VirtualNeuralNetwork {
-public:
-  std::vector<std::vector<double>> infer(Gomoku *gomoku) {
-    return {{
-                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04,
-            },
-            {0.}};
-  }
-};
-
 int main() {
-  auto t = std::make_shared<ThreadPool>(4);
-  auto g = std::make_shared<Gomoku>(10, 5, 1);
-  auto n = std::make_shared<TestNeuralNetwork>();
-  g->execute_move(12);
-  g->execute_move(13);
-  g->execute_move(14);
-  g->execute_move(15);
-  g->execute_move(16);
-  g->execute_move(17);
-  g->execute_move(18);
-  g->execute_move(19);
-  g->display();
+  // auto t = std::make_shared<ThreadPool>(4);
+  // auto g = std::make_shared<Gomoku>(10, 5, 1);
+  // auto n = std::make_shared<TestNeuralNetwork>();
+  // g->execute_move(12);
+  // g->execute_move(13);
+  // g->execute_move(14);
+  // g->execute_move(15);
+  // g->execute_move(16);
+  // g->execute_move(17);
+  // g->execute_move(18);
+  // g->execute_move(19);
+  // g->display();
 
-  auto m = std::make_shared<MCTS>(t.get(), n.get(), 5, 400, 0.5,
-                                  g->get_action_size());
+  // auto m = std::make_shared<MCTS>(t.get(), n.get(), 5, 400, 0.5,
+  //                                 g->get_action_size());
 
-  std::cout << "RUNNING" << std::endl;
+  // std::cout << "RUNNING" << std::endl;
 
-  auto res = m->get_action_probs(g.get(), 1);
-  std::for_each(res.begin(), res.end(),
-                [](double x) { std::cout << x << ", "; });
+  // auto res = m->get_action_probs(g.get(), 1);
+  // std::for_each(res.begin(), res.end(),
+  //               [](double x) { std::cout << x << ", "; });
 
   // while (g->get_game_status()[0] == 0) {
   //   auto res = m->get_action_probs(g.get(), 1);

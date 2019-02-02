@@ -1,12 +1,12 @@
 config = {
     # gomoku
-    'n': 8,
-    'n_in_row': 4,
+    'n': 10,
+    'n_in_row': 5,
 
     # mcts
     'thread_pool_size': 4,
-    'num_mcts_sims': 400,
-    'c_puct': 3,
+    'num_mcts_sims': 800,
+    'c_puct': 1.5,
     'c_virtual_loss': 1,
 
     # neural_network

@@ -1,6 +1,4 @@
-
-#if !defined(__GOMOKU__)
-#define __GOMOKU__
+#pragma once
 
 #include <tuple>
 #include <vector>
@@ -32,5 +30,3 @@ private:
   int cur_color;       // current player's color
   move_type last_move; // last move
 };
-
-#endif // __GOMOKU__

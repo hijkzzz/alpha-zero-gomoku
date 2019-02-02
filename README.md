@@ -2,7 +2,7 @@
 A multi-threaded implementation of AlphaZero
 
 ## Features
-* free lock parallel MCTS(only one atomic variable)
+* free lock parallel MCTS
 * Gomoku and MCTS are written in C++
 * swig wrap python extension
 
@@ -45,12 +45,12 @@ config.py
 
 ## Environment
 
-* SWIG 3.0+
 * Python 3.6+
-* GCC4.8.2+ for linux/MSVC14.00+ for windows (support C++11 and compatible with Python3.6+)
-* pytorch 0.4+
+* pytorch 1.0+
 * pygame
-
+* SWIG 3.0+
+* libtorch
+* GCC4.8.2+ for linux/MSVC14.00+ for windows
 
 ## Run
 ```
@@ -69,12 +69,6 @@ python learner_test.py play  # play with human
 
 ## GUI
 ![](https://github.com/hijkzzz/alpha-zero-gomoku/blob/master/assets/gomoku_gui.png)
-
-## TODO
-* Policy Value Network with Task Queue(The performance of the parallel MCTS is limited by Python GIL and neural network
-
-## Notice
-* If your computer is out of memory, reduce the number of pre-allocated tree nodes(#define thread_object_pool_size in mcts.cpp).
 
 ## References
 1. Mastering the Game of Go without Human Knowledge

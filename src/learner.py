@@ -7,7 +7,7 @@ import math
 import os
 
 from neural_network import NeuralNetWorkWrapper
-from swig import MCTS, ThreadPool, Gomoku, VirtualNeuralNetwork
+from swig import MCTS, Gomoku
 from gomoku_gui import GomokuGUI
 
 
@@ -18,24 +18,6 @@ def tuple_2d_to_numpy_2d(tuple_2d):
     for i, tuple_1d in enumerate(tuple_2d):
         res[i] = list(tuple_1d)
     return np.array(res)
-
-
-class CallbackNeuralNetwork(VirtualNeuralNetwork):
-    # for swig callback inferface
-    # Define Python class 'constructor'
-    def __init__(self, neural_network):
-        VirtualNeuralNetwork.__init__(self)
-        self.neural_network = neural_network
-
-    # Override C++ method
-    def infer(self, gomoku):
-        board = tuple_2d_to_numpy_2d(gomoku.get_board())
-        last_move = gomoku.get_last_move()
-        cur_player_color = gomoku.get_current_color()
-
-        p_batch, v_batch = self.neural_network.infer([(board, last_move, cur_player_color)])
-        return [p_batch[0].tolist(), v_batch[0].tolist()]
-
 
 class Leaner():
     def __init__(self, config):
