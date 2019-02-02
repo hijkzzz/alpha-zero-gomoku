@@ -3,7 +3,7 @@
 #include <iostream>
 
 NeuralNetwork::NeuralNetwork(std::string model_path)
-    : module(torch::jit::load(model_path)) {
+    : module(torch::jit::load(model_path.c_str())) {
   // move to CUDA
   this->module->to(at::kCUDA);
 }
@@ -13,13 +13,13 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
 
   // convert data format
   auto board = gomoku->get_board();
-  std::vector<int> board0;
+  std::vector<int32_t> board0;
   for (unsigned int i = 0; i < board.size(); i++) {
     board0.insert(board0.end(), board[i].begin(), board[i].end());
   }
 
   torch::Tensor temp =
-      torch::from_blob(&board0[0], {1, 1, n, n}, torch::dtype(torch::kInt64))
+      torch::from_blob(&board0[0], {1, 1, n, n}, torch::dtype(torch::kInt32))
           .toType(torch::kFloat32)
           .to(at::kCUDA);
 
@@ -49,10 +49,16 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
   // infer
   std::vector<torch::jit::IValue> inputs;
   inputs.push_back(torch::cat({state0, state1, state2, state3}, 1));
-  torch::Tensor result = this->module->forward(inputs).toTensor().to(at::kCPU);
+  auto result = this->module->forward(inputs).toTuple();
 
-  std::cout << result << std::endl;
+  torch::Tensor p = result->elements()[0].toTensor().exp().to(at::kCPU)[0];
+  torch::Tensor v = result->elements()[1].toTensor().to(at::kCPU)[0];
+
+  // debug
+  std::cout << p << std::endl;
+  std::cout << v << std::endl;
 
   // output
-  return {{}};
+  return {std::vector<double>(p.data_ptr, p.data_ptr + n * n),
+          std::vector<double>(v.data_ptr, v.data_ptr + 1)};
 }

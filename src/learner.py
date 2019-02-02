@@ -45,30 +45,24 @@ class Leaner():
 
         self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'], config['kl_targ'], config['epochs'],
                                          config['num_channels'], config['n'], self.action_size)
-        self.nnet_best = NeuralNetWorkWrapper(config['lr'], config['l2'], config['kl_targ'],
-                                              config['epochs'], config['num_channels'], config['n'], self.action_size)
-
-        # add callbacks for MCTS
-        self.nnet_cb = CallbackNeuralNetwork(self.nnet)
-        self.nnet_best_cb = CallbackNeuralNetwork(self.nnet_best)
-
         # mcts
         self.num_mcts_sims = config['num_mcts_sims']
         self.c_puct = config['c_puct']
         self.c_virtual_loss = config['c_virtual_loss']
-
-        self.thread_pool = ThreadPool(config['thread_pool_size'])
+        self.thread_pool_size = config['thread_pool_size']
 
     def learn(self):
         # train the model by self play
-        # t = threading.Thread(target=self.gomoku_gui.loop)
-        # t.start()
+        t = threading.Thread(target=self.gomoku_gui.loop)
+        t.start()
 
         if os.path.exists('./models/checkpoint'):
             print("loading checkpoint...")
-            self.nnet.load_model(filename="checkpoint")
+            self.nnet.load_model(folder='models', filename="checkpoint")
 
-        self.nnet.save_model(filename="best_checkpoint")
+        # generate checkpoint.pt
+        self.nnet.save_model(folder='models', filename="checkpoint")
+        self.nnet.save_model(folder='models', filename="best_checkpoint")
 
         for i in range(1, self.num_iters + 1):
             print("ITER ::: " + str(i))
@@ -88,16 +82,14 @@ class Leaner():
             train_data = sample(self.examples_buffer, self.batch_size)
 
             # train neural network
-            self.nnet.save_model(filename="checkpoint")
             self.nnet.train(train_data)
+            self.nnet.save_model(folder='models', filename="checkpoint")
 
             if i % self.check_freq == 0:
                 # compare performance
-                self.nnet_best.load_model(filename="best_checkpoint")
-
-                mcts = MCTS(self.thread_pool, self.nnet_cb, self.c_puct,
+                mcts = MCTS("./models/checkpoint.pt", self.thread_pool_size, self.c_puct,
                             self.num_mcts_sims, self.c_virtual_loss, self.action_size)
-                mcts_best = MCTS(self.thread_pool, self.nnet_best_cb, self.c_puct,
+                mcts_best = MCTS("./models/best_checkpoint.pt", self.thread_pool_size, self.c_puct,
                                  self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
                 one_won, two_won, draws = self.contest(mcts, mcts_best, self.contest_num)
@@ -105,12 +97,12 @@ class Leaner():
 
                 if one_won + two_won > 0 and float(one_won) / (one_won + two_won) > self.update_threshold:
                     print('ACCEPTING NEW MODEL')
-                    self.nnet.save_model(filename="best_checkpoint")
+                    self.nnet.save_model(folder='models', filename="best_checkpoint")
                 else:
                     print('REJECTING NEW MODEL')
 
 
-        # t.join()
+        t.join()
 
     def self_play(self, first_color):
         """
@@ -123,7 +115,7 @@ class Leaner():
 
         train_examples = []
         gomoku = Gomoku(self.n, self.n_in_row, first_color)
-        mcts = MCTS(self.thread_pool, self.nnet_cb, self.c_puct,
+        mcts = MCTS("./models/checkpoint.pt", self.thread_pool_size, self.c_puct,
                     self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
         episode_step = 0
@@ -197,6 +189,7 @@ class Leaner():
         players = [player2, None, player1]
         player_index = first_player
         gomoku = Gomoku(self.n, self.n_in_row, first_player)
+        self.gomoku_gui.reset_status()
 
         while True:
             player = players[player_index + 1]
@@ -207,6 +200,7 @@ class Leaner():
 
             # execute move
             gomoku.execute_move(best_move)
+            self.gomoku_gui.execute_move(player_index, best_move)
 
             # check game status
             ended, winner = gomoku.get_game_status()
@@ -242,9 +236,8 @@ class Leaner():
         t.start()
 
         # load best model
-        mcts_best = MCTS(self.thread_pool, self.nnet_best_cb, self.c_puct,
-                    self.num_mcts_sims * 2, self.c_virtual_loss, self.action_size)
-        self.nnet_best.load_model(filename=checkpoint_name)
+        mcts_best = MCTS("./models/best_checkpoint.pt", self.thread_pool_size, self.c_puct,
+                            self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
         # create gomoku game
         human_color = self.gomoku_gui.get_human_color()

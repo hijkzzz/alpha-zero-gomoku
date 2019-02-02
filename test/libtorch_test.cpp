@@ -36,4 +36,3 @@ int main() {
   // test display
   gomoku.display();
 }
-
