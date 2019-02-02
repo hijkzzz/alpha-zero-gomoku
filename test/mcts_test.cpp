@@ -13,7 +13,7 @@ int main() {
   g->execute_move(19);
   g->display();
 
-  auto m = std::make_shared<MCTS>("./models/checkpoint.pt", 4, 1.5, 400, 1,
+  auto m = std::make_shared<MCTS>("../test/models/checkpoint.pt", 4, 1.5, 400, 1,
                                   g->get_action_size());
 
   std::cout << "RUNNING" << std::endl;
@@ -24,8 +24,6 @@ int main() {
                   [](double x) { std::cout << x << ","; });
     std::cout << std::endl;
     m->update_with_move(-1);
-
-    break;
   }
 
   return 0;

@@ -6,6 +6,7 @@ NeuralNetwork::NeuralNetwork(std::string model_path)
     : module(torch::jit::load(model_path.c_str())) {
   // move to CUDA
   this->module->to(at::kCUDA);
+  assert(this->module != nullptr);
 }
 
 std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
@@ -20,15 +21,10 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
 
   torch::Tensor temp =
       torch::from_blob(&board0[0], {1, 1, n, n}, torch::dtype(torch::kInt32))
-          .to(at::kCUDA)
-          .toType(torch::kFloat32);
+          .to(at::kCUDA);
 
-  torch::Tensor state0 = temp.gt(0);
-  torch::Tensor state1 = temp.lt(0);
-
-  // debug
-  std::cout << state0 << std::endl;
-  std::cout << state1 << std::endl;
+  torch::Tensor state0 = temp.gt(0).toType(torch::kFloat32);
+  torch::Tensor state1 = temp.lt(0).toType(torch::kFloat32);
 
   int last_move = gomoku->get_last_move();
   int cur_player = gomoku->get_current_color();
@@ -42,13 +38,9 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
       torch::ones({1, 1, n, n}, torch::dtype(torch::kFloat32)).to(at::kCUDA);
   state3 *= cur_player;
 
-  // debug
-  std::cout << state2 << std::endl;
-  std::cout << state3 << std::endl;
-
   // infer
-  std::vector<torch::jit::IValue> inputs;
-  inputs.push_back(torch::cat({state0, state1, state2, state3}, 1));
+  torch::Tensor states = torch::cat({state0, state1, state2, state3}, 1);
+  std::vector<torch::jit::IValue> inputs{states};
   auto result = this->module->forward(inputs).toTuple();
 
   torch::Tensor p = result->elements()[0]
@@ -58,10 +50,6 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
                         .to(at::kCPU)[0];
   torch::Tensor v =
       result->elements()[1].toTensor().toType(torch::kFloat32).to(at::kCPU)[0];
-
-  // debug
-  std::cout << p << std::endl;
-  std::cout << v << std::endl;
 
   // output
   std::vector<double> prob(static_cast<float*>(p.data_ptr()),

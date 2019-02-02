@@ -35,4 +35,15 @@ int main() {
 
   // test display
   gomoku.display();
+
+  NeuralNetwork nn("../test/models/checkpoint.pt");
+  auto res = nn.infer(&gomoku);
+  auto p = res[0];
+  auto v = res[1];
+
+  std::for_each(p.begin(), p.end(),
+              [](double x) { std::cout << x << ","; });
+  std::cout << std::endl;
+
+  std::cout << v << std::endl;
 }
