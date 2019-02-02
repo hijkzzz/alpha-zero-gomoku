@@ -26,7 +26,7 @@ config = {
     'update_threshold': 0.55,
     'contest_num': 10,
     'check_freq': 50,
-    'examples_buffer_max_len': 10000,
+    'examples_buffer_max_len': 20000,
 
     # test
     'human_color': 1

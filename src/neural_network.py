@@ -208,7 +208,7 @@ class NeuralNetWorkWrapper():
         filepath = os.path.join(folder, filename)
         torch.save(self.neural_network.state_dict(), filepath)
 
-        # output for c++
+        # output for libtorch
         filepath = os.path.join(folder, filename + '.pt')
         self.neural_network.eval()
         self.neural_network.save(filepath)

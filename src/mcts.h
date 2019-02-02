@@ -35,7 +35,7 @@ class TreeNode {
   bool is_leaf;
   std::mutex lock;
 
-  std::atomic<int> n_visited;
+  std::atomic<unsigned int> n_visited;
   double p_sa;
   double q_sa;
   std::atomic<int> virtual_loss;

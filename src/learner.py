@@ -7,7 +7,7 @@ import math
 import os
 
 from neural_network import NeuralNetWorkWrapper
-from swig import MCTS, Gomoku
+from library import MCTS, Gomoku
 from gomoku_gui import GomokuGUI
 
 
