@@ -5,7 +5,7 @@ config = {
 
     # mcts
     'thread_pool_size': 4,
-    'num_mcts_sims': 800,
+    'num_mcts_sims': 400,
     'c_puct': 1.5,
     'c_virtual_loss': 1,
 
@@ -15,14 +15,14 @@ config = {
     'num_channels': 256,
     'epochs': 5,
     'batch_size': 512,
-    'kl_targ': 0.02,
+    'kl_targ': 0.03,
 
     # train
     'num_iters': 100000,
     'num_eps': 1,
     'explore_num': 0,
     'temp': 1,
-    'dirichlet_alpha': 0.1,
+    'dirichlet_alpha': 0.03,
     'update_threshold': 0.55,
     'contest_num': 10,
     'check_freq': 50,

@@ -1,36 +1,43 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(test)
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_BUILD_TYPE Release)
+project(library)
+
+option(TEST_MODE "test mode" ON)
 
 # find package
-set(CMAKE_PREFIX_PATH C:/Users/janhu/Desktop/tools/libtorch)
 find_package(Torch REQUIRED)
 
-# add library
-include_directories(${PROJECT_SOURCE_DIR}/src)
-aux_source_directory(${PROJECT_SOURCE_DIR}/src DIR_LIB_SRCS)
-add_library(_test ${DIR_LIB_SRCS})
-target_link_libraries(_test ${TORCH_LIBRARIES})
+find_package(SWIG REQUIRED)
+include(${SWIG_USE_FILE})
 
-# enable test
-enable_testing()
+find_package(PythonLibs)
+include_directories(${PYTHON_INCLUDE_PATH})
 
-# test thread pool
-add_executable(thread_pool_test ${PROJECT_SOURCE_DIR}/test/thread_pool_test.cpp)
-add_test(thread_pool_test thread_pool_test)
+# add source
+include_directories(./src)
+aux_source_directory(./src SOURCES)
 
-# test gomoku
-add_executable(gomoku_test ${PROJECT_SOURCE_DIR}/test/gomoku_test.cpp)
-target_link_libraries(gomoku_test _test)
-add_test(gomoku_test gomoku_test)
+if(TEST_MODE)
+    # test submodule
+    add_library(test ${SOURCES})
+    target_link_libraries(test ${TORCH_LIBRARIES})
 
-# test libtorch
-add_executable(libtorch_test ${PROJECT_SOURCE_DIR}/test/libtorch_test.cpp)
-target_link_libraries(libtorch_test _test)
-add_test(libtorch_test libtorch_test)
+    add_executable(thread_pool_test ./test/thread_pool_test.cpp)
+    target_link_libraries(thread_pool_test test)
 
-# test mcts
-add_executable(mcts_test ${PROJECT_SOURCE_DIR}/test/mcts_test.cpp)
-target_link_libraries(mcts_test _test)
-add_test(mcts_test mcts_test)
+    add_executable(gomoku_test ./test/gomoku_test.cpp)
+    target_link_libraries(gomoku_test test)
+
+    add_executable(libtorch_test ./test/libtorch_test.cpp)
+    target_link_libraries(libtorch_test test)
+
+    add_executable(mcts_test ./test/mcts_test.cpp)
+    target_link_libraries(mcts_test test)
+
+else()
+    #swig module
+    set_source_files_properties(./src/library.i PROPERTIES CPLUSPLUS ON)
+    set_source_files_properties(./src/library.i PROPERTIES SWIG_FLAGS "-includeall")
+    swig_add_module(library python ./src/library.i ${SOURCES})
+    swig_link_libraries(library ${PYTHON_LIBRARIES} ${TORCH_LIBRARIES})
+
+endif()

@@ -2,7 +2,7 @@
 A multi-threaded implementation of AlphaZero
 
 ## Features
-* free lock parallel MCTS
+* parallel MCTS with virtual loss
 * Gomoku and MCTS are written in C++
 * swig wrap python extension
 
@@ -11,13 +11,13 @@ A multi-threaded implementation of AlphaZero
 config.py
 
     [gomoku]
-    n = 8                                 board size
-    nir = 4                               n in row
+    n = 10                                 board size
+    nir = 5                                n in row
 
     [mcts]
     thread_pool_size = 4                   MCTS threads number
     num_mcts_sims = 400                    mcts simulation times
-    c_puct = 3                             PUCT coeff
+    c_puct = 1.5                           PUCT coeff
     c_virtual_loss = 1                     virtual loss coeff
 
     [neural_network]
@@ -26,14 +26,14 @@ config.py
     num_channels = 256                     convolution neural network channel size
     epochs = 5                             train epochs
     batch_size = 512                       batch size
-    kl_targ = 0.02                         threshold of KL divergence
+    kl_targ = 0.03                         threshold of KL divergence
 
     [train]
     num_iters = 100000                     train iterations
     num_eps = 1                            self play times in per iter
     explore_num  = 0                       explore step in a game
     temp  = 1                              temperature
-    dirichlet_alpha  = 0.1                 action noise in self play games
+    dirichlet_alpha  = 0.03                action noise in self play games
     update_threshold = 0.55                update model threshold
     contest_num = 10                       new/old model compare times
     check_freq  = 50                       test model frequency
@@ -46,23 +46,27 @@ config.py
 ## Environment
 
 * Python 3.6+
-* pytorch 1.0+
-* pygame
+* PyGame 1.9+
+* PyTorch 1.0+
+* LibTorch 1.0+
 * SWIG 3.0+
-* libtorch
-* GCC4.8.2+ for linux/MSVC14.00+ for windows
+* MSVC14.00+/GCC4.8.2+
+* CMake 3.0+
 
 ## Run
 ```
 # Generate Python wrapper
 cd src
-swig -c++ -python -threads .\swig.i
+swig -c++ -python .\swig.i
 
 # Compile Python extension
-python setup.py build_ext --inplace
+mkdir build
+cd build
+cmake .. -DCMAKE_PREFIX_PATH=path/to/libtorch
+cmake --build
 
 # Run
-cd ../test
+cd test
 python learner_test.py train # train model
 python learner_test.py play  # play with human
 ```

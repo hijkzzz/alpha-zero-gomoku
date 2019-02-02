@@ -1,4 +1,4 @@
-%module swig
+%module library
 
 %{
 #include "gomoku.h"
@@ -12,6 +12,8 @@ namespace std {
   %template(DoubleVector) vector<double>;
   %template(DoubleVectorVector) vector<vector<double>>;
 }
+
+%include "std_string.i"
 
 %include "gomoku.h"
 %include "mcts.h"

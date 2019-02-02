@@ -13,7 +13,7 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
 
   // convert data format
   auto board = gomoku->get_board();
-  std::vector<int32_t> board0;
+  std::vector<int> board0;
   for (unsigned int i = 0; i < board.size(); i++) {
     board0.insert(board0.end(), board[i].begin(), board[i].end());
   }
@@ -51,14 +51,22 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
   inputs.push_back(torch::cat({state0, state1, state2, state3}, 1));
   auto result = this->module->forward(inputs).toTuple();
 
-  torch::Tensor p = result->elements()[0].toTensor().exp().to(at::kCPU)[0];
-  torch::Tensor v = result->elements()[1].toTensor().to(at::kCPU)[0];
+  torch::Tensor p = result->elements()[0]
+                        .toTensor()
+                        .exp()
+                        .toType(torch::kFloat32)
+                        .to(at::kCPU)[0];
+  torch::Tensor v =
+      result->elements()[1].toTensor().toType(torch::kFloat32).to(at::kCPU)[0];
 
   // debug
   std::cout << p << std::endl;
   std::cout << v << std::endl;
 
   // output
-  return {std::vector<double>(p.data_ptr, p.data_ptr + n * n),
-          std::vector<double>(v.data_ptr, v.data_ptr + 1)};
+  std::vector<double> prob(static_cast<float*>(p.data_ptr()),
+                           static_cast<float*>(p.data_ptr()) + n * n);
+  std::vector<double> value{v.item<float>()};
+
+  return {prob, value};
 }
