@@ -1,10 +1,22 @@
 # -*- coding: utf-8 -*-
-import numpy as np
 import sys
 sys.path.append('../src')
+sys.path.append('../build')
 
-import neural_network
 import torch
+from library import Gomoku
+import neural_network
+import neural_network2
+import numpy as np
+
+
+def tuple_2d_to_numpy_2d(tuple_2d):
+    # help function
+    # convert type
+    res = [None] * len(tuple_2d)
+    for i, tuple_1d in enumerate(tuple_2d):
+        res[i] = list(tuple_1d)
+    return np.array(res)
 
 
 if __name__ == "__main__":
@@ -31,10 +43,10 @@ if __name__ == "__main__":
     p_batch = torch.Tensor([[1 / 25 for _ in range(25)], [1 / 25 for _ in range(25)]]).cuda()
     v_batch = torch.Tensor([0.5, 0.5]).cuda()
 
-    log_ps, vs = policy_value_net.neural_network(state_batch.cuda())
-    print('log_p, v \n', np.exp(log_ps.cpu().detach().numpy()), vs.cpu())
+    log_p, v = policy_value_net.neural_network(state_batch.cuda())
+    print('p, v \n', np.exp(log_p.cpu().detach().numpy()), v.cpu())
 
-    loss = policy_value_net.alpha_loss(log_ps, vs, p_batch, v_batch.unsqueeze(1))
+    loss = policy_value_net.alpha_loss(log_p, v, p_batch, v_batch.unsqueeze(1))
 
     print('loss \n', loss.cpu())
 
@@ -48,5 +60,39 @@ if __name__ == "__main__":
     # test infer
     print('infer \n', policy_value_net.infer(list(zip(board_batch, last_action_batch, cur_player_batch))))
 
-    #save model
-    neural_network.NeuralNetWorkWrapper(lr, l2, kl_targ, epochs, 256, 10, 100).save_model()
+    # test libtorch
+    nn = neural_network.NeuralNetWorkWrapper(lr, l2, kl_targ, epochs, 256, 10, 100)
+    nn.save_model(folder="models", filename="checkpoint")
+    # nn.load_model(folder="models", filename="checkpoint")
+
+    gomoku = Gomoku(10, 5, 1)
+    gomoku.execute_move(3)
+    gomoku.execute_move(4)
+    gomoku.execute_move(6)
+    gomoku.execute_move(23)
+    gomoku.execute_move(8)
+    gomoku.execute_move(9)
+    gomoku.execute_move(78)
+    gomoku.execute_move(0)
+    gomoku.execute_move(17)
+    gomoku.execute_move(7)
+    gomoku.execute_move(19)
+    gomoku.execute_move(67)
+    gomoku.execute_move(60)
+    gomoku.execute_move(14)
+    gomoku.execute_move(11)
+    gomoku.execute_move(2)
+    gomoku.execute_move(99)
+    gomoku.execute_move(10)
+    gomoku.execute_move(1)
+    gomoku.execute_move(5)
+    gomoku.execute_move(18)
+    gomoku.execute_move(12)
+    gomoku.execute_move(15)
+    gomoku.execute_move(24)
+    gomoku.execute_move(16)
+
+    feature_batch = [(tuple_2d_to_numpy_2d(gomoku.get_board()), gomoku.get_last_move(), gomoku.get_current_color())]
+    print('feature', feature_batch)
+
+    print(nn.infer(feature_batch))

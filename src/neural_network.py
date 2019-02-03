@@ -191,14 +191,14 @@ class NeuralNetWorkWrapper():
         for param_group in self.optim.param_groups:
             param_group['lr'] = lr
 
-    def load_model(self, filename="checkpoint", folder="models"):
+    def load_model(self, folder="models", filename="checkpoint"):
         """load model from file
         """
 
         filepath = os.path.join(folder, filename)
         self.neural_network.load_state_dict(torch.load(filepath))
 
-    def save_model(self, filename="checkpoint", folder="models"):
+    def save_model(self, folder="models", filename="checkpoint"):
         """save model to file
         """
 

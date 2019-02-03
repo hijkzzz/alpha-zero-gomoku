@@ -84,16 +84,17 @@ void TreeNode::expand(const std::vector<double> &action_priors) {
   {
     // get lock
     std::lock_guard<std::mutex> lock(this->lock);
+    unsigned int action_size = this->children.size();
 
     if (this->is_leaf) {
-      for (unsigned int i = 0; i < this->children.size(); i++) {
+      for (unsigned int i = 0; i < action_size; i++) {
         // illegal action
         if (abs(action_priors[i] - 0) < FLT_EPSILON) {
           continue;
         }
 
         this->children[i] =
-            new TreeNode(this, action_priors[i], this->children.size());
+            new TreeNode(this, action_priors[i], action_size);
       }
 
       // not leaf
@@ -108,7 +109,7 @@ void TreeNode::backup(double value) {
     this->parent->backup(-value);
   }
 
-  int n_visited = this->n_visited.load();
+  unsigned int n_visited = this->n_visited.load();
   this->q_sa = (n_visited * this->q_sa + value) / (n_visited + 1);
   this->n_visited++;
 }
@@ -119,7 +120,7 @@ double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
   unsigned int sum_n_visited = 0;
   std::for_each(this->parent->children.begin(), this->parent->children.end(),
                 [&sum_n_visited](TreeNode *node) {
-                  sum_n_visited += node ? node->n_visited.load() : 0;
+                  sum_n_visited += (node != nullptr ? node->n_visited.load() : 0);
                 });
 
   double u = (c_puct * this->p_sa * sqrt(sum_n_visited) / (1 + n_visited));
@@ -253,7 +254,7 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
   double value = 0;
 
   // not end
-  if (!status[0]) {
+  if (status[0] == 0) {
     // predict action_probs and value by neural network
     std::vector<double> action_priors(this->action_size, 0);
 
@@ -300,7 +301,7 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
     value = (winner == 0 ? 0 : (winner == game->get_current_color() ? 1 : -1));
   }
 
-  // backup, -value because game->get_current_color() is next player
+  // value(parent -> node) = -value
   node->backup(-value);
   return;
 }

@@ -36,6 +36,9 @@ int main() {
   // test display
   gomoku.display();
 
+  std::cout << gomoku.get_last_move() << std::endl;
+  std::cout << gomoku.get_current_color() << std::endl;
+
   NeuralNetwork nn("../test/models/checkpoint.pt");
   auto res = nn.infer(&gomoku);
   auto p = res[0];
