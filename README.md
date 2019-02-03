@@ -13,8 +13,8 @@ Edit config.py
 
 * Python 3.6+
 * PyGame 1.9+
-* PyTorch 1.0+
-* LibTorch 1.0+
+* PyTorch(CUDA) 1.0+
+* LibTorch(CUDA) 1.0+
 * SWIG 3.0+
 * MSVC14.00+/GCC4.8.2+
 * CMake 3.0+
