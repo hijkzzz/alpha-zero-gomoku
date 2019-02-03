@@ -1,6 +1,6 @@
 config = {
     # gomoku
-    'n': 8,                                     # board size
+    'n': 10,                                    # board size
     'n_in_row': 5,                              # n in row
 
     # mcts
@@ -15,18 +15,18 @@ config = {
     'num_channels': 128,                        # convolution neural network channel size
     'epochs': 5,                                # train epochs
     'batch_size': 512,                          # batch size
-    'kl_targ': 0.03,                            # threshold of KL divergence
+    'kl_targ': 0.02,                            # threshold of KL divergence
 
     # train
     'num_iters': 100000,                        # train iterations
     'num_eps': 1,                               # self play times in per iter
     'explore_num': 0,                           # explore step in a game
     'temp': 1,                                  # temperature
-    'dirichlet_alpha': 0.1,                    # action noise in self play games
+    'dirichlet_alpha': 0.06,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
     'contest_num': 10,                          # new/old model compare times
     'check_freq': 50,                           # test model frequency
-    'examples_buffer_max_len': 10000,           # max length of examples buffer
+    'examples_buffer_max_len': 40000,           # max length of examples buffer
 
     # test
     'human_color': 1                            # human player's color

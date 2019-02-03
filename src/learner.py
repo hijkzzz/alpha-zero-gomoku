@@ -240,7 +240,7 @@ class Leaner():
 
         # load best model
         mcts_best = MCTS("./models/best_checkpoint.pt", self.thread_pool_size, self.c_puct,
-                            self.num_mcts_sims, self.c_virtual_loss, self.action_size)
+                            self.num_mcts_sims * 2, self.c_virtual_loss, self.action_size)
 
         # create gomoku game
         human_color = self.gomoku_gui.get_human_color()
@@ -261,7 +261,7 @@ class Leaner():
                 self.gomoku_gui.set_is_human(True)
                 # wait human action
                 while self.gomoku_gui.get_is_human():
-                    time.sleep(0.01)
+                    time.sleep(0.1)
                 best_move = self.gomoku_gui.get_human_move()
 
             # execute move
