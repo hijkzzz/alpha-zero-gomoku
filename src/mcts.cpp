@@ -6,15 +6,22 @@
 #include <mcts.h>
 
 // TreeNode
+TreeNode::TreeNode()
+    : parent(nullptr),
+      is_leaf(true),
+      virtual_loss(0),
+      n_visited(0),
+      p_sa(0),
+      q_sa(0) {}
 
 TreeNode::TreeNode(TreeNode *parent, double p_sa, unsigned int action_size)
     : parent(parent),
-      p_sa(p_sa),
       children(action_size, nullptr),
       is_leaf(true),
       virtual_loss(0),
+      n_visited(0),
       q_sa(0),
-      n_visited(0) {}
+      p_sa(p_sa) {}
 
 TreeNode::TreeNode(
     const TreeNode &node) {  // because automic<>, define copy function

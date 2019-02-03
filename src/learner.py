@@ -1,14 +1,17 @@
 from random import shuffle, sample
-import numpy as np
 from collections import deque
 import threading
 import time
 import math
 import os
+import numpy as np
 
 from neural_network import NeuralNetWorkWrapper
-from library import MCTS, Gomoku
 from gomoku_gui import GomokuGUI
+
+import sys
+sys.path.append('../build')
+from library import MCTS, Gomoku
 
 
 def tuple_2d_to_numpy_2d(tuple_2d):

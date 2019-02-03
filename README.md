@@ -55,10 +55,6 @@ config.py
 
 ## Run
 ```
-# Generate Python wrapper
-cd src
-swig -c++ -python .\swig.i
-
 # Compile Python extension
 mkdir build
 cd build

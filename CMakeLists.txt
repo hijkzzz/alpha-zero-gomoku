@@ -1,23 +1,17 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(library)
 
-option(TEST_MODE "test mode" ON)
+option(TEST_MODE "test mode" OFF)
 
-# find package
-find_package(Torch REQUIRED)
-
-find_package(SWIG REQUIRED)
-include(${SWIG_USE_FILE})
-
-find_package(PythonLibs)
-include_directories(${PYTHON_INCLUDE_PATH})
-
-# add source
+# add source directory
 include_directories(./src)
 aux_source_directory(./src SOURCES)
 
+# find torch
+find_package(Torch REQUIRED)
+
 if(TEST_MODE)
-    # test submodule
+    # add test library
     add_library(test ${SOURCES})
     target_link_libraries(test ${TORCH_LIBRARIES})
 
@@ -34,10 +28,17 @@ if(TEST_MODE)
     target_link_libraries(mcts_test test)
 
 else()
-    #swig module
-    set_source_files_properties(./src/library.i PROPERTIES CPLUSPLUS ON)
-    set_source_files_properties(./src/library.i PROPERTIES SWIG_FLAGS "-includeall")
-    swig_add_module(library python ./src/library.i ${SOURCES})
+    # find swig
+    find_package(SWIG REQUIRED)
+    include(${SWIG_USE_FILE})
+
+    # find python
+    find_package(PythonLibs)
+    include_directories(${PYTHON_INCLUDE_PATH})
+
+    # swig add module
+    set_property(SOURCE ./src/library.i PROPERTY CPLUSPLUS ON)
+    swig_add_library(library TYPE SHARED LANGUAGE python SOURCES ./src/library.i ${SOURCES})
     swig_link_libraries(library ${PYTHON_LIBRARIES} ${TORCH_LIBRARIES})
 
 endif()

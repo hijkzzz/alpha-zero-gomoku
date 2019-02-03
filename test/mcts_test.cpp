@@ -13,7 +13,7 @@ int main() {
   g->execute_move(19);
   g->display();
 
-  auto m = std::make_shared<MCTS>("../test/models/checkpoint.pt", 4, 1.5, 400, 1,
+  auto m = std::make_shared<MCTS>("../test/models/checkpoint.pt", 8, 1.5, 400, 1,
                                   g->get_action_size());
 
   std::cout << "RUNNING" << std::endl;

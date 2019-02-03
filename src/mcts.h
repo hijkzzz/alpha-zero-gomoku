@@ -48,10 +48,10 @@ class MCTS {
        unsigned int action_size);
   std::vector<double> get_action_probs(Gomoku *gomoku, double temp = 1e-3);
   void update_with_move(int last_move);
-  static void tree_deleter(TreeNode * t);
 
  private:
   void simulate(std::shared_ptr<Gomoku> game);
+  static void tree_deleter(TreeNode * t);
 
   // variables
   std::unique_ptr<TreeNode, decltype(MCTS::tree_deleter)*> root;
