@@ -1,12 +1,12 @@
 config = {
     # gomoku
-    'n': 10,
+    'n': 8,
     'n_in_row': 5,
 
     # mcts
-    'thread_pool_size': 8,
-    'num_mcts_sims': 800,
-    'c_puct': 1.5,
+    'thread_pool_size': 4,
+    'num_mcts_sims': 400,
+    'c_puct': 2,
     'c_virtual_loss': 1,
 
     # neural_network
@@ -22,11 +22,11 @@ config = {
     'num_eps': 1,
     'explore_num': 0,
     'temp': 1,
-    'dirichlet_alpha': 0.03,
+    'dirichlet_alpha': 0.1,
     'update_threshold': 0.55,
     'contest_num': 10,
     'check_freq': 50,
-    'examples_buffer_max_len': 20000,
+    'examples_buffer_max_len': 10000,
 
     # test
     'human_color': 1
