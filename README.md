@@ -55,14 +55,16 @@ config.py
 
 ## Run
 ```
+# Add LibTorch/SWIG to environment variable $PATH
+
 # Compile Python extension
 mkdir build
 cd build
-cmake .. -DCMAKE_PREFIX_PATH=path/to/libtorch
+cmake .. -DCMAKE_PREFIX_PATH=path/to/libtorch -DCMAKE_BUILD_TYPE=Release
 cmake --build
 
 # Run
-cd test
+cd ../test
 python learner_test.py train # train model
 python learner_test.py play  # play with human
 ```

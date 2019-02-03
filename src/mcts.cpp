@@ -134,7 +134,7 @@ double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
 }
 
 // MCTS
-MCTS::MCTS(std::string model_path, unsigned int thread_num, unsigned int c_puct,
+MCTS::MCTS(std::string model_path, unsigned int thread_num, double c_puct,
            unsigned int num_mcts_sims, double c_virtual_loss,
            unsigned int action_size)
     : neural_network(new NeuralNetwork(model_path)),

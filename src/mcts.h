@@ -43,7 +43,7 @@ class TreeNode {
 
 class MCTS {
  public:
-  MCTS(std::string model_path, unsigned int thread_num, unsigned int c_puct,
+  MCTS(std::string model_path, unsigned int thread_num, double c_puct,
        unsigned int num_mcts_sims, double c_virtual_loss,
        unsigned int action_size);
   std::vector<double> get_action_probs(Gomoku *gomoku, double temp = 1e-3);
@@ -51,15 +51,15 @@ class MCTS {
 
  private:
   void simulate(std::shared_ptr<Gomoku> game);
-  static void tree_deleter(TreeNode * t);
+  static void tree_deleter(TreeNode *t);
 
   // variables
-  std::unique_ptr<TreeNode, decltype(MCTS::tree_deleter)*> root;
+  std::unique_ptr<TreeNode, decltype(MCTS::tree_deleter) *> root;
   std::unique_ptr<ThreadPool> thread_pool;
   std::unique_ptr<NeuralNetwork> neural_network;
 
   unsigned int action_size;
-  unsigned int c_puct;
   unsigned int num_mcts_sims;
+  double c_puct;
   double c_virtual_loss;
 };

@@ -1,4 +1,4 @@
-%module library
+%module(threads="1") library
 
 %{
 #include "gomoku.h"
