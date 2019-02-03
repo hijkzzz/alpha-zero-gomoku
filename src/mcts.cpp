@@ -66,7 +66,8 @@ unsigned int TreeNode::select(double c_puct, double c_virtual_loss) {
       continue;
     }
 
-    double cur_value = children[i]->get_value(c_puct, c_virtual_loss);
+    unsigned int sum_n_visited = this->n_visited.load() + 1;
+    double cur_value = children[i]->get_value(c_puct, c_virtual_loss, sum_n_visited);
     if (cur_value > best_value) {
       best_value = cur_value;
       best_move = i;
@@ -114,13 +115,7 @@ void TreeNode::backup(double value) {
   this->n_visited++;
 }
 
-double TreeNode::get_value(double c_puct, double c_virtual_loss) const {
-  unsigned int sum_n_visited = 0;
-  std::for_each(this->parent->children.begin(), this->parent->children.end(),
-                [&sum_n_visited](TreeNode *node) {
-                  sum_n_visited += (node != nullptr ? node->n_visited.load() : 0);
-                });
-
+double TreeNode::get_value(double c_puct, double c_virtual_loss, unsigned int sum_n_visited) const {
   auto n_visited = this->n_visited.load();
   double u = (c_puct * this->p_sa * sqrt(sum_n_visited) / (1 + n_visited));
 
