@@ -7,7 +7,7 @@ config = {
     'thread_pool_size': 4,                      # MCTS threads number
     'num_mcts_sims': 400,                       # mcts simulation times
     'c_puct': 3,                                # PUCT coeff
-    'c_virtual_loss': 1,                        # virtual loss coeff
+    'c_virtual_loss': 0.5,                      # virtual loss coeff
 
     # neural_network
     'lr': 0.001,                                # learning rate
@@ -22,7 +22,7 @@ config = {
     'num_eps': 1,                               # self play times in per iter
     'explore_num': 0,                           # explore step in a game
     'temp': 1,                                  # temperature
-    'dirichlet_alpha': 0.1,                     # action noise in self play games
+    'dirichlet_alpha': 0.1,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
     'contest_num': 10,                          # new/old model compare times
     'check_freq': 50,                           # test model frequency

@@ -67,7 +67,8 @@ unsigned int TreeNode::select(double c_puct, double c_virtual_loss) {
     }
 
     unsigned int sum_n_visited = this->n_visited.load() + 1;
-    double cur_value = children[i]->get_value(c_puct, c_virtual_loss, sum_n_visited);
+    double cur_value =
+        children[i]->get_value(c_puct, c_virtual_loss, sum_n_visited);
     if (cur_value > best_value) {
       best_value = cur_value;
       best_move = i;
@@ -94,8 +95,7 @@ void TreeNode::expand(const std::vector<double> &action_priors) {
           continue;
         }
 
-        this->children[i] =
-            new TreeNode(this, action_priors[i], action_size);
+        this->children[i] = new TreeNode(this, action_priors[i], action_size);
       }
 
       // not leaf
@@ -115,16 +115,20 @@ void TreeNode::backup(double value) {
   this->n_visited++;
 }
 
-double TreeNode::get_value(double c_puct, double c_virtual_loss, unsigned int sum_n_visited) const {
+double TreeNode::get_value(double c_puct, double c_virtual_loss,
+                           unsigned int sum_n_visited) const {
+  // u
   auto n_visited = this->n_visited.load();
   double u = (c_puct * this->p_sa * sqrt(sum_n_visited) / (1 + n_visited));
 
-  if (n_visited == 0) {
+  // virtual loss
+  double virtual_loss = c_virtual_loss * this->virtual_loss.load();
+  int n_visited_with_loss = n_visited - virtual_loss;
+
+  if (n_visited_with_loss <= 0) {
     return u;
   } else {
-    double virtual_loss =
-        c_virtual_loss * this->virtual_loss.load() / n_visited;
-    return this->q_sa + u + virtual_loss;
+    return u + (this->q_sa * n_visited - virtual_loss) / n_visited_with_loss;
   }
 }
 
