@@ -47,5 +47,6 @@ python learner_test.py play  # play with human
 1. Mastering the Game of Go without Human Knowledge
 2. Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm
 3. Parallel Monte-Carlo Tree Search
-4. A Lock-free Multithreaded Monte-Carlo Tree Search Algorithm
-5. github.com/suragnair/alpha-zero-general
+4. An Analysis of Virtual Loss in Parallel MCTS
+5. A Lock-free Multithreaded Monte-Carlo Tree Search Algorithm
+6. github.com/suragnair/alpha-zero-general
