@@ -10,17 +10,15 @@ import torch.nn.functional as F
 
 import numpy as np
 
-# 3x3 convolution
-
 
 def conv3x3(in_channels, out_channels, stride=1):
+    # 3x3 convolution
     return nn.Conv2d(in_channels, out_channels, kernel_size=3,
                      stride=stride, padding=1, bias=False)
 
-# Residual block
-
 
 class ResidualBlock(nn.Module):
+    # Residual block
     def __init__(self, in_channels, out_channels, stride=1):
         super(ResidualBlock, self).__init__()
         self.conv1 = conv3x3(in_channels, out_channels, stride)
@@ -67,7 +65,7 @@ class NeuralNetWork(nn.Module):
         self.res4 = ResidualBlock(num_channels, num_channels)
 
         # policy head
-        self.p_conv = nn.Conv2d(num_channels, 4, kernel_size=1, padding=0)
+        self.p_conv = nn.Conv2d(num_channels, 4, kernel_size=1, padding=0, bias=False)
         self.p_bn = nn.BatchNorm2d(num_features=4)
         self.relu = nn.ReLU(inplace=True)
 
@@ -75,7 +73,7 @@ class NeuralNetWork(nn.Module):
         self.log_softmax = nn.LogSoftmax(dim=1)
 
         # value head
-        self.v_conv = nn.Conv2d(num_channels, 2, kernel_size=1, padding=0)
+        self.v_conv = nn.Conv2d(num_channels, 2, kernel_size=1, padding=0, bias=False)
         self.v_bn = nn.BatchNorm2d(num_features=2)
 
         self.v_fc1 = nn.Linear(2 * n ** 2, 128)
@@ -192,7 +190,7 @@ class NeuralNetWorkWrapper():
             )
 
             entropy = -np.mean(
-                np.sum(new_p *  np.log(new_p + 1e-10), axis=1)
+                np.sum(new_p * np.log(new_p + 1e-10), axis=1)
             )
 
             # early stopping if D_KL diverges badly
