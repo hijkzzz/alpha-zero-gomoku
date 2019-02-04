@@ -6,7 +6,6 @@ sys.path.append('../build')
 import torch
 from library import Gomoku
 import neural_network
-import neural_network2
 import numpy as np
 
 

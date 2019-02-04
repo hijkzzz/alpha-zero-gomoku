@@ -10,48 +10,101 @@ import torch.nn.functional as F
 
 import numpy as np
 
+# 3x3 convolution
+def conv3x3(in_channels, out_channels, stride=1):
+    return nn.Conv2d(in_channels, out_channels, kernel_size=3,
+                     stride=stride, padding=1, bias=False)
 
-class NeuralNetWork(torch.jit.ScriptModule):
+# Residual block
+class ResidualBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, stride=1):
+        super(ResidualBlock, self).__init__()
+        self.conv1 = conv3x3(in_channels, out_channels, stride)
+        self.bn1 = nn.BatchNorm2d(out_channels)
+        self.relu = nn.ReLU(inplace=True)
+
+        self.conv2 = conv3x3(out_channels, out_channels)
+        self.bn2 = nn.BatchNorm2d(out_channels)
+
+        self.downsample = False
+        if in_channels != out_channels or stride != 1:
+            self.downsample = True
+            self.downsample_conv = conv3x3(in_channels, out_channels, stride=stride)
+            self.downsample_bn = nn.BatchNorm2d(out_channels)
+
+    def forward(self, x):
+        residual = x
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+        out = self.conv2(out)
+        out = self.bn2(out)
+
+        if self.downsample:
+            residual = self.downsample_conv(residual)
+            residual = self.downsample_bn(residual)
+
+        out += residual
+        out = self.relu(out)
+        return out
+
+
+class NeuralNetWork(nn.Module):
     """Policy and Value Network
     """
-    __constants__ = ['conv1', 'conv2', 'conv3', 'pi_conv', 'pi_fc', 'v_conv', 'v_fc1', 'v_fc2']
 
     def __init__(self, num_channels, n, action_size):
         super(NeuralNetWork, self).__init__()
 
-        self.conv1 = nn.Sequential(
-            nn.Conv2d(4, num_channels, kernel_size=3, padding=1), nn.ReLU())
-        self.conv2 = nn.Sequential(
-            nn.Conv2d(num_channels, num_channels, kernel_size=3, padding=1), nn.ReLU())
-        self.conv3 = nn.Sequential(
-            nn.Conv2d(num_channels, num_channels, kernel_size=3, padding=1), nn.ReLU())
+        # residual block
+        self.res1 = ResidualBlock(4, num_channels)
+        self.res2 = ResidualBlock(num_channels, num_channels)
+        self.res3 = ResidualBlock(num_channels, num_channels)
 
-        self.pi_conv = nn.Sequential(
-            nn.Conv2d(num_channels, 4, kernel_size=1, padding=0), nn.ReLU())
-        self.pi_fc = nn.Sequential(nn.Linear(4 * n ** 2, action_size), nn.ReLU(), nn.LogSoftmax(dim=1))
+        # policy head
+        self.p_conv = nn.Conv2d(num_channels, 4, kernel_size=1, padding=0)
+        self.p_bn = nn.BatchNorm2d(num_features=4)
+        self.relu = nn.ReLU(inplace=True)
 
-        self.v_conv = nn.Sequential(
-            nn.Conv2d(num_channels, 2, kernel_size=1, padding=0), nn.ReLU())
-        self.v_fc1 = nn.Sequential(nn.Linear(2 * n ** 2, 64), nn.ReLU())
-        self.v_fc2 = nn.Sequential(nn.Linear(64, 1), nn.Tanh())
+        self.p_fc = nn.Linear(4 * n ** 2, action_size)
+        self.log_softmax = nn.LogSoftmax(dim=1)
 
-    @torch.jit.script_method
-    def forward(self, states):
-        out = self.conv1(states)
-        out = self.conv2(out)
-        out = self.conv3(out)
+        # value head
+        self.v_conv = nn.Conv2d(num_channels, 2, kernel_size=1, padding=0)
+        self.v_bn = nn.BatchNorm2d(num_features=2)
 
-        pi = self.pi_conv(out)
-        pi = self.pi_fc(pi.view(pi.size(0), -1))
+        self.v_fc1 = nn.Linear(2 * n ** 2, 128)
+        self.v_fc2 = nn.Linear(128, 1)
+        self.tanh = nn.Tanh()
 
+    def forward(self, inputs):
+        # residual block
+        out = self.res1(inputs)
+        out = self.res2(out)
+        out = self.res3(out)
+
+        # policy head
+        p = self.p_conv(out)
+        p = self.p_bn(p)
+        p = self.relu(p)
+
+        p = self.p_fc(p.view(p.size(0), -1))
+        p = self.log_softmax(p)
+
+        # value head
         v = self.v_conv(out)
+        v = self.v_bn(v)
+        v = self.relu(v)
+
         v = self.v_fc1(v.view(v.size(0), -1))
+        v = self.relu(v)
         v = self.v_fc2(v)
+        v = self.tanh(v)
 
-        return pi, v
+        return p, v
 
 
-class AlphaLoss(torch.nn.Module):
+class AlphaLoss(nn.Module):
     """
     Custom loss as defined in the paper :
     (z - v) ** 2 --> MSE Loss
@@ -115,7 +168,6 @@ class NeuralNetWorkWrapper():
             self.neural_network.train()
 
             # zero the parameter gradients
-            self.set_learning_rate(self.lr)
             self.optim.zero_grad()
 
             # forward + backward + optimize
@@ -210,5 +262,8 @@ class NeuralNetWorkWrapper():
 
         # output for libtorch
         filepath = os.path.join(folder, filename + '.pt')
+
         self.neural_network.eval()
-        self.neural_network.save(filepath)
+        example = torch.rand(1, 4, self.n, self.n).cuda()
+        traced_script_module = torch.jit.trace(self.neural_network, example)
+        traced_script_module.save(filepath)
