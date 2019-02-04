@@ -25,7 +25,7 @@ config = {
     'dirichlet_alpha': 0.06,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
     'contest_num': 10,                          # new/old model compare times
-    'check_freq': 50,                           # test model frequency
+    'check_freq': 100,                          # test model frequency
     'examples_buffer_max_len': 40000,           # max length of examples buffer
 
     # test
