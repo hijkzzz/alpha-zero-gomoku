@@ -73,9 +73,11 @@ class Leaner():
             # self play
             first_color = 1
             for eps in range(1, self.num_eps + 1):
-                self.examples_buffer.extend(self.self_play(first_color))
+                examples = self.self_play(first_color)
+                self.examples_buffer.extend(examples)
                 first_color = -first_color
-                print("EPS :: " + str(eps) + ", EXAMPLES :: " + str(len(self.examples_buffer)))
+
+                print("EPS :: " + str(eps) + ", EXAMPLES :: " + str(len(examples)))
 
             # sample train data
             if len(self.examples_buffer) < self.batch_size:
@@ -104,6 +106,8 @@ class Leaner():
                 else:
                     print('REJECTING NEW MODEL')
 
+                del mcts
+                del mcts_best
 
         t.join()
 
@@ -160,6 +164,8 @@ class Leaner():
             if ended == 1:
                 # b, last_action, cur_player, p, v
                 return [(x[0], x[1], x[2], x[3], x[2] * winner) for x in train_examples]
+
+        del mcts
 
     def contest(self, player1, player2, contest_num):
         """compare new and old model

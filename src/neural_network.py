@@ -197,7 +197,7 @@ class NeuralNetWorkWrapper():
             if kl > self.kl_targ:
                 break
 
-        print("LOSS :: {}, entropy :: {}, KL :: {}".format(loss.item(), entropy, kl))
+        print("LOSS :: {}, ENTROPY :: {}, KL :: {}".format(loss.item(), entropy, kl))
 
     def infer(self, feature_batch):
         """predict p and v by raw input

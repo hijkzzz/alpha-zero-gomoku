@@ -7,6 +7,8 @@ NeuralNetwork::NeuralNetwork(std::string model_path)
   // move to CUDA
   this->module->to(at::kCUDA);
   assert(this->module != nullptr);
+
+  std::cout << "MCTS LOADING: " << model_path.c_str() << std::endl;
 }
 
 std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
