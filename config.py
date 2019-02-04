@@ -15,7 +15,7 @@ config = {
     'num_channels': 128,                        # convolution neural network channel size
     'epochs': 5,                                # train epochs
     'batch_size': 512,                          # batch size
-    'kl_targ': 0.02,                            # threshold of KL divergence
+    'kl_targ': 0.01,                            # threshold of KL divergence
 
     # train
     'num_iters': 100000,                        # train iterations

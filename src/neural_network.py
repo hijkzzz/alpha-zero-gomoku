@@ -11,11 +11,15 @@ import torch.nn.functional as F
 import numpy as np
 
 # 3x3 convolution
+
+
 def conv3x3(in_channels, out_channels, stride=1):
     return nn.Conv2d(in_channels, out_channels, kernel_size=3,
                      stride=stride, padding=1, bias=False)
 
 # Residual block
+
+
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, stride=1):
         super(ResidualBlock, self).__init__()
@@ -60,6 +64,7 @@ class NeuralNetWork(nn.Module):
         self.res1 = ResidualBlock(4, num_channels)
         self.res2 = ResidualBlock(num_channels, num_channels)
         self.res3 = ResidualBlock(num_channels, num_channels)
+        self.res4 = ResidualBlock(num_channels, num_channels)
 
         # policy head
         self.p_conv = nn.Conv2d(num_channels, 4, kernel_size=1, padding=0)
@@ -82,6 +87,7 @@ class NeuralNetWork(nn.Module):
         out = self.res1(inputs)
         out = self.res2(out)
         out = self.res3(out)
+        out = self.res4(out)
 
         # policy head
         p = self.p_conv(out)
@@ -185,11 +191,15 @@ class NeuralNetWorkWrapper():
                 axis=1)
             )
 
+            entropy = -np.mean(
+                np.sum(new_p *  np.log(new_p + 1e-10), axis=1)
+            )
+
             # early stopping if D_KL diverges badly
             if kl > self.kl_targ:
                 break
 
-        print("LOSS :: {},  KL :: {}".format(loss.item(), kl))
+        print("LOSS :: {}, entropy :: {}, KL :: {}".format(loss.item(), entropy, kl))
 
     def infer(self, feature_batch):
         """predict p and v by raw input
