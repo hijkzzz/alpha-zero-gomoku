@@ -5,7 +5,7 @@ config = {
 
     # mcts
     'thread_pool_size': 4,                      # MCTS threads number
-    'num_mcts_sims': 400,                       # mcts simulation times
+    'num_mcts_sims': 800,                       # mcts simulation times
     'c_puct': 3,                                # PUCT coeff
     'c_virtual_loss': 0.5,                      # virtual loss coeff
 
