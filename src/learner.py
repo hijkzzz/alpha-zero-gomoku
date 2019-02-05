@@ -165,8 +165,6 @@ class Leaner():
                 # b, last_action, cur_player, p, v
                 return [(x[0], x[1], x[2], x[3], x[2] * winner) for x in train_examples]
 
-        del mcts
-
     def contest(self, player1, player2, contest_num):
         """compare new and old model
            Args: player1, player2 is white/balck player
