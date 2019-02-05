@@ -15,12 +15,12 @@ config = {
     'num_channels': 128,                        # convolution neural network channel size
     'epochs': 5,                                # train epochs
     'batch_size': 512,                          # batch size
-    'kl_targ': 0.01,                            # threshold of KL divergence
+    'kl_targ': 0.02,                            # threshold of KL divergence
 
     # train
     'num_iters': 100000,                        # train iterations
     'num_eps': 1,                               # self play times in per iter
-    'explore_num': 2,                           # explore step in a game
+    'explore_num': 6,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.03,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
