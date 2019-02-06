@@ -8,7 +8,7 @@ config = {
     'num_mcts_sims': 800,                       # MCTS simulation times
     'c_puct': 3.5,                              # PUCT coeff
     'c_virtual_loss': 0.5,                      # virtual loss coeff
-    'mcts_use_gpu' : False,                     # MCTS use GPU
+    'mcts_use_gpu' : True,                      # MCTS use GPU
 
     # neural_network
     'lr': 0.001,                                # learning rate
