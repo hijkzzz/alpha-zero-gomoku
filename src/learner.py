@@ -5,6 +5,7 @@ import time
 import math
 import os
 import numpy as np
+import pickle
 
 from neural_network import NeuralNetWorkWrapper
 from gomoku_gui import GomokuGUI
@@ -61,11 +62,12 @@ class Leaner():
 
         if os.path.exists('./models/checkpoint'):
             print("loading checkpoint...")
-            self.nnet.load_model(folder='models', filename="checkpoint")
+            self.nnet.load_model('models', "checkpoint")
+            self.load_samples("models", "checkpoint")
 
-        # generate checkpoint.pt
-        self.nnet.save_model(folder='models', filename="checkpoint")
-        self.nnet.save_model(folder='models', filename="best_checkpoint")
+        # generate .pt for libtorch
+        self.nnet.save_model('models', "checkpoint")
+        self.nnet.save_model('models', "best_checkpoint")
 
         for i in range(1, self.num_iters + 1):
             print("ITER ::: " + str(i))
@@ -75,8 +77,9 @@ class Leaner():
             for eps in range(1, self.num_eps + 1):
                 examples = self.self_play(first_color)
                 self.examples_buffer.extend(examples)
-                first_color = -first_color
+                self.save_samples("models", "checkpoint")
 
+                first_color = -first_color
                 print("EPS :: " + str(eps) + ", EXAMPLES :: " + str(len(examples)))
 
             # sample train data
@@ -88,7 +91,7 @@ class Leaner():
 
             # train neural network
             self.nnet.train(train_data)
-            self.nnet.save_model(folder='models', filename="checkpoint")
+            self.nnet.save_model('models', "checkpoint")
 
             if i % self.check_freq == 0:
                 # compare performance
@@ -102,7 +105,7 @@ class Leaner():
 
                 if one_won + two_won > 0 and float(one_won) / (one_won + two_won) > self.update_threshold:
                     print('ACCEPTING NEW MODEL')
-                    self.nnet.save_model(folder='models', filename="best_checkpoint")
+                    self.nnet.save_model('models', "best_checkpoint")
                 else:
                     print('REJECTING NEW MODEL')
 
@@ -285,3 +288,26 @@ class Leaner():
         print("human win" if winner == human_color else "alpha win")
 
         t.join()
+
+    def load_samples(self, folder="models", filename="checkpoint"):
+        """load self.examples_buffer
+        """
+
+        filepath = os.path.join(folder, filename + '.example')
+        with open(filepath, 'rb') as f:
+            self.examples_buffer = pickle.load(f)
+
+
+
+    def save_samples(self, folder="models", filename="checkpoint"):
+        """save self.examples_buffer
+        """
+
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+
+        filepath = os.path.join(folder, filename + '.example')
+        with open(filepath, 'wb') as f:
+            pickle.dump(self.examples_buffer, f, -1)
+
+
