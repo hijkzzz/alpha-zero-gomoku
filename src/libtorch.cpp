@@ -4,15 +4,14 @@
 
 // #define CUDA
 
-NeuralNetwork::NeuralNetwork(std::string model_path)
-    : module(torch::jit::load(model_path.c_str())) {
-#if defined(CUDA)
-  // move to CUDA
-  this->module->to(at::kCUDA);
-#endif  // CUDA
+NeuralNetwork::NeuralNetwork(std::string model_path, bool use_gpu)
+    : module(torch::jit::load(model_path.c_str())), use_gpu(use_gpu) {
+  if (this->use_gpu) {
+    // move to CUDA
+    this->module->to(at::kCUDA);
+    std::cout << "LIBTORCH USE CUDA" << std::endl;
+  }
   assert(this->module != nullptr);
-
-  std::cout << "MCTS LOADING: " << model_path.c_str() << std::endl;
 }
 
 std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
@@ -26,11 +25,7 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
   }
 
   torch::Tensor temp =
-      torch::from_blob(&board0[0], {1, 1, n, n}, torch::dtype(torch::kInt32))
-#if defined(CUDA)
-          .to(at::kCUDA)
-#endif  // CUDA
-      ;
+      torch::from_blob(&board0[0], {1, 1, n, n}, torch::dtype(torch::kInt32));
 
   torch::Tensor state0 = temp.gt(0).toType(torch::kFloat32);
   torch::Tensor state1 = temp.lt(0).toType(torch::kFloat32);
@@ -39,42 +34,32 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
   int cur_player = gomoku->get_current_color();
 
   torch::Tensor state2 =
-      torch::zeros({1, 1, n, n}, torch::dtype(torch::kFloat32))
-#if defined(CUDA)
-          .to(at::kCUDA)
-#endif  // CUDA
-      ;
+      torch::zeros({1, 1, n, n}, torch::dtype(torch::kFloat32));
+
   if (last_move != -1) {
     state2[0][0][last_move / n][last_move % n] = 1;
   }
   torch::Tensor state3 =
-      torch::ones({1, 1, n, n}, torch::dtype(torch::kFloat32))
-#if defined(CUDA)
-          .to(at::kCUDA)
-#endif  // CUDA
-      ;
+      torch::ones({1, 1, n, n}, torch::dtype(torch::kFloat32));
   state3 *= cur_player;
 
   // infer
   torch::Tensor states = torch::cat({state0, state1, state2, state3}, 1);
+  if (this->use_gpu) {
+    states = states.to(at::kCUDA);
+  }
+
   std::vector<torch::jit::IValue> inputs{states};
   auto result = this->module->forward(inputs).toTuple();
 
-  torch::Tensor p = result->elements()[0]
-                        .toTensor()
-                        .exp()
-                        .toType(torch::kFloat32)
-#if defined(CUDA)
-                        .to(at::kCPU)
-#endif  // CUDA
-                            [0];
-  torch::Tensor v = result->elements()[1]
-                        .toTensor()
-                        .toType(torch::kFloat32)
-#if defined(CUDA)
-                        .to(at::kCPU)
-#endif  // CUDA
-                            [0];
+  torch::Tensor p =
+      result->elements()[0].toTensor().exp().toType(torch::kFloat32)[0];
+  torch::Tensor v = result->elements()[1].toTensor().toType(torch::kFloat32)[0];
+
+  if (this->use_gpu) {
+    p = p.to(at::kCPU);
+    v = v.to(at::kCPU);
+  }
 
   // output
   std::vector<double> prob(static_cast<float*>(p.data_ptr()),

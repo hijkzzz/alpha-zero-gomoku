@@ -135,7 +135,7 @@ class NeuralNetWorkWrapper():
     """train and predict
     """
 
-    def __init__(self, lr, l2, kl_targ, epochs, num_channels, n, action_size):
+    def __init__(self, lr, l2, kl_targ, epochs, num_channels, n, action_size, mcts_use_gpu = False):
         """ init
         """
         if not torch.cuda.is_available():
@@ -148,6 +148,7 @@ class NeuralNetWorkWrapper():
         self.epochs = epochs
         self.num_channels = num_channels
         self.n = n
+        self.mcts_use_gpu = mcts_use_gpu
 
         self.neural_network = NeuralNetWork(num_channels, n, action_size)
         self.neural_network.cuda()
@@ -272,14 +273,16 @@ class NeuralNetWorkWrapper():
         filepath = os.path.join(folder, filename + '.pt')
         self.neural_network.eval()
 
-        # libtorch use CPU
-        self.neural_network.cpu()
-        example = torch.rand(1, 4, self.n, self.n)
-        traced_script_module = torch.jit.trace(self.neural_network, example)
-        traced_script_module.save(filepath)
-        self.neural_network.cuda()
+        if self.mcts_use_gpu:
+            # libtorch use CUDA
+            example = torch.rand(1, 4, self.n, self.n).cuda()
+            traced_script_module = torch.jit.trace(self.neural_network, example)
+            traced_script_module.save(filepath)
+        else:
+            # libtorch use CPU
+            self.neural_network.cpu()
+            example = torch.rand(1, 4, self.n, self.n)
+            traced_script_module = torch.jit.trace(self.neural_network, example)
+            traced_script_module.save(filepath)
+            self.neural_network.cuda()
 
-        # libtorch use CUDA
-        # example = torch.rand(1, 4, self.n, self.n).cuda()
-        # traced_script_module = torch.jit.trace(self.neural_network, example)
-        # traced_script_module.save(filepath)

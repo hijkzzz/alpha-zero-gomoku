@@ -25,7 +25,8 @@ class TreeNode {
   void expand(const std::vector<double> &action_priors);
   void backup(double leaf_value);
 
-  double get_value(double c_puct, double c_virtual_loss, unsigned int sum_n_visited) const;
+  double get_value(double c_puct, double c_virtual_loss,
+                   unsigned int sum_n_visited) const;
   inline bool get_is_leaf() const { return this->is_leaf; }
 
  private:
@@ -45,7 +46,7 @@ class MCTS {
  public:
   MCTS(std::string model_path, unsigned int thread_num, double c_puct,
        unsigned int num_mcts_sims, double c_virtual_loss,
-       unsigned int action_size);
+       unsigned int action_size, bool use_gpu);
   std::vector<double> get_action_probs(Gomoku *gomoku, double temp = 1e-3);
   void update_with_move(int last_move);
 

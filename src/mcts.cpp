@@ -135,14 +135,14 @@ double TreeNode::get_value(double c_puct, double c_virtual_loss,
 // MCTS
 MCTS::MCTS(std::string model_path, unsigned int thread_num, double c_puct,
            unsigned int num_mcts_sims, double c_virtual_loss,
-           unsigned int action_size)
-    : neural_network(new NeuralNetwork(model_path)),
+           unsigned int action_size, bool use_gpu)
+    : neural_network(new NeuralNetwork(model_path, use_gpu)),
       thread_pool(new ThreadPool(thread_num)),
       c_puct(c_puct),
       num_mcts_sims(num_mcts_sims),
       c_virtual_loss(c_virtual_loss),
       action_size(action_size),
-      root(new TreeNode(nullptr, 1., action_size), MCTS::tree_deleter) {}
+      root(new TreeNode(nullptr, 1., action_size), MCTS::tree_deleter){}
 
 void MCTS::update_with_move(int last_action) {
   auto old_root = this->root.get();

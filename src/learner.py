@@ -46,9 +46,10 @@ class Leaner():
 
         # neural network
         self.batch_size = config['batch_size']
+        self.mcts_use_gpu = config['mcts_use_gpu']
 
         self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'], config['kl_targ'], config['epochs'],
-                                         config['num_channels'], config['n'], self.action_size)
+                                         config['num_channels'], config['n'], self.action_size, self.mcts_use_gpu)
         # mcts
         self.num_mcts_sims = config['num_mcts_sims']
         self.c_puct = config['c_puct']
@@ -96,9 +97,9 @@ class Leaner():
             if i % self.check_freq == 0:
                 # compare performance
                 mcts = MCTS("./models/checkpoint.pt", self.thread_pool_size, self.c_puct,
-                            self.num_mcts_sims, self.c_virtual_loss, self.action_size)
+                            self.num_mcts_sims, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
                 mcts_best = MCTS("./models/best_checkpoint.pt", self.thread_pool_size, self.c_puct,
-                                 self.num_mcts_sims, self.c_virtual_loss, self.action_size)
+                                 self.num_mcts_sims, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
 
                 one_won, two_won, draws = self.contest(mcts, mcts_best, self.contest_num)
                 print("NEW/PREV WINS : %d / %d ; DRAWS : %d" % (one_won, two_won, draws))
@@ -126,7 +127,7 @@ class Leaner():
         train_examples = []
         gomoku = Gomoku(self.n, self.n_in_row, first_color)
         mcts = MCTS("./models/checkpoint.pt", self.thread_pool_size, self.c_puct,
-                    self.num_mcts_sims, self.c_virtual_loss, self.action_size)
+                    self.num_mcts_sims, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
 
         episode_step = 0
         while True:
@@ -247,7 +248,7 @@ class Leaner():
 
         # load best model
         mcts_best = MCTS("./models/best_checkpoint.pt", self.thread_pool_size, self.c_puct,
-                            self.num_mcts_sims * 2, self.c_virtual_loss, self.action_size)
+                            self.num_mcts_sims * 2, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
 
         # create gomoku game
         human_color = self.gomoku_gui.get_human_color()
