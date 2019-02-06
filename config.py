@@ -1,11 +1,11 @@
 config = {
     # gomoku
-    'n': 15,                                    # board size
+    'n': 10,                                    # board size
     'n_in_row': 5,                              # n in row
 
     # mcts
     'thread_pool_size': 4,                      # MCTS threads number
-    'num_mcts_sims': 1200,                      # mcts simulation times
+    'num_mcts_sims': 800,                       # mcts simulation times
     'c_puct': 5,                                # PUCT coeff
     'c_virtual_loss': 0.5,                      # virtual loss coeff
 
