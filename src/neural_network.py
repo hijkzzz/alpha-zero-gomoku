@@ -270,8 +270,16 @@ class NeuralNetWorkWrapper():
 
         # output for libtorch
         filepath = os.path.join(folder, filename + '.pt')
-
         self.neural_network.eval()
-        example = torch.rand(1, 4, self.n, self.n).cuda()
+
+        # libtorch use CPU
+        self.neural_network.cpu()
+        example = torch.rand(1, 4, self.n, self.n)
         traced_script_module = torch.jit.trace(self.neural_network, example)
         traced_script_module.save(filepath)
+        self.neural_network.cuda()
+
+        # libtorch use CUDA
+        # example = torch.rand(1, 4, self.n, self.n).cuda()
+        # traced_script_module = torch.jit.trace(self.neural_network, example)
+        # traced_script_module.save(filepath)

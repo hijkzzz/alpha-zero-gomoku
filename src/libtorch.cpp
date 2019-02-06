@@ -2,10 +2,14 @@
 
 #include <iostream>
 
+// #define CUDA
+
 NeuralNetwork::NeuralNetwork(std::string model_path)
     : module(torch::jit::load(model_path.c_str())) {
+#if defined(CUDA)
   // move to CUDA
   this->module->to(at::kCUDA);
+#endif  // CUDA
   assert(this->module != nullptr);
 
   std::cout << "MCTS LOADING: " << model_path.c_str() << std::endl;
@@ -23,7 +27,10 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
 
   torch::Tensor temp =
       torch::from_blob(&board0[0], {1, 1, n, n}, torch::dtype(torch::kInt32))
-          .to(at::kCUDA);
+#if defined(CUDA)
+          .to(at::kCUDA)
+#endif  // CUDA
+      ;
 
   torch::Tensor state0 = temp.gt(0).toType(torch::kFloat32);
   torch::Tensor state1 = temp.lt(0).toType(torch::kFloat32);
@@ -32,12 +39,20 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
   int cur_player = gomoku->get_current_color();
 
   torch::Tensor state2 =
-      torch::zeros({1, 1, n, n}, torch::dtype(torch::kFloat32)).to(at::kCUDA);
+      torch::zeros({1, 1, n, n}, torch::dtype(torch::kFloat32))
+#if defined(CUDA)
+          .to(at::kCUDA)
+#endif  // CUDA
+      ;
   if (last_move != -1) {
     state2[0][0][last_move / n][last_move % n] = 1;
   }
   torch::Tensor state3 =
-      torch::ones({1, 1, n, n}, torch::dtype(torch::kFloat32)).to(at::kCUDA);
+      torch::ones({1, 1, n, n}, torch::dtype(torch::kFloat32))
+#if defined(CUDA)
+          .to(at::kCUDA)
+#endif  // CUDA
+      ;
   state3 *= cur_player;
 
   // infer
@@ -49,9 +64,17 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
                         .toTensor()
                         .exp()
                         .toType(torch::kFloat32)
-                        .to(at::kCPU)[0];
-  torch::Tensor v =
-      result->elements()[1].toTensor().toType(torch::kFloat32).to(at::kCPU)[0];
+#if defined(CUDA)
+                        .to(at::kCPU)
+#endif  // CUDA
+                            [0];
+  torch::Tensor v = result->elements()[1]
+                        .toTensor()
+                        .toType(torch::kFloat32)
+#if defined(CUDA)
+                        .to(at::kCPU)
+#endif  // CUDA
+                            [0];
 
   // output
   std::vector<double> prob(static_cast<float*>(p.data_ptr()),
