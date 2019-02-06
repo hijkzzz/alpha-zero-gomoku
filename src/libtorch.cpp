@@ -9,7 +9,7 @@ NeuralNetwork::NeuralNetwork(std::string model_path, bool use_gpu)
   if (this->use_gpu) {
     // move to CUDA
     this->module->to(at::kCUDA);
-    std::cout << "LIBTORCH USE CUDA" << std::endl;
+    // std::cout << "LIBTORCH USE CUDA" << std::endl;
   }
   assert(this->module != nullptr);
 }
