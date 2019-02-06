@@ -1,18 +1,18 @@
 config = {
     # gomoku
-    'n': 10,                                    # board size
+    'n': 15,                                    # board size
     'n_in_row': 5,                              # n in row
 
     # mcts
     'thread_pool_size': 4,                      # MCTS threads number
-    'num_mcts_sims': 600,                       # mcts simulation times
-    'c_puct': 4,                                # PUCT coeff
+    'num_mcts_sims': 1200,                      # mcts simulation times
+    'c_puct': 5,                                # PUCT coeff
     'c_virtual_loss': 0.5,                      # virtual loss coeff
 
     # neural_network
     'lr': 0.001,                                # learning rate
     'l2': 0.0001,                               # L2
-    'num_channels': 128,                        # convolution neural network channel size
+    'num_channels': 256,                        # convolution neural network channel size
     'epochs': 5,                                # train epochs
     'batch_size': 512,                          # batch size
     'kl_targ': 0.02,                            # threshold of KL divergence
@@ -20,7 +20,7 @@ config = {
     # train
     'num_iters': 100000,                        # train iterations
     'num_eps': 1,                               # self play times in per iter
-    'explore_num': 4,                           # explore step in a game
+    'explore_num': 6,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.03,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
