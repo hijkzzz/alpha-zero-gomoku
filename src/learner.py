@@ -1,9 +1,9 @@
 from random import shuffle, sample
 from collections import deque
+from os import path, mkdir
 import threading
 import time
 import math
-import os
 import numpy as np
 import pickle
 
@@ -63,7 +63,8 @@ class Leaner():
         t = threading.Thread(target=self.gomoku_gui.loop)
         t.start()
 
-        if os.path.exists('./models/checkpoint.example'):
+
+        if path.exists(path.join('models', 'checkpoint.example')):
             print("loading checkpoint...")
             self.nnet.load_model('models', "checkpoint")
             self.load_samples("models", "checkpoint")
@@ -99,9 +100,9 @@ class Leaner():
             if i % self.check_freq == 0:
 
                 # compare performance
-                mcts = MCTS("./models/checkpoint.pt", self.thread_pool_size, self.c_puct,
+                mcts = MCTS(path.join('models', 'checkpoint.pt'), self.thread_pool_size, self.c_puct,
                             self.num_mcts_sims, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
-                mcts_best = MCTS("./models/best_checkpoint.pt", self.thread_pool_size, self.c_puct,
+                mcts_best = MCTS(path.join('models', 'best_checkpoint.pt'), self.thread_pool_size, self.c_puct,
                                  self.num_mcts_sims, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
 
                 one_won, two_won, draws = self.contest(mcts, mcts_best, self.contest_num)
@@ -126,7 +127,7 @@ class Leaner():
 
         train_examples = []
         gomoku = Gomoku(self.n, self.n_in_row, first_color)
-        mcts = MCTS("./models/checkpoint.pt", self.thread_pool_size, self.c_puct,
+        mcts = MCTS(path.join('models', 'checkpoint.pt'), self.thread_pool_size, self.c_puct,
                     self.num_mcts_sims, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
 
         episode_step = 0
@@ -247,7 +248,7 @@ class Leaner():
         t.start()
 
         # load best model
-        mcts_best = MCTS("./models/best_checkpoint.pt", self.thread_pool_size, self.c_puct,
+        mcts_best = MCTS(path.join('models', checkpoint_name + '.pt'), self.thread_pool_size, self.c_puct,
                             self.num_mcts_sims * 2, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
 
         # create gomoku game
@@ -294,7 +295,7 @@ class Leaner():
         """load self.examples_buffer
         """
 
-        filepath = os.path.join(folder, filename + '.example')
+        filepath = path.join(folder, filename + '.example')
         with open(filepath, 'rb') as f:
             self.examples_buffer = pickle.load(f)
 
@@ -304,10 +305,10 @@ class Leaner():
         """save self.examples_buffer
         """
 
-        if not os.path.exists(folder):
-            os.mkdir(folder)
+        if not path.exists(folder):
+            mkdir(folder)
 
-        filepath = os.path.join(folder, filename + '.example')
+        filepath = path.join(folder, filename + '.example')
         with open(filepath, 'wb') as f:
             pickle.dump(self.examples_buffer, f, -1)
 
