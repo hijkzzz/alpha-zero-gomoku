@@ -41,7 +41,7 @@ python learner_test.py play  # play with human
 ## Git Branchs
 * master(lock parallel MCTS, libtorch)
 * python(pure python, single thread)
-* free-lock(free-lock parallel MCTS, requires a lot of memory)
+* ~~free-lock(free-lock parallel MCTS, requires a lot of memory)~~
 
 ## References
 1. Mastering the Game of Go without Human Knowledge
