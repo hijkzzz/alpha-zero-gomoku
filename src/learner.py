@@ -44,24 +44,27 @@ class Leaner():
 
         self.examples_buffer = deque([], maxlen=config['examples_buffer_max_len'])
 
-        # neural network
-        self.batch_size = config['batch_size']
-        self.mcts_use_gpu = config['mcts_use_gpu']
-
-        self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'], config['kl_targ'], config['epochs'],
-                                         config['num_channels'], config['n'], self.action_size, self.mcts_use_gpu)
         # mcts
         self.num_mcts_sims = config['num_mcts_sims']
         self.c_puct = config['c_puct']
         self.c_virtual_loss = config['c_virtual_loss']
         self.thread_pool_size = config['thread_pool_size']
+        self.mcts_use_gpu = config['mcts_use_gpu']
+
+        # neural network
+        self.batch_size = config['batch_size']
+        self.nn_use_gpu = config['nn_use_gpu']
+
+        self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'], config['kl_targ'], config['epochs'],
+                                         config['num_channels'], config['n'], self.action_size, self.nn_use_gpu, self.mcts_use_gpu)
+
 
     def learn(self):
         # train the model by self play
         t = threading.Thread(target=self.gomoku_gui.loop)
         t.start()
 
-        if os.path.exists('./models/checkpoint'):
+        if os.path.exists('./models/checkpoint.example'):
             print("loading checkpoint...")
             self.nnet.load_model('models', "checkpoint")
             self.load_samples("models", "checkpoint")

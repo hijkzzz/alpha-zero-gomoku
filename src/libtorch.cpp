@@ -47,8 +47,8 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
 
   if (this->use_gpu) {
     // select a cuda stream
-    at::cuda::CUDAStream stream = at::cuda::getStreamFromPool();
-    at::cuda::setCurrentCUDAStream(stream);
+    // at::cuda::CUDAStream stream = at::cuda::getStreamFromPool(true);
+    // at::cuda::setCurrentCUDAStream(stream);
 
     states = states.to(at::kCUDA);
   }
