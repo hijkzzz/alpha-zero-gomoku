@@ -139,7 +139,7 @@ class NeuralNetWorkWrapper():
         """ init
         """
         if not torch.cuda.is_available():
-            print("cuda is unavailable")
+            print("ERROR! CUDA is unavailable!")
             exit(1)
 
         self.lr = lr
@@ -228,12 +228,12 @@ class NeuralNetWorkWrapper():
         """
         n = self.n
 
-        board_batch = torch.Tensor(board_batch).cuda().unsqueeze(1)
+        board_batch = torch.Tensor(board_batch).unsqueeze(1)
         state0 = (board_batch > 0).float()
         state1 = (board_batch < 0).float()
 
-        state2 = torch.zeros((len(last_action_batch), 1, n, n)).cuda().float()
-        state3 = torch.ones((len(cur_player_batch), 1, n, n)).cuda().float()
+        state2 = torch.zeros((len(last_action_batch), 1, n, n)).float()
+        state3 = torch.ones((len(cur_player_batch), 1, n, n)).float()
 
         for i in range(len(cur_player_batch)):
             state3[i][0] *= cur_player_batch[i]
@@ -243,7 +243,7 @@ class NeuralNetWorkWrapper():
                 x, y = last_action // self.n, last_action % self.n
                 state2[i][0][x][y] = 1
 
-        return torch.cat((state0, state1, state2, state3), dim=1)
+        return torch.cat((state0, state1, state2, state3), dim=1).cuda()
 
     def set_learning_rate(self, lr):
         """set learning rate

@@ -8,7 +8,6 @@ NeuralNetwork::NeuralNetwork(std::string model_path, bool use_gpu)
   if (this->use_gpu) {
     // move to CUDA
     this->module->to(at::kCUDA);
-    // std::cout << "LIBTORCH USE CUDA" << std::endl;
   }
   assert(this->module != nullptr);
 }
@@ -42,15 +41,15 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
       torch::ones({1, 1, n, n}, torch::dtype(torch::kFloat32));
   state3 *= cur_player;
 
-  // select a cuda stream
-  if (this->use_gpu) {
-    at::cuda::CUDAStream stream = at::cuda::getStreamFromPool();
-    at::cuda::setCurrentCUDAStream(stream);
-  }
 
   // infer
   torch::Tensor states = torch::cat({state0, state1, state2, state3}, 1);
+
   if (this->use_gpu) {
+    // select a cuda stream
+    at::cuda::CUDAStream stream = at::cuda::getStreamFromPool();
+    at::cuda::setCurrentCUDAStream(stream);
+
     states = states.to(at::kCUDA);
   }
 
