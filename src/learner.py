@@ -77,7 +77,8 @@ class Leaner():
             first_color = 1
             for eps in range(1, self.num_eps + 1):
                 examples = self.self_play(first_color)
-                self.examples_buffer.extend(examples)\
+                self.examples_buffer.extend(examples)
+                self.save_samples("models", "checkpoint")
 
                 first_color = -first_color
                 print("EPS :: " + str(eps) + ", EXAMPLES :: " + str(len(examples)))
@@ -94,7 +95,6 @@ class Leaner():
             self.nnet.save_model('models', "checkpoint")
 
             if i % self.check_freq == 0:
-                self.save_samples("models", "checkpoint")
 
                 # compare performance
                 mcts = MCTS("./models/checkpoint.pt", self.thread_pool_size, self.c_puct,

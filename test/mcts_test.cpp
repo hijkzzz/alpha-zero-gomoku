@@ -13,17 +13,17 @@ int main() {
   g->execute_move(19);
   g->display();
 
-  auto m = std::make_shared<MCTS>("../test/models/checkpoint.pt", 8, 1.5, 400, 1,
-                                  g->get_action_size());
+  MCTS m("../test/models/checkpoint.pt", 4, 3, 10000, 0.3, g->get_action_size(),
+         true);
 
   std::cout << "RUNNING" << std::endl;
 
   while (true) {
-    auto res = m->get_action_probs(g.get(), 1);
+    auto res = m.get_action_probs(g.get(), 1);
     std::for_each(res.begin(), res.end(),
                   [](double x) { std::cout << x << ","; });
     std::cout << std::endl;
-    m->update_with_move(-1);
+    m.update_with_move(-1);
   }
 
   return 0;

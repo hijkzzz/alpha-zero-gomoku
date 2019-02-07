@@ -60,7 +60,7 @@ if __name__ == "__main__":
     print('infer \n', policy_value_net.infer(list(zip(board_batch, last_action_batch, cur_player_batch))))
 
     # test libtorch
-    nn = neural_network.NeuralNetWorkWrapper(lr, l2, kl_targ, epochs, 256, 10, 100)
+    nn = neural_network.NeuralNetWorkWrapper(lr, l2, kl_targ, epochs, 256, 10, 100, True)
     nn.save_model(folder="models", filename="checkpoint")
     # nn.load_model(folder="models", filename="checkpoint")
 

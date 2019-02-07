@@ -1,8 +1,7 @@
 #include <libtorch.h>
+#include <ATen/cuda/CUDAStream.h>
 
 #include <iostream>
-
-// #define CUDA
 
 NeuralNetwork::NeuralNetwork(std::string model_path, bool use_gpu)
     : module(torch::jit::load(model_path.c_str())), use_gpu(use_gpu) {
@@ -42,6 +41,12 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
   torch::Tensor state3 =
       torch::ones({1, 1, n, n}, torch::dtype(torch::kFloat32));
   state3 *= cur_player;
+
+  // select a cuda stream
+  if (this->use_gpu) {
+    at::cuda::CUDAStream stream = at::cuda::getStreamFromPool();
+    at::cuda::setCurrentCUDAStream(stream);
+  }
 
   // infer
   torch::Tensor states = torch::cat({state0, state1, state2, state3}, 1);

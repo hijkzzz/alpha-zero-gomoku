@@ -6,8 +6,8 @@ config = {
     # mcts
     'thread_pool_size': 4,                      # MCTS threads number
     'num_mcts_sims': 800,                       # MCTS simulation times
-    'c_puct': 3.5,                              # PUCT coeff
-    'c_virtual_loss': 0.5,                      # virtual loss coeff
+    'c_puct': 3,                                # PUCT coeff
+    'c_virtual_loss': 0.3,                      # virtual loss coeff
     'mcts_use_gpu' : True,                      # MCTS use GPU
 
     # neural_network
@@ -21,7 +21,7 @@ config = {
     # train
     'num_iters': 100000,                        # train iterations
     'num_eps': 1,                               # self play times in per iter
-    'explore_num': 6,                           # explore step in a game
+    'explore_num': 4,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.03,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
