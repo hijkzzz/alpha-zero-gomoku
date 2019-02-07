@@ -14,6 +14,8 @@ import sys
 sys.path.append('../build')
 from library import MCTS, Gomoku
 
+# important
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
 def tuple_2d_to_numpy_2d(tuple_2d):
     # help function
