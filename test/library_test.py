@@ -4,6 +4,7 @@ import sys
 sys.path.append('../build')
 
 from library import Gomoku, MCTS
+import numpy as np
 
 if __name__ == "__main__":
     g = Gomoku(10, 5, 1)
@@ -23,4 +24,5 @@ if __name__ == "__main__":
 
     res = mcts.get_action_probs(g, 1)
     print(list(res))
+    print(int(np.argmax(np.array(list(res)))))
     mcts.update_with_move(-1)
