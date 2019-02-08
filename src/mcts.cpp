@@ -123,9 +123,9 @@ double TreeNode::get_value(double c_puct, double c_virtual_loss,
 
   // virtual loss
   double virtual_loss = c_virtual_loss * this->virtual_loss.load();
-  double n_visited_with_loss = n_visited - virtual_loss;
+  int n_visited_with_loss = n_visited - virtual_loss;
 
-  if (n_visited_with_loss <= FLT_EPSILON) {
+  if (n_visited_with_loss <= 0) {
     return u;
   } else {
     return u + (this->q_sa * n_visited - virtual_loss) / n_visited_with_loss;

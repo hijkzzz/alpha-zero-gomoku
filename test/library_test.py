@@ -7,22 +7,23 @@ from library import Gomoku, MCTS
 import numpy as np
 
 if __name__ == "__main__":
-    g = Gomoku(10, 5, 1)
-    g.execute_move(12)
-    g.execute_move(13)
-    g.execute_move(14)
-    g.execute_move(15)
-    g.execute_move(16)
-    g.execute_move(17)
-    g.execute_move(18)
-    g.execute_move(22)
-    g.display()
+    gomoku = Gomoku(10, 5, 1)
+    gomoku.execute_move(0)
+    gomoku.execute_move(99)
+    gomoku.execute_move(1)
+    gomoku.execute_move(98)
+    gomoku.execute_move(2)
+    gomoku.execute_move(97)
+    gomoku.execute_move(3)
+    gomoku.execute_move(96)
 
-    mcts = MCTS("./models/checkpoint.pt", 4, 4, 10000, 0.5, 100, True)
+    gomoku.display()
+
+    mcts = MCTS("./models/checkpoint.pt", 2, 4, 800, 0.5, 100, False)
 
     print("RUNNING")
 
-    res = mcts.get_action_probs(g, 1)
+    res = mcts.get_action_probs(gomoku, 1)
     print(list(res))
     print(int(np.argmax(np.array(list(res)))))
     mcts.update_with_move(-1)
