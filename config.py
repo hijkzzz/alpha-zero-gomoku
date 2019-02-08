@@ -4,14 +4,14 @@ config = {
     'n_in_row': 5,                              # n in row
 
     # mcts
-    'mcts_use_gpu' : True,                      # mcts use gpu
+    'mcts_use_gpu' : True,                      # mcts use cuda
     'thread_pool_size': 4,                      # mcts threads number
     'num_mcts_sims': 800,                       # mcts simulation times
-    'c_puct': 3,                                # puct coeff
-    'c_virtual_loss': 0.3,                      # virtual loss coeff
+    'c_puct': 4,                                # puct coeff
+    'c_virtual_loss': 0.5,                      # virtual loss coeff
 
     # neural_network
-    'nn_use_gpu' : True,                        # neural network use GPU
+    'nn_use_gpu' : True,                        # neural network use cuda
     'lr': 0.001,                                # learning rate
     'l2': 0.0001,                               # L2
     'num_channels': 128,                        # convolution neural network channel size
