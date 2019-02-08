@@ -46,7 +46,8 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
   torch::Tensor states = torch::cat({state0, state1, state2, state3}, 1);
 
   if (this->use_gpu) {
-    // get a CUDA stream
+    // TODO: use different CUDA stream
+    // https://github.com/pytorch/pytorch/issues/16614
     // at::cuda::CUDAStream stream = at::cuda::getStreamFromPool();
     // at::cuda::setCurrentCUDAStream(stream);
 
