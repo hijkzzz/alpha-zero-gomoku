@@ -24,7 +24,7 @@ def tuple_2d_to_numpy_2d(tuple_2d):
 
 class Leaner():
     def __init__(self, config):
-        # config see README.md
+        # see config.py
         # gomoku
         self.n = config['n']
         self.n_in_row = config['n_in_row']
@@ -81,7 +81,6 @@ class Leaner():
             for eps in range(1, self.num_eps + 1):
                 examples = self.self_play(first_color)
                 self.examples_buffer.extend(examples)
-                self.save_samples("models", "checkpoint")
 
                 first_color = -first_color
                 print("EPS :: " + str(eps) + ", EXAMPLES :: " + str(len(examples)))
@@ -98,6 +97,8 @@ class Leaner():
             self.nnet.save_model('models', "checkpoint")
 
             if i % self.check_freq == 0:
+                # save samples
+                self.save_samples("models", "checkpoint")
 
                 # compare performance
                 mcts = MCTS(path.join('models', 'checkpoint.pt'), self.thread_pool_size, self.c_puct,
@@ -299,8 +300,6 @@ class Leaner():
         with open(filepath, 'rb') as f:
             self.examples_buffer = pickle.load(f)
 
-
-
     def save_samples(self, folder="models", filename="checkpoint"):
         """save self.examples_buffer
         """
@@ -311,5 +310,3 @@ class Leaner():
         filepath = path.join(folder, filename + '.example')
         with open(filepath, 'wb') as f:
             pickle.dump(self.examples_buffer, f, -1)
-
-
