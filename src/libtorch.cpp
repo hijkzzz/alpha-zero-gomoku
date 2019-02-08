@@ -31,6 +31,10 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
   int last_move = gomoku->get_last_move();
   int cur_player = gomoku->get_current_color();
 
+  if (cur_player == -1) {
+    std::swap(state0, state1);
+  }
+
   torch::Tensor state2 =
       torch::zeros({1, 1, n, n}, torch::dtype(torch::kFloat32));
 

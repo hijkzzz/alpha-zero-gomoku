@@ -239,6 +239,9 @@ class NeuralNetWorkWrapper():
         state3 = torch.ones((len(cur_player_batch), 1, n, n)).float()
 
         for i in range(len(cur_player_batch)):
+            if cur_player_batch[i] == -1:
+                state0[i][0], state1[i][0] = state1[i][0], state0[i][0]
+
             state3[i][0] *= cur_player_batch[i]
 
             last_action = last_action_batch[i]
