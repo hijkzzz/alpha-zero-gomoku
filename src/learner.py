@@ -115,6 +115,9 @@ class Leaner():
                 else:
                     print('REJECTING NEW MODEL')
 
+                del mcts
+                del mcts_best
+
         t.join()
 
     def self_play(self, first_color):
