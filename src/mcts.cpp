@@ -111,8 +111,11 @@ void TreeNode::backup(double value) {
   }
 
   unsigned int n_visited = this->n_visited.load();
-  this->q_sa = (n_visited * this->q_sa + value) / (n_visited + 1);
   this->n_visited++;
+  {
+    std::lock_guard<std::mutex> lock(this->lock);
+    this->q_sa = (n_visited * this->q_sa + value) / (n_visited + 1);
+  }
 }
 
 double TreeNode::get_value(double c_puct, double c_virtual_loss,

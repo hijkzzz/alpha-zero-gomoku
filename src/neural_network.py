@@ -232,15 +232,19 @@ class NeuralNetWorkWrapper():
         n = self.n
 
         board_batch = torch.Tensor(board_batch).unsqueeze(1)
-        state0 = (board_batch > 0).float()
-        state1 = (board_batch < 0).float()
+        state0 = torch.ones((len(board_batch), 1, n, n)).float()
+        state1 = torch.ones((len(board_batch), 1, n, n)).float()
 
         state2 = torch.zeros((len(last_action_batch), 1, n, n)).float()
         state3 = torch.ones((len(cur_player_batch), 1, n, n)).float()
 
         for i in range(len(cur_player_batch)):
             if cur_player_batch[i] == -1:
-                state0[i][0], state1[i][0] = state1[i][0], state0[i][0]
+                state0[i] *= (board_batch[i] < 0).float()
+                state1[i] *= (board_batch[i] > 0).float()
+            else:
+                state0[i] *= (board_batch[i] > 0).float()
+                state1[i] *= (board_batch[i] < 0).float()
 
             state3[i][0] *= cur_player_batch[i]
 
