@@ -128,6 +128,7 @@ class Leaner():
         ends, the outcome of the game is used to assign values to each example
         in train_examples.
         """
+        self.gomoku_gui.reset_status()
 
         train_examples = []
         gomoku = Gomoku(self.n, self.n_in_row, first_color)
@@ -165,6 +166,7 @@ class Leaner():
             action = np.random.choice(len(prob_noise), p=prob_noise)
 
             # execute move
+            self.gomoku_gui.execute_move(cur_player, action)
             gomoku.execute_move(action)
             mcts.update_with_move(action)
 
