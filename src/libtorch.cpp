@@ -1,10 +1,7 @@
 #include <libtorch.h>
-#include <ATen/cuda/CUDAContext.h>
 #include <ATen/cuda/CUDAGuard.h>
 
 #include <iostream>
-
-thread_local at::cuda::CUDAStream stream = at::cuda::getStreamFromPool();
 
 NeuralNetwork::NeuralNetwork(std::string model_path, bool use_gpu)
     : module(torch::jit::load(model_path.c_str())), use_gpu(use_gpu) {
@@ -54,7 +51,8 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
   if (this->use_gpu) {
     // use different CUDA stream
     // https://github.com/pytorch/pytorch/issues/16614
-    at::cuda::CUDAStreamGuard guard(stream);
+    // at::cuda::CUDAStream stream = at::cuda::getStreamFromPool();
+    // at::cuda::CUDAStreamGuard guard(stream);
 
     states = states.to(at::kCUDA);
 
