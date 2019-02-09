@@ -5,7 +5,7 @@ config = {
 
     # mcts
     'mcts_use_gpu' : True,                      # mcts use cuda
-    'thread_pool_size': 1,                      # mcts threads number
+    'thread_pool_size': ,                      # mcts threads number
     'num_mcts_sims': 800,                       # mcts simulation times
     'c_puct': 4,                                # puct coeff
     'c_virtual_loss': 0.1,                      # virtual loss coeff
