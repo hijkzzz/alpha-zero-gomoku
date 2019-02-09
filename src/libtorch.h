@@ -1,7 +1,6 @@
 #pragma once
 
 #include <torch/script.h> // One-stop header.
-#include <ATen/cuda/CUDAContext.h>
 
 #include <string>
 #include <memory>
