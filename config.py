@@ -1,6 +1,6 @@
 config = {
     # gomoku
-    'n': 15,                                    # board size
+    'n': 10,                                    # board size
     'n_in_row': 5,                              # n in row
 
     # mcts
