@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(library)
 
-option(TEST_MODE "test mode" ON)
+option(TEST_MODE "test mode" OFF)
 
 # add source directory
 include_directories(./src)
