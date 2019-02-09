@@ -30,8 +30,6 @@ int main() {
   gomoku.execute_move(18);
   gomoku.execute_move(12);
   gomoku.execute_move(15);
-  gomoku.execute_move(24);
-  gomoku.execute_move(16);
 
   // test display
   gomoku.display();
@@ -43,6 +41,21 @@ int main() {
   auto res = nn.infer(&gomoku);
   auto p = res[0];
   auto v = res[1];
+
+  std::for_each(p.begin(), p.end(),
+              [](double x) { std::cout << x << ","; });
+  std::cout << std::endl;
+
+  std::cout << v << std::endl;
+
+  // 2
+  gomoku.execute_move(24);
+  std::cout << gomoku.get_last_move() << std::endl;
+  std::cout << gomoku.get_current_color() << std::endl;
+
+  res = nn.infer(&gomoku);
+  p = res[0];
+  v = res[1];
 
   std::for_each(p.begin(), p.end(),
               [](double x) { std::cout << x << ","; });

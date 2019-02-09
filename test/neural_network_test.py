@@ -88,10 +88,13 @@ if __name__ == "__main__":
     gomoku.execute_move(18)
     gomoku.execute_move(12)
     gomoku.execute_move(15)
-    gomoku.execute_move(24)
-    gomoku.execute_move(16)
 
     feature_batch = [(tuple_2d_to_numpy_2d(gomoku.get_board()), gomoku.get_last_move(), gomoku.get_current_color())]
-    print('feature', feature_batch)
-
+    print(feature_batch)
     print(nn.infer(feature_batch))
+
+    gomoku.execute_move(24)
+    feature_batch = [(tuple_2d_to_numpy_2d(gomoku.get_board()), gomoku.get_last_move(), gomoku.get_current_color())]
+    print(feature_batch)
+    print(nn.infer(feature_batch))
+
