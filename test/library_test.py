@@ -19,11 +19,11 @@ if __name__ == "__main__":
 
     gomoku.display()
 
-    mcts = MCTS("./models/checkpoint.pt", 2, 4, 800, 0.5, 100, False)
+    mcts = MCTS("./models/checkpoint.pt", 4, 4, 1600, 0.5, 100, True)
 
     print("RUNNING")
-
-    res = mcts.get_action_probs(gomoku, 1)
-    print(list(res))
-    print(int(np.argmax(np.array(list(res)))))
-    mcts.update_with_move(-1)
+    while True:
+        res = mcts.get_action_probs(gomoku, 1)
+        print(list(res))
+        print(int(np.argmax(np.array(list(res)))))
+        mcts.update_with_move(-1)
