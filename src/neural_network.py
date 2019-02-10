@@ -59,10 +59,9 @@ class NeuralNetWork(nn.Module):
         super(NeuralNetWork, self).__init__()
 
         # residual block
-        self.res1 = ResidualBlock(4, num_channels)
+        self.res1 = ResidualBlock(2, num_channels)
         self.res2 = ResidualBlock(num_channels, num_channels)
         self.res3 = ResidualBlock(num_channels, num_channels)
-        self.res4 = ResidualBlock(num_channels, num_channels)
 
         # policy head
         self.p_conv = nn.Conv2d(num_channels, 4, kernel_size=1, padding=0, bias=False)
@@ -85,7 +84,6 @@ class NeuralNetWork(nn.Module):
         out = self.res1(inputs)
         out = self.res2(out)
         out = self.res3(out)
-        out = self.res4(out)
 
         # policy head
         p = self.p_conv(out)
