@@ -73,17 +73,17 @@ class Leaner():
         self.nnet.save_model('models', "checkpoint")
         self.nnet.save_model('models', "best_checkpoint")
 
+        first_color = 1
         for i in range(1, self.num_iters + 1):
             print("ITER ::: " + str(i))
 
             # self play
-            first_color = 1
             for eps in range(1, self.num_eps + 1):
                 examples = self.self_play(first_color)
                 self.examples_buffer.extend(examples)
 
-                first_color = -first_color
                 print("EPS :: " + str(eps) + ", EXAMPLES :: " + str(len(examples)))
+                first_color = -first_color
 
             # sample train data
             if len(self.examples_buffer) < self.batch_size:
@@ -128,12 +128,13 @@ class Leaner():
         ends, the outcome of the game is used to assign values to each example
         in train_examples.
         """
-        self.gomoku_gui.reset_status()
+        print(first_color)
 
         train_examples = []
         gomoku = Gomoku(self.n, self.n_in_row, first_color)
         mcts = MCTS(path.join('models', 'checkpoint.pt'), self.thread_pool_size, self.c_puct,
                     self.num_mcts_sims, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
+        self.gomoku_gui.reset_status()
 
         episode_step = 0
         while True:
