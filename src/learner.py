@@ -187,18 +187,23 @@ class Leaner():
 
         for i in range(contest_num):
             if i < contest_num // 2:
-                # first half, white first
+                # first half, player1 is white
                 winner = self._contest(player1, player2, 1)
+                if winner == 1:
+                    one_won += 1
+                elif winner == -1:
+                    two_won += 1
+                else:
+                    draws += 1
             else:
-                # second half, black first
-                winner = self._contest(player1, player2, -1)
-
-            if winner == 1:
-                one_won += 1
-            elif winner == -1:
-                two_won += 1
-            else:
-                draws += 1
+                # second half, player1 is black
+                winner = self._contest(player2, player1, 1)
+                if winner == 1:
+                    two_won += 1
+                elif winner == -1:
+                    one_won += 1
+                else:
+                    draws += 1
 
         return one_won, two_won, draws
 
