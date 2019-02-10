@@ -128,8 +128,6 @@ class Leaner():
         ends, the outcome of the game is used to assign values to each example
         in train_examples.
         """
-        print(first_color)
-
         train_examples = []
         gomoku = Gomoku(self.n, self.n_in_row, first_color)
         mcts = MCTS(path.join('models', 'checkpoint.pt'), self.thread_pool_size, self.c_puct,
