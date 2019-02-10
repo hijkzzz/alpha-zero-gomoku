@@ -235,23 +235,24 @@ class NeuralNetWorkWrapper():
         state0 = (board_batch > 0).float()
         state1 = (board_batch < 0).float()
 
-        state2 = torch.zeros((len(last_action_batch), 1, n, n)).float()
-        state3 = torch.ones((len(cur_player_batch), 1, n, n)).float()
+        # state2 = torch.zeros((len(last_action_batch), 1, n, n)).float()
+        # state3 = torch.ones((len(cur_player_batch), 1, n, n)).float()
 
-        for i in range(len(cur_player_batch)):
+        for i in range(len(board_batch)):
             if cur_player_batch[i] == -1:
                 temp = state0[i].clone()
                 state0[i].copy_(state1[i])
                 state1[i].copy_(temp)
 
-            state3[i][0] *= cur_player_batch[i]
+            # state3[i][0] *= cur_player_batch[i]
 
-            last_action = last_action_batch[i]
-            if last_action != -1:
-                x, y = last_action // self.n, last_action % self.n
-                state2[i][0][x][y] = 1
+            # last_action = last_action_batch[i]
+            # if last_action != -1:
+            #     x, y = last_action // self.n, last_action % self.n
+            #     state2[i][0][x][y] = 1
 
-        res =  torch.cat((state0, state1, state2, state3), dim=1)
+        # res =  torch.cat((state0, state1, state2, state3), dim=1)
+        res =  torch.cat((state0, state1), dim=1)
         return res.cuda() if self.nn_use_gpu else res
 
     def set_learning_rate(self, lr):
@@ -285,14 +286,14 @@ class NeuralNetWorkWrapper():
         if self.mcts_use_gpu:
             # libtorch use CUDA
             self.neural_network.cuda()
-            example = torch.rand(1, 4, self.n, self.n).cuda()
+            example = torch.rand(1, 2, self.n, self.n).cuda()
 
             traced_script_module = torch.jit.trace(self.neural_network, example)
             traced_script_module.save(filepath)
         else:
             # libtorch use CPU
             self.neural_network.cpu()
-            example = torch.rand(1, 4, self.n, self.n)
+            example = torch.rand(1, 2, self.n, self.n)
 
             traced_script_module = torch.jit.trace(self.neural_network, example)
             traced_script_module.save(filepath)

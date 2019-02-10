@@ -36,18 +36,19 @@ std::vector<std::vector<double>> NeuralNetwork::infer(Gomoku* gomoku) {
     std::swap(state0, state1);
   }
 
-  torch::Tensor state2 =
-      torch::zeros({1, 1, n, n}, torch::dtype(torch::kFloat32));
+  // torch::Tensor state2 =
+  //     torch::zeros({1, 1, n, n}, torch::dtype(torch::kFloat32));
 
-  if (last_move != -1) {
-    state2[0][0][last_move / n][last_move % n] = 1;
-  }
-  torch::Tensor state3 =
-      torch::ones({1, 1, n, n}, torch::dtype(torch::kFloat32));
-  state3 *= cur_player;
+  // if (last_move != -1) {
+  //   state2[0][0][last_move / n][last_move % n] = 1;
+  // }
+  // torch::Tensor state3 =
+  //     torch::ones({1, 1, n, n}, torch::dtype(torch::kFloat32));
+  // state3 *= cur_player;
 
   // infer
-  torch::Tensor states = torch::cat({state0, state1, state2, state3}, 1);
+  torch::Tensor states = torch::cat({state0, state1}, 1);
+  // torch::Tensor states = torch::cat({state0, state1, state2, state3}, 1);
 
   if (this->use_gpu) {
     // use different CUDA stream
