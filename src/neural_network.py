@@ -240,7 +240,7 @@ class NeuralNetWorkWrapper():
 
         for i in range(len(cur_player_batch)):
             if cur_player_batch[i] == -1:
-                temp = torch.tensor(state0[i])
+                temp = state0[i].clone()
                 state0[i].copy_(state1[i])
                 state1[i].copy_(temp)
 
