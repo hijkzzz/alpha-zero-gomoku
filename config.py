@@ -6,7 +6,7 @@ config = {
     # mcts
     'mcts_use_gpu' : True,                      # mcts use cuda
     'thread_pool_size': 2,                      # mcts threads number
-    'num_mcts_sims': 800,                      # mcts simulation times
+    'num_mcts_sims': 800,                       # mcts simulation times
     'c_puct': 4,                                # puct coeff
     'c_virtual_loss': 0.5,                      # virtual loss coeff
 
@@ -22,7 +22,7 @@ config = {
     # train
     'num_iters': 100000,                        # train iterations
     'num_eps': 1,                               # self play times in per iter
-    'explore_num': 4,                           # explore step in a game
+    'explore_num': 0,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.03,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
