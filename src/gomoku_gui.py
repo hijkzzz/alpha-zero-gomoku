@@ -12,8 +12,8 @@ class GomokuGUI():
         self.green = (0, 255, 0)
 
         # screen
-        self.width = 1000 if n > 10 else 700
-        self.height = 1000 if n > 10 else 700
+        self.width = 800 if n > 10 else 600
+        self.height = 800 if n > 10 else 600
 
         self.n = n
         self.grid_width = self.width / (self.n + 3)
@@ -79,7 +79,7 @@ class GomokuGUI():
             os.path.join(base_folder, '../assets/background.png')).convert()
 
         # font
-        self.font = pygame.font.SysFont('Arial', 20)
+        self.font = pygame.font.SysFont('Arial', 18)
 
         while self.is_running:
             # timer
