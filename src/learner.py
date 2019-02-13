@@ -153,12 +153,14 @@ class Leaner():
 
             # dirichlet noise
             legal_moves = list(gomoku.get_legal_moves())
-            noise = 0.25 * np.random.dirichlet(self.dirichlet_alpha * np.ones(len(legal_moves)))
+            noise = 0.25 * np.random.dirichlet(self.dirichlet_alpha * np.ones(np.count_nonzero(legal_moves)))
 
             prob_noise = 0.75 * prob
+            j = 0
             for i in range(len(prob_noise)):
                 if legal_moves[i] == 1:
-                    prob_noise[i] += noise[i]
+                    prob_noise[i] += noise[j]
+                    j += 1
             prob_noise /= np.sum(prob_noise)
 
             action = np.random.choice(len(prob_noise), p=prob_noise)
