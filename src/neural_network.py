@@ -163,7 +163,6 @@ class NeuralNetWorkWrapper():
             self.neural_network.train()
 
             # sample
-            print("sampling...")
             train_data = random.sample(example_buffer, batch_size)
 
             # extract train data

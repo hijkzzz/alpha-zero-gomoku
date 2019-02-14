@@ -68,7 +68,7 @@ class Leaner():
             self.nnet.load_model('models', "checkpoint")
             self.load_samples("models", "checkpoint")
 
-        # generate .pt for libtorch
+        # save .pt for libtorch
         self.nnet.save_model('models', "checkpoint")
         self.nnet.save_model('models', "best_checkpoint")
 
@@ -84,7 +84,7 @@ class Leaner():
                 print("EPS :: " + str(eps) + ", EXAMPLES :: " + str(len(examples)))
                 first_color = -first_color
 
-            # sample train data
+            # need more samples
             if len(self.examples_buffer) < self.batch_size:
                 continue
 
