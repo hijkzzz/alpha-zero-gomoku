@@ -22,12 +22,11 @@ if __name__ == "__main__":
     lr = 0.002
     l2 = 0.0002
     epochs = 5
-    kl_targ = 0.04
     num_channels = 128
     n = 5
     action_size = n ** 2
 
-    policy_value_net = neural_network.NeuralNetWorkWrapper(lr, l2, kl_targ, epochs, num_channels, n, action_size)
+    policy_value_net = neural_network.NeuralNetWorkWrapper(lr, l2, epochs, num_channels, n, action_size)
 
     # test data convert
     board_batch = [[[1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1], [1, 0, -1, 0, -1]],
@@ -60,7 +59,7 @@ if __name__ == "__main__":
     print('infer \n', policy_value_net.infer(list(zip(board_batch, last_action_batch, cur_player_batch))))
 
     # test libtorch
-    nn = neural_network.NeuralNetWorkWrapper(lr, l2, kl_targ, epochs, 128, 10, 100, True, False)
+    nn = neural_network.NeuralNetWorkWrapper(lr, l2, epochs, 128, 10, 100, True, False)
     # nn.save_model(folder="models", filename="checkpoint")
     nn.load_model(folder="models", filename="checkpoint")
 

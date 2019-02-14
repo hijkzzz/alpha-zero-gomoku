@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+import random
 
 import torch
 import torch.nn as nn
@@ -76,8 +77,8 @@ class NeuralNetWork(nn.Module):
         self.v_conv = nn.Conv2d(num_channels, 2, kernel_size=1, padding=0, bias=False)
         self.v_bn = nn.BatchNorm2d(num_features=2)
 
-        self.v_fc1 = nn.Linear(2 * n ** 2, 128)
-        self.v_fc2 = nn.Linear(128, 1)
+        self.v_fc1 = nn.Linear(2 * n ** 2, 256)
+        self.v_fc2 = nn.Linear(256, 1)
         self.tanh = nn.Tanh()
 
     def forward(self, inputs):
@@ -135,12 +136,11 @@ class NeuralNetWorkWrapper():
     """train and predict
     """
 
-    def __init__(self, lr, l2, kl_targ, epochs, num_channels, n, action_size, nn_use_gpu = True, mcts_use_gpu = True):
+    def __init__(self, lr, l2, epochs, num_channels, n, action_size, nn_use_gpu=True, mcts_use_gpu=True):
         """ init
         """
         self.lr = lr
         self.l2 = l2
-        self.kl_targ = kl_targ
         self.epochs = epochs
         self.num_channels = num_channels
         self.n = n
@@ -155,25 +155,24 @@ class NeuralNetWorkWrapper():
         self.optim = Adam(self.neural_network.parameters(), lr=self.lr, weight_decay=self.l2)
         self.alpha_loss = AlphaLoss()
 
-    def train(self, example_batch):
+    def train(self, example_buffer, batch_size):
         """train neural network
         """
-        # extract train data
-        board_batch, last_action_batch, cur_player_batch, p_batch, v_batch = list(zip(*example_batch))
 
-        state_batch = self._data_convert(board_batch, last_action_batch, cur_player_batch)
-        p_batch = torch.Tensor(p_batch)
-        v_batch = torch.Tensor(v_batch).unsqueeze(1)
-
-        if self.nn_use_gpu:
-            p_batch = p_batch.cuda()
-            v_batch = v_batch.cuda()
-
-        # for calculating KL divergence
-        old_p, old_v = self._infer(state_batch)
-
-        for epoch in range(self.epochs):
+        for _ in range(self.epochs):
             self.neural_network.train()
+
+            # sample
+            print("sampling...")
+            train_data = random.sample(example_buffer, batch_size)
+
+            # extract train data
+            board_batch, last_action_batch, cur_player_batch, p_batch, v_batch = list(zip(*train_data))
+
+            state_batch = self._data_convert(board_batch, last_action_batch, cur_player_batch)
+            p_batch = torch.Tensor(p_batch).cuda() if self.nn_use_gpu else torch.Tensor(p_batch)
+            v_batch = torch.Tensor(v_batch).unsqueeze(
+                1).cuda() if self.nn_use_gpu else torch.Tensor(v_batch).unsqueeze(1)
 
             # zero the parameter gradients
             self.optim.zero_grad()
@@ -185,23 +184,14 @@ class NeuralNetWorkWrapper():
 
             self.optim.step()
 
-            # calculate KL divergence
+            # calculate entropy
             new_p, _ = self._infer(state_batch)
-
-            kl = np.mean(np.sum(old_p * (
-                np.log(old_p + 1e-10) - np.log(new_p + 1e-10)),
-                axis=1)
-            )
 
             entropy = -np.mean(
                 np.sum(new_p * np.log(new_p + 1e-10), axis=1)
             )
 
-            # early stopping if D_KL diverges badly
-            if kl > self.kl_targ:
-                break
-
-        print("LOSS :: {}, ENTROPY :: {}, KL :: {}".format(loss.item(), entropy, kl))
+            print("LOSS :: {}, ENTROPY :: {}".format(loss.item(), entropy))
 
     def infer(self, feature_batch):
         """predict p and v by raw input
@@ -249,7 +239,7 @@ class NeuralNetWorkWrapper():
             #     state2[i][0][x][y] = 1
 
         # res =  torch.cat((state0, state1, state2), dim=1)
-        res =  torch.cat((state0, state1), dim=1)
+        res = torch.cat((state0, state1), dim=1)
         return res.cuda() if self.nn_use_gpu else res
 
     def set_learning_rate(self, lr):

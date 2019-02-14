@@ -1,4 +1,3 @@
-from random import shuffle, sample
 from collections import deque
 from os import path, mkdir
 import threading
@@ -54,7 +53,7 @@ class Leaner():
         self.batch_size = config['batch_size']
         self.nn_use_gpu = config['nn_use_gpu']
 
-        self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'], config['kl_targ'], config['epochs'],
+        self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'], config['epochs'],
                                          config['num_channels'], config['n'], self.action_size, self.nn_use_gpu, self.mcts_use_gpu)
 
 
@@ -89,11 +88,8 @@ class Leaner():
             if len(self.examples_buffer) < self.batch_size:
                 continue
 
-            print("sampling...")
-            train_data = sample(self.examples_buffer, self.batch_size)
-
             # train neural network
-            self.nnet.train(train_data)
+            self.nnet.train(self.examples_buffer, self.batch_size)
             self.nnet.save_model('models', "checkpoint")
 
             if i % self.check_freq == 0:

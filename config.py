@@ -14,10 +14,9 @@ config = {
     'nn_use_gpu' : True,                        # neural network use cuda
     'lr': 0.001,                                # learning rate
     'l2': 0.0001,                               # L2
-    'num_channels': 128,                        # convolution neural network channel size
-    'epochs': 2,                                # train epochs
-    'batch_size': 1024,                         # batch size
-    'kl_targ': 0.02,                            # threshold of KL divergence
+    'num_channels': 256,                        # convolution neural network channel size
+    'epochs': 3,                                # train epochs
+    'batch_size': 512,                          # batch size
 
     # train
     'num_iters': 100000,                        # train iterations
@@ -28,7 +27,7 @@ config = {
     'update_threshold': 0.55,                   # update model threshold
     'contest_num': 10,                          # new/old model compare times
     'check_freq': 100,                          # test model frequency
-    'examples_buffer_max_len': 40000,           # max length of examples buffer
+    'examples_buffer_max_len': 50000,           # max length of examples buffer
 
     # test
     'human_color': 1                            # human player's color
