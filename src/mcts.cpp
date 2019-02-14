@@ -139,7 +139,7 @@ double TreeNode::get_value(double c_puct, double c_virtual_loss,
 MCTS::MCTS(std::string model_path, unsigned int thread_num, double c_puct,
            unsigned int num_mcts_sims, double c_virtual_loss,
            unsigned int action_size, bool use_gpu)
-    : neural_network(new NeuralNetwork(model_path, use_gpu)),
+    : neural_network(new NeuralNetwork(model_path, use_gpu, thread_num)),
       thread_pool(new ThreadPool(thread_num)),
       c_puct(c_puct),
       num_mcts_sims(num_mcts_sims),
@@ -259,7 +259,9 @@ void MCTS::simulate(std::shared_ptr<Gomoku> game) {
     // predict action_probs and value by neural network
     std::vector<double> action_priors(this->action_size, 0);
 
-    auto result = this->neural_network->infer(game.get());
+    auto future = this->neural_network->commit(game.get());
+    auto result = future.get();
+
     action_priors = std::move(result[0]);
     value = result[1][0];
 

@@ -1,6 +1,4 @@
-
-#if !defined(__THREAD_POOL__)
-#define __THREAD_POOL__
+#pragma once
 
 #include <vector>
 #include <queue>
@@ -98,5 +96,3 @@ private:
   std::atomic<bool> run;                    // is running
   std::atomic<unsigned int> idl_thread_num; // idle thread number
 };
-
-#endif // __THREAD_POOL__

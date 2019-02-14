@@ -61,8 +61,8 @@ if __name__ == "__main__":
 
     # test libtorch
     nn = neural_network.NeuralNetWorkWrapper(lr, l2, kl_targ, epochs, 128, 10, 100, True, False)
-    nn.save_model(folder="models", filename="checkpoint")
-    # nn.load_model(folder="models", filename="checkpoint")
+    # nn.save_model(folder="models", filename="checkpoint")
+    nn.load_model(folder="models", filename="checkpoint")
 
     gomoku = Gomoku(10, 5, 1)
     gomoku.execute_move(3)

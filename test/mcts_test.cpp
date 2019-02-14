@@ -13,7 +13,7 @@ int main() {
   g->execute_move(19);
   g->display();
 
-  MCTS m("../test/models/checkpoint.pt", 8, 3, 10000, 0.3, g->get_action_size(),
+  MCTS m("../test/models/checkpoint.pt", 4, 3, 1000, 0.3, g->get_action_size(),
          true);
 
   std::cout << "RUNNING" << std::endl;

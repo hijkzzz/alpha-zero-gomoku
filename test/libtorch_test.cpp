@@ -37,13 +37,12 @@ int main() {
   std::cout << gomoku.get_last_move() << std::endl;
   std::cout << gomoku.get_current_color() << std::endl;
 
-  NeuralNetwork nn("../test/models/checkpoint.pt", true);
-  auto res = nn.infer(&gomoku);
+  NeuralNetwork nn("../test/models/checkpoint.pt", true, 1);
+  auto res = nn.commit(&gomoku).get();
   auto p = res[0];
   auto v = res[1];
 
-  std::for_each(p.begin(), p.end(),
-              [](double x) { std::cout << x << ","; });
+  std::for_each(p.begin(), p.end(), [](double x) { std::cout << x << ","; });
   std::cout << std::endl;
 
   std::cout << v << std::endl;
@@ -53,12 +52,36 @@ int main() {
   std::cout << gomoku.get_last_move() << std::endl;
   std::cout << gomoku.get_current_color() << std::endl;
 
-  res = nn.infer(&gomoku);
+  res = nn.commit(&gomoku).get();
   p = res[0];
   v = res[1];
 
-  std::for_each(p.begin(), p.end(),
-              [](double x) { std::cout << x << ","; });
+  std::for_each(p.begin(), p.end(), [](double x) { std::cout << x << ","; });
+  std::cout << std::endl;
+
+  std::cout << v << std::endl;
+
+  // stress testing
+  auto start = std::chrono::system_clock::now();
+
+  for (unsigned i = 0; i < 1000; i++) {
+    nn.commit(&gomoku);
+  }
+
+  res = nn.commit(&gomoku).get();
+  auto end = std::chrono::system_clock::now();
+
+  std::cout <<  double(std::chrono::duration_cast<std::chrono::microseconds>(end -
+                                                                     start)
+                       .count()) *
+                   std::chrono::microseconds::period::num /
+                   std::chrono::microseconds::period::den
+            << std::endl;
+
+  p = res[0];
+  v = res[1];
+
+  std::for_each(p.begin(), p.end(), [](double x) { std::cout << x << ","; });
   std::cout << std::endl;
 
   std::cout << v << std::endl;
