@@ -98,7 +98,7 @@ void NeuralNetwork::infer() {
 
       } else {
         // timeout
-        std::cout << "timeout" << std::endl;
+        // std::cout << "timeout" << std::endl;
         timeout = true;
       }
     }

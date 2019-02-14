@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     gomoku.display()
 
-    mcts = MCTS("./models/checkpoint.pt", 2, 4, 1600, 0.5, 100, True)
+    mcts = MCTS("./models/checkpoint.pt", 8, 4, 3200, 0.5, 100, True)
 
     print("RUNNING")
     while True:
