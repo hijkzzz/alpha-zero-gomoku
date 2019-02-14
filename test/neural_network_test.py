@@ -53,15 +53,15 @@ if __name__ == "__main__":
                              p_batch.cpu().numpy().tolist(), v_batch.cpu().numpy().tolist()))
     print('train\n', example_batch)
 
-    policy_value_net.train(example_batch)
+    policy_value_net.train(example_batch, len(example_batch))
 
     # test infer
     print('infer \n', policy_value_net.infer(list(zip(board_batch, last_action_batch, cur_player_batch))))
 
     # test libtorch
     nn = neural_network.NeuralNetWorkWrapper(lr, l2, epochs, 128, 10, 100, True, False)
-    # nn.save_model(folder="models", filename="checkpoint")
-    nn.load_model(folder="models", filename="checkpoint")
+    nn.save_model(folder="models", filename="checkpoint")
+    # nn.load_model(folder="models", filename="checkpoint")
 
     gomoku = Gomoku(10, 5, 1)
     gomoku.execute_move(3)

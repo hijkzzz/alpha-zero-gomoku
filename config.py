@@ -7,7 +7,7 @@ config = {
     'mcts_use_gpu' : True,                      # mcts use cuda
     'thread_pool_size': 4,                      # mcts threads number
     'num_mcts_sims': 1600,                      # mcts simulation times
-    'c_puct': 3,                                # puct coeff
+    'c_puct': 2.5,                                # puct coeff
     'c_virtual_loss': 0.5,                      # virtual loss coeff
 
     # neural_network
@@ -15,7 +15,7 @@ config = {
     'lr': 0.001,                                # learning rate
     'l2': 0.0001,                               # L2
     'num_channels': 256,                        # convolution neural network channel size
-    'epochs': 3,                                # train epochs
+    'epochs': 2,                                # train epochs
     'batch_size': 512,                          # batch size
 
     # train
@@ -23,7 +23,7 @@ config = {
     'num_eps': 1,                               # self play times in per iter
     'explore_num': 0,                           # explore step in a game
     'temp': 1,                                  # temperature
-    'dirichlet_alpha': 0.3,                     # action noise in self play games
+    'dirichlet_alpha': 0.1,                     # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
     'contest_num': 10,                          # new/old model compare times
     'check_freq': 100,                          # test model frequency

@@ -10,18 +10,18 @@ import time
 
 if __name__ == "__main__":
     gomoku = Gomoku(10, 5, 1)
-    # gomoku.execute_move(0)
-    # gomoku.execute_move(99)
-    # gomoku.execute_move(1)
-    # gomoku.execute_move(98)
-    # gomoku.execute_move(2)
-    # gomoku.execute_move(97)
-    # gomoku.execute_move(3)
-    # gomoku.execute_move(96)
+    gomoku.execute_move(0)
+    gomoku.execute_move(99)
+    gomoku.execute_move(1)
+    gomoku.execute_move(98)
+    gomoku.execute_move(2)
+    gomoku.execute_move(97)
+    gomoku.execute_move(3)
+    gomoku.execute_move(96)
 
     gomoku.display()
 
-    mcts = MCTS("./models/checkpoint.pt", 8, 4, 3200, 0.5, 100, True)
+    mcts = MCTS("./models/checkpoint.pt", 4, 1.5, 1600, 0.5, 100, True)
 
     print("RUNNING")
     while True:
