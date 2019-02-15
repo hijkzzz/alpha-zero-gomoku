@@ -258,7 +258,7 @@ class Leaner():
 
         # load best model
         mcts_best = MCTS(path.join('models', checkpoint_name + '.pt'), self.thread_pool_size, self.c_puct,
-                            self.num_mcts_sims * 2, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
+                            self.num_mcts_sims * 4, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
 
         # create gomoku game
         human_color = self.gomoku_gui.get_human_color()
