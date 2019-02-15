@@ -8,7 +8,7 @@ config = {
     'thread_pool_size': 8,                      # mcts threads number
     'num_mcts_sims': 1600,                      # mcts simulation times
     'c_puct': 1.5,                                # puct coeff
-    'c_virtual_loss': 1,                        # virtual loss coeff
+    'c_virtual_loss': 3,                        # virtual loss coeff
 
     # neural_network
     'nn_use_gpu' : True,                        # neural network use cuda
