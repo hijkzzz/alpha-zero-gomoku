@@ -59,11 +59,11 @@ if __name__ == "__main__":
     print('infer \n', policy_value_net.infer(list(zip(board_batch, last_action_batch, cur_player_batch))))
 
     # test libtorch
-    nn = neural_network.NeuralNetWorkWrapper(lr, l2, epochs, 128, 10, 100, True, False)
+    nn = neural_network.NeuralNetWorkWrapper(lr, l2, epochs, 256, 15, 225, True, True)
     nn.save_model(folder="models", filename="checkpoint")
     # nn.load_model(folder="models", filename="checkpoint")
 
-    gomoku = Gomoku(10, 5, 1)
+    gomoku = Gomoku(15, 5, 1)
     gomoku.execute_move(3)
     gomoku.execute_move(4)
     gomoku.execute_move(6)
