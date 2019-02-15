@@ -110,8 +110,14 @@ void TreeNode::backup(double value) {
     this->parent->backup(-value);
   }
 
+  // remove vitural loss
+  this->virtual_loss--;
+
+  // update n_visited
   unsigned int n_visited = this->n_visited.load();
   this->n_visited++;
+
+  // update q_sa
   {
     std::lock_guard<std::mutex> lock(this->lock);
     this->q_sa = (n_visited * this->q_sa + value) / (n_visited + 1);
