@@ -7,8 +7,8 @@ config = {
     'mcts_use_gpu' : True,                      # mcts use cuda
     'thread_pool_size': 4,                      # mcts threads number
     'num_mcts_sims': 1600,                      # mcts simulation times
-    'c_puct': 3,                                # puct coeff
-    'c_virtual_loss': 3,                        # virtual loss coeff
+    'c_puct': 2.5,                                # puct coeff
+    'c_virtual_loss': 2.5,                        # virtual loss coeff
 
     # neural_network
     'nn_use_gpu' : True,                        # neural network use cuda
@@ -23,11 +23,11 @@ config = {
     'num_eps': 1,                               # self play times in per iter
     'explore_num': 0,                           # explore step in a game
     'temp': 1,                                  # temperature
-    'dirichlet_alpha': 0.1,                    # action noise in self play games
+    'dirichlet_alpha': 0.1,                     # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
     'contest_num': 10,                          # new/old model compare times
     'check_freq': 100,                          # test model frequency
-    'examples_buffer_max_len': 50000,           # max length of examples buffer
+    'examples_buffer_max_len': 30000,           # max length of examples buffer
 
     # test
     'human_color': 1                            # human player's color
