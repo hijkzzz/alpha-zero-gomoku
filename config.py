@@ -15,7 +15,7 @@ config = {
     'lr': 0.001,                                # learning rate
     'l2': 0.0001,                               # L2
     'num_channels': 256,                        # convolution neural network channel size
-    'epochs': 2,                                # train epochs
+    'epochs': 1,                                # train epochs
     'batch_size': 512,                          # batch size
 
     # train
