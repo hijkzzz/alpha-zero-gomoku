@@ -138,15 +138,6 @@ class Leaner():
             temp = self.temp if episode_step <= self.explore_num else 0
             prob = np.array(list(mcts.get_action_probs(gomoku, temp)))
 
-            # generate sample
-            board = tuple_2d_to_numpy_2d(gomoku.get_board())
-            last_action = gomoku.get_last_move()
-            cur_player = gomoku.get_current_color()
-
-            sym = self.get_symmetries(board, prob)
-            for b, p in sym:
-                train_examples.append([b, last_action, cur_player, p])
-
             # dirichlet noise
             legal_moves = list(gomoku.get_legal_moves())
             noise = 0.25 * np.random.dirichlet(self.dirichlet_alpha * np.ones(np.count_nonzero(legal_moves)))
@@ -160,6 +151,15 @@ class Leaner():
             prob_noise /= np.sum(prob_noise)
 
             action = np.random.choice(len(prob_noise), p=prob_noise)
+            
+            # generate sample
+            board = tuple_2d_to_numpy_2d(gomoku.get_board())
+            last_action = gomoku.get_last_move()
+            cur_player = gomoku.get_current_color()
+
+            sym = self.get_symmetries(board, prob_noise)
+            for b, p in sym:
+                train_examples.append([b, last_action, cur_player, p])
 
             # execute move
             self.gomoku_gui.execute_move(cur_player, action)
