@@ -15,19 +15,19 @@ config = {
     'lr': 0.001,                                # learning rate
     'l2': 0.0001,                               # L2
     'num_channels': 256,                        # convolution neural network channel size
-    'epochs': 1,                                # train epochs
+    'epochs': 10,                               # train epochs
     'batch_size': 512,                          # batch size
 
     # train
     'num_iters': 100000,                        # train iterations
-    'num_eps': 1,                               # self play times in per iter
+    'num_eps': 10,                              # self play times in per iter
     'explore_num': 4,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.03,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
     'contest_num': 10,                          # new/old model compare times
-    'check_freq': 100,                          # test model frequency
-    'examples_buffer_max_len': 30000,           # max length of examples buffer
+    'check_freq': 10,                           # test model frequency
+    'examples_buffer_max_len': 40000,           # max length of examples buffer
 
     # test
     'human_color': 1                            # human player's color

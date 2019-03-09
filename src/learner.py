@@ -111,9 +111,6 @@ class Leaner():
                 else:
                     print('REJECTING NEW MODEL')
 
-                del mcts
-                del mcts_best
-
         t.join()
 
     def self_play(self, first_color):
@@ -150,8 +147,6 @@ class Leaner():
                     j += 1
             prob_noise /= np.sum(prob_noise)
 
-            action = np.random.choice(len(prob_noise), p=prob_noise)
-            
             # generate sample
             board = tuple_2d_to_numpy_2d(gomoku.get_board())
             last_action = gomoku.get_last_move()
@@ -162,6 +157,8 @@ class Leaner():
                 train_examples.append([b, last_action, cur_player, p])
 
             # execute move
+            action = np.random.choice(len(prob_noise), p=prob_noise)
+
             self.gomoku_gui.execute_move(cur_player, action)
             gomoku.execute_move(action)
             mcts.update_with_move(action)
@@ -171,8 +168,6 @@ class Leaner():
             if ended == 1:
                 # b, last_action, cur_player, p, v
                 return [(x[0], x[1], x[2], x[3], x[2] * winner) for x in train_examples]
-
-        del mcts
 
     def contest(self, player1, player2, contest_num):
         """compare new and old model
