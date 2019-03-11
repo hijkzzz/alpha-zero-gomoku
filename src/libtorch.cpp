@@ -88,7 +88,7 @@ void NeuralNetwork::infer() {
     // pop task
     {
       std::unique_lock<std::mutex> lock(this->lock);
-      if (this->cv.wait_for(lock, 5ms,
+      if (this->cv.wait_for(lock, 3ms,
                             [this] { return this->tasks.size() > 0; })) {
         auto task = std::move(this->tasks.front());
         states.emplace_back(std::move(task.first));
