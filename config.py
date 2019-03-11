@@ -7,7 +7,7 @@ config = {
     'libtorch_use_gpu' : True,                  # libtorch use cuda
     'thread_pool_size': 4,                      # mcts threads number
     'num_mcts_sims': 1600,                      # mcts simulation times
-    'c_puct': 5,                                # puct coeff
+    'c_puct': 6,                                # puct coeff
     'c_virtual_loss': 3,                        # virtual loss coeff
 
     # neural_network
