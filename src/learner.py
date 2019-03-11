@@ -5,13 +5,14 @@ import time
 import math
 import numpy as np
 import pickle
+import concurrent.futures
 
 from neural_network import NeuralNetWorkWrapper
 from gomoku_gui import GomokuGUI
 
 import sys
 sys.path.append('../build')
-from library import MCTS, Gomoku
+from library import MCTS, Gomoku, NeuralNetwork
 
 def tuple_2d_to_numpy_2d(tuple_2d):
     # help function
@@ -20,6 +21,7 @@ def tuple_2d_to_numpy_2d(tuple_2d):
     for i, tuple_1d in enumerate(tuple_2d):
         res[i] = list(tuple_1d)
     return np.array(res)
+
 
 class Leaner():
     def __init__(self, config):
@@ -33,6 +35,7 @@ class Leaner():
         # train
         self.num_iters = config['num_iters']
         self.num_eps = config['num_eps']
+        self.parallel_play_size = config['parallel_play_size']
         self.check_freq = config['check_freq']
         self.contest_num = config['contest_num']
         self.dirichlet_alpha = config['dirichlet_alpha']
@@ -47,42 +50,42 @@ class Leaner():
         self.c_puct = config['c_puct']
         self.c_virtual_loss = config['c_virtual_loss']
         self.thread_pool_size = config['thread_pool_size']
-        self.mcts_use_gpu = config['mcts_use_gpu']
+        self.libtorch_use_gpu = config['libtorch_use_gpu']
 
         # neural network
         self.batch_size = config['batch_size']
-        self.nn_use_gpu = config['nn_use_gpu']
+        self.train_use_gpu = config['train_use_gpu']
 
         self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'], config['epochs'],
-                                         config['num_channels'], config['n'], self.action_size, self.nn_use_gpu, self.mcts_use_gpu)
-
+                                         config['num_channels'], config['n'], self.action_size, self.train_use_gpu, self.libtorch_use_gpu)
 
     def learn(self):
         # train the model by self play
         t = threading.Thread(target=self.gomoku_gui.loop)
         t.start()
 
-
         if path.exists(path.join('models', 'checkpoint.example')):
             print("loading checkpoint...")
-            self.nnet.load_model('models', "checkpoint")
-            self.load_samples("models", "checkpoint")
+            self.nnet.load_model()
+            self.load_samples()
 
-        # save .pt for libtorch
-        self.nnet.save_model('models', "checkpoint")
+        # save torchscript
+        self.nnet.save_model()
         self.nnet.save_model('models', "best_checkpoint")
 
-        first_color = 1
         for i in range(1, self.num_iters + 1):
-            print("ITER ::: " + str(i))
+            print("ITER :: " + str(i))
 
-            # self play
-            for eps in range(1, self.num_eps + 1):
-                examples = self.self_play(first_color)
-                self.examples_buffer.extend(examples)
+            # self play in parallel
+            libtorch = NeuralNetwork('./models/checkpoint.pt',
+                                     self.libtorch_use_gpu, self.thread_pool_size * self.parallel_play_size)
 
-                print("EPS :: " + str(eps) + ", EXAMPLES :: " + str(len(examples)))
-                first_color = -first_color
+            with concurrent.futures.ThreadPoolExecutor(max_workers=self.parallel_play_size) as executor:
+                futures = [executor.submit(self.self_play, 1 if k % 2 else -1, libtorch, k == 1) for k in range(1, self.num_eps + 1)]
+                for k, f in enumerate(futures):
+                    examples = f.result()
+                    print("EPS: {}, STEPS: {}".format(k, len(examples) // 8))
+                    self.examples_buffer.extend(examples)
 
             # need more samples
             if len(self.examples_buffer) < self.batch_size:
@@ -90,17 +93,19 @@ class Leaner():
 
             # train neural network
             self.nnet.train(self.examples_buffer, self.batch_size)
-            self.nnet.save_model('models', "checkpoint")
+            self.nnet.save_model()
+            self.save_samples()
 
+            # compare performance
             if i % self.check_freq == 0:
-                # save samples
-                self.save_samples("models", "checkpoint")
-
-                # compare performance
-                mcts = MCTS(path.join('models', 'checkpoint.pt'), self.thread_pool_size, self.c_puct,
-                            self.num_mcts_sims, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
-                mcts_best = MCTS(path.join('models', 'best_checkpoint.pt'), self.thread_pool_size, self.c_puct,
-                                 self.num_mcts_sims, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
+                libtorch = NeuralNetwork('./models/checkpoint.pt',
+                                         self.libtorch_use_gpu, self.thread_pool_size)
+                mcts = MCTS(libtorch, self.thread_pool_size, self.c_puct,
+                            self.num_mcts_sims, self.c_virtual_loss, self.action_size)
+                libtorch_best = NeuralNetwork('./models/best_checkpoint.pt',
+                                              self.libtorch_use_gpu, self.thread_pool_size)
+                mcts_best = MCTS(libtorch_best, self.thread_pool_size, self.c_puct,
+                                 self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
                 one_won, two_won, draws = self.contest(mcts, mcts_best, self.contest_num)
                 print("NEW/PREV WINS : %d / %d ; DRAWS : %d" % (one_won, two_won, draws))
@@ -113,7 +118,7 @@ class Leaner():
 
         t.join()
 
-    def self_play(self, first_color):
+    def self_play(self, first_color, libtorch, show):
         """
         This function executes one episode of self-play, starting with player 1.
         As the game is played, each turn is added as a training example to
@@ -123,9 +128,11 @@ class Leaner():
         """
         train_examples = []
         gomoku = Gomoku(self.n, self.n_in_row, first_color)
-        mcts = MCTS(path.join('models', 'checkpoint.pt'), self.thread_pool_size, self.c_puct,
-                    self.num_mcts_sims, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
-        self.gomoku_gui.reset_status()
+        mcts = MCTS(libtorch, self.thread_pool_size, self.c_puct,
+                    self.num_mcts_sims, self.c_virtual_loss, self.action_size)
+
+        if show:
+            self.gomoku_gui.reset_status()
 
         episode_step = 0
         while True:
@@ -159,7 +166,8 @@ class Leaner():
             # execute move
             action = np.random.choice(len(prob_noise), p=prob_noise)
 
-            self.gomoku_gui.execute_move(cur_player, action)
+            if show:
+                self.gomoku_gui.execute_move(cur_player, action)
             gomoku.execute_move(action)
             mcts.update_with_move(action)
 
@@ -252,8 +260,10 @@ class Leaner():
         t.start()
 
         # load best model
-        mcts_best = MCTS(path.join('models', checkpoint_name + '.pt'), self.thread_pool_size, self.c_puct,
-                            self.num_mcts_sims * 4, self.c_virtual_loss, self.action_size, self.mcts_use_gpu)
+        libtorch_best = NeuralNetwork('./models/best_checkpoint.pt',
+                                        self.libtorch_use_gpu, self.thread_pool_size * 2)
+        mcts_best = MCTS(libtorch_best, self.thread_pool_size * 2, self.c_puct,
+                            self.num_mcts_sims * 4, self.c_virtual_loss, self.action_size)
 
         # create gomoku game
         human_color = self.gomoku_gui.get_human_color()
@@ -295,21 +305,21 @@ class Leaner():
 
         t.join()
 
-    def load_samples(self, folder="models", filename="checkpoint"):
+    def load_samples(self, folder="models", filename="checkpoint.example"):
         """load self.examples_buffer
         """
 
-        filepath = path.join(folder, filename + '.example')
+        filepath = path.join(folder, filename)
         with open(filepath, 'rb') as f:
             self.examples_buffer = pickle.load(f)
 
-    def save_samples(self, folder="models", filename="checkpoint"):
+    def save_samples(self, folder="models", filename="checkpoint.example"):
         """save self.examples_buffer
         """
 
         if not path.exists(folder):
             mkdir(folder)
 
-        filepath = path.join(folder, filename + '.example')
+        filepath = path.join(folder, filename)
         with open(filepath, 'wb') as f:
             pickle.dump(self.examples_buffer, f, -1)

@@ -17,14 +17,14 @@ class NeuralNetwork {
   NeuralNetwork(std::string model_path, bool use_gpu, unsigned int batch_size);
   ~NeuralNetwork();
 
-  std::future<return_type> commit(Gomoku* gomoku);
+  std::future<return_type> commit(Gomoku* gomoku); // commit task to queue
 
  private:
   using task_type = std::pair<torch::Tensor, std::promise<return_type>>;
 
-  void infer();  // infer by batch
+  void infer();  // infer
 
-  std::unique_ptr<std::thread> loop;  // infer thread
+  std::unique_ptr<std::thread> loop;  // call infer in loop
   bool running; // is running
 
   std::queue<task_type> tasks;  // tasks queue

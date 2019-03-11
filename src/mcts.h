@@ -44,9 +44,9 @@ class TreeNode {
 
 class MCTS {
  public:
-  MCTS(std::string model_path, unsigned int thread_num, double c_puct,
+  MCTS(NeuralNetwork *neural_network, unsigned int thread_num, double c_puct,
        unsigned int num_mcts_sims, double c_virtual_loss,
-       unsigned int action_size, bool use_gpu);
+       unsigned int action_size);
   std::vector<double> get_action_probs(Gomoku *gomoku, double temp = 1e-3);
   void update_with_move(int last_move);
 
@@ -57,7 +57,7 @@ class MCTS {
   // variables
   std::unique_ptr<TreeNode, decltype(MCTS::tree_deleter) *> root;
   std::unique_ptr<ThreadPool> thread_pool;
-  std::unique_ptr<NeuralNetwork> neural_network;
+  NeuralNetwork *neural_network;
 
   unsigned int action_size;
   unsigned int num_mcts_sims;

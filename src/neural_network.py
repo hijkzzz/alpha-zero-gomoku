@@ -134,7 +134,7 @@ class NeuralNetWorkWrapper():
     """train and predict
     """
 
-    def __init__(self, lr, l2, epochs, num_channels, n, action_size, nn_use_gpu=True, mcts_use_gpu=True):
+    def __init__(self, lr, l2, epochs, num_channels, n, action_size, train_use_gpu=True, libtorch_use_gpu=True):
         """ init
         """
         self.lr = lr
@@ -143,11 +143,11 @@ class NeuralNetWorkWrapper():
         self.num_channels = num_channels
         self.n = n
 
-        self.mcts_use_gpu = mcts_use_gpu
-        self.nn_use_gpu = nn_use_gpu
+        self.libtorch_use_gpu = libtorch_use_gpu
+        self.train_use_gpu = train_use_gpu
 
         self.neural_network = NeuralNetWork(num_channels, n, action_size)
-        if self.nn_use_gpu:
+        if self.train_use_gpu:
             self.neural_network.cuda()
 
         self.optim = Adam(self.neural_network.parameters(), lr=self.lr, weight_decay=self.l2)
@@ -167,9 +167,9 @@ class NeuralNetWorkWrapper():
             board_batch, last_action_batch, cur_player_batch, p_batch, v_batch = list(zip(*train_data))
 
             state_batch = self._data_convert(board_batch, last_action_batch, cur_player_batch)
-            p_batch = torch.Tensor(p_batch).cuda() if self.nn_use_gpu else torch.Tensor(p_batch)
+            p_batch = torch.Tensor(p_batch).cuda() if self.train_use_gpu else torch.Tensor(p_batch)
             v_batch = torch.Tensor(v_batch).unsqueeze(
-                1).cuda() if self.nn_use_gpu else torch.Tensor(v_batch).unsqueeze(1)
+                1).cuda() if self.train_use_gpu else torch.Tensor(v_batch).unsqueeze(1)
 
             # zero the parameter gradients
             self.optim.zero_grad()
@@ -188,7 +188,7 @@ class NeuralNetWorkWrapper():
                 np.sum(new_p * np.log(new_p + 1e-10), axis=1)
             )
 
-            print("LOSS :: {}, ENTROPY :: {}".format(loss.item(), entropy))
+            print("LOSS: {}, ENTROPY: {}".format(loss.item(), entropy))
 
     def infer(self, feature_batch):
         """predict p and v by raw input
@@ -237,7 +237,7 @@ class NeuralNetWorkWrapper():
 
         # res =  torch.cat((state0, state1, state2), dim=1)
         res = torch.cat((state0, state1), dim=1)
-        return res.cuda() if self.nn_use_gpu else res
+        return res.cuda() if self.train_use_gpu else res
 
     def set_learning_rate(self, lr):
         """set learning rate
@@ -263,26 +263,21 @@ class NeuralNetWorkWrapper():
         filepath = os.path.join(folder, filename)
         torch.save(self.neural_network.state_dict(), filepath)
 
-        # output for libtorch
-        filepath = os.path.join(folder, filename + '.pt')
+        # save torchscript
+        filepath += '.pt'
         self.neural_network.eval()
 
-        if self.mcts_use_gpu:
-            # libtorch use CUDA
+        if self.libtorch_use_gpu:
             self.neural_network.cuda()
             example = torch.rand(1, 2, self.n, self.n).cuda()
-
-            traced_script_module = torch.jit.trace(self.neural_network, example)
-            traced_script_module.save(filepath)
         else:
-            # libtorch use CPU
             self.neural_network.cpu()
-            example = torch.rand(1, 2, self.n, self.n)
+            example = torch.rand(1, 2, self.n, self.n).cpu()
 
-            traced_script_module = torch.jit.trace(self.neural_network, example)
-            traced_script_module.save(filepath)
+        traced_script_module = torch.jit.trace(self.neural_network, example)
+        traced_script_module.save(filepath)
 
-        if self.nn_use_gpu:
+        if self.train_use_gpu:
             self.neural_network.cuda()
         else:
             self.neural_network.cpu()

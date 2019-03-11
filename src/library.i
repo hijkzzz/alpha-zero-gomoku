@@ -2,6 +2,7 @@
 
 %{
 #include "gomoku.h"
+#include "libtorch.h"
 #include "mcts.h"
 %}
 
@@ -17,3 +18,9 @@ namespace std {
 
 %include "gomoku.h"
 %include "mcts.h"
+
+class NeuralNetwork {
+ public:
+  NeuralNetwork(std::string model_path, bool use_gpu, unsigned int batch_size);
+  ~NeuralNetwork();
+};
