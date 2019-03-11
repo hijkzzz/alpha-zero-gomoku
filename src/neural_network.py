@@ -251,7 +251,9 @@ class NeuralNetWorkWrapper():
         """
 
         filepath = os.path.join(folder, filename)
-        self.neural_network.load_state_dict(torch.load(filepath))
+        state = torch.load(filepath)
+        self.neural_network.load_state_dict(state['network'])
+        self.optim.load_state_dict(state['optim'])
 
     def save_model(self, folder="models", filename="checkpoint"):
         """save model to file
@@ -261,7 +263,8 @@ class NeuralNetWorkWrapper():
             os.mkdir(folder)
 
         filepath = os.path.join(folder, filename)
-        torch.save(self.neural_network.state_dict(), filepath)
+        state = {'network':self.neural_network.state_dict(), 'optim':self.optim.state_dict()}
+        torch.save(state, filepath)
 
         # save torchscript
         filepath += '.pt'
