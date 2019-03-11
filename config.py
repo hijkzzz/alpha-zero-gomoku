@@ -20,15 +20,15 @@ config = {
 
     # train
     'num_iters': 100000,                        # train iterations
-    'num_eps': 12,                              # self play times in per iter
-    'parallel_play_size': 6,                    # self play in parallel
+    'num_eps': 16,                              # self play times in per iter
+    'parallel_play_size': 8,                    # self play in parallel
     'explore_num': 4,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.03,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
     'contest_num': 10,                          # new/old model compare times
     'check_freq': 20,                           # test model frequency
-    'examples_buffer_max_len': 20000,           # max length of examples buffer
+    'examples_buffer_max_len': 40000,           # max length of examples buffer
 
     # test
     'human_color': 1                            # human player's color
