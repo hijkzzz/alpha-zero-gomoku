@@ -7,22 +7,22 @@ config = {
     'libtorch_use_gpu' : True,                  # libtorch use cuda
     'thread_pool_size': 4,                      # mcts threads number
     'num_mcts_sims': 1600,                      # mcts simulation times
-    'c_puct': 6,                                # puct coeff
+    'c_puct': 5,                                # puct coeff
     'c_virtual_loss': 3,                        # virtual loss coeff
 
     # neural_network
     'train_use_gpu' : True,                     # train neural network using cuda
     'lr': 0.001,                                # learning rate
-    'l2': 0.001,                                # L2
+    'l2': 0.0003,                               # L2
     'num_channels': 256,                        # convolution neural network channel size
     'epochs': 16,                               # train epochs
     'batch_size': 512,                          # batch size
 
     # train
     'num_iters': 100000,                        # train iterations
-    'num_eps': 16,                              # self play times in per iter
-    'parallel_play_size': 8,                    # self play in parallel
-    'explore_num': 8,                           # explore step in a game
+    'num_eps': 10,                              # self play times in per iter
+    'parallel_play_size': 4,                    # self play in parallel
+    'explore_num': 4,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.03,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
