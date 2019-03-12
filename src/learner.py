@@ -85,8 +85,8 @@ class Leaner():
                 for k, f in enumerate(futures):
                     examples = f.result()
                     # decrease libtorch batch size
-                    remain = min(self.num_eps - k, self.parallel_play_size)
-                    libtorch.set_batch_size(remain * self.thread_pool_size)
+                    remain = min(len(futures) - k - 1, self.parallel_play_size)
+                    libtorch.set_batch_size(max(remain * self.thread_pool_size, 1))
                     print("EPS: {}, STEPS: {}".format(k + 1, len(examples) // 8))
                     self.examples_buffer.extend(examples)
 
