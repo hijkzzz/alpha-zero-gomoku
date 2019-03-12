@@ -22,7 +22,7 @@ config = {
     'num_iters': 100000,                        # train iterations
     'num_eps': 10,                              # self play times in per iter
     'parallel_play_size': 8,                    # self play in parallel
-    'explore_num': 4,                           # explore step in a game
+    'explore_num': 6,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.03,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
