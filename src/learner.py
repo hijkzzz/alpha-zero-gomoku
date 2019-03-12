@@ -90,6 +90,9 @@ class Leaner():
                     print("EPS: {}, STEPS: {}".format(k + 1, len(examples) // 8))
                     self.examples_buffer.extend(examples)
 
+            # release gpu memory
+            del libtorch
+
             # need more samples
             if len(self.examples_buffer) < self.batch_size:
                 continue
@@ -118,6 +121,10 @@ class Leaner():
                     self.nnet.save_model('models', "best_checkpoint")
                 else:
                     print('REJECTING NEW MODEL')
+
+                # release gpu memory
+                del libtorch
+                del libtorch_best
 
         t.join()
 
