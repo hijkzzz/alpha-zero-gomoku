@@ -105,11 +105,11 @@ class Leaner():
             # compare performance
             if i % self.check_freq == 0:
                 libtorch = NeuralNetwork('./models/checkpoint.pt',
-                                         self.libtorch_use_gpu, self.thread_pool_size)
+                                         self.libtorch_use_gpu, self.thread_pool_size * self.contest_num // 2)
                 mcts = MCTS(libtorch, self.thread_pool_size, self.c_puct,
                             self.num_mcts_sims, self.c_virtual_loss, self.action_size)
                 libtorch_best = NeuralNetwork('./models/best_checkpoint.pt',
-                                              self.libtorch_use_gpu, self.thread_pool_size)
+                                              self.libtorch_use_gpu, self.thread_pool_size * self.contest_num // 2)
                 mcts_best = MCTS(libtorch_best, self.thread_pool_size, self.c_puct,
                                  self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
@@ -195,23 +195,14 @@ class Leaner():
 
         one_won, two_won, draws = 0, 0, 0
 
-        for i in range(contest_num):
-            if i < contest_num // 2:
-                # first half, player1 is white
-                winner = self._contest(player1, player2, 1)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=contest_num) as executor:
+            futures = [executor.submit(self._contest, player1, player2, 1 if k % 2 else -1) for k in range(1, contest_num + 1)]
+            for f in futures:
+                winner = f.result()
                 if winner == 1:
                     one_won += 1
                 elif winner == -1:
                     two_won += 1
-                else:
-                    draws += 1
-            else:
-                # second half, player1 is black
-                winner = self._contest(player2, player1, 1)
-                if winner == 1:
-                    two_won += 1
-                elif winner == -1:
-                    one_won += 1
                 else:
                     draws += 1
 
