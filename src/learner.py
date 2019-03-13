@@ -104,16 +104,12 @@ class Leaner():
 
             # compare performance
             if i % self.check_freq == 0:
-                libtorch = NeuralNetwork('./models/checkpoint.pt',
+                libtorch_current = NeuralNetwork('./models/checkpoint.pt',
                                          self.libtorch_use_gpu, self.thread_pool_size * self.contest_num // 2)
-                mcts = MCTS(libtorch, self.thread_pool_size, self.c_puct,
-                            self.num_mcts_sims, self.c_virtual_loss, self.action_size)
                 libtorch_best = NeuralNetwork('./models/best_checkpoint.pt',
                                               self.libtorch_use_gpu, self.thread_pool_size * self.contest_num // 2)
-                mcts_best = MCTS(libtorch_best, self.thread_pool_size, self.c_puct,
-                                 self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
-                one_won, two_won, draws = self.contest(mcts, mcts_best, self.contest_num)
+                one_won, two_won, draws = self.contest(libtorch_current, libtorch_best, self.contest_num)
                 print("NEW/PREV WINS : %d / %d ; DRAWS : %d" % (one_won, two_won, draws))
 
                 if one_won + two_won > 0 and float(one_won) / (one_won + two_won) > self.update_threshold:
@@ -123,7 +119,7 @@ class Leaner():
                     print('REJECTING NEW MODEL')
 
                 # release gpu memory
-                del libtorch
+                del libtorch_current
                 del libtorch_best
 
         t.join()
@@ -189,10 +185,9 @@ class Leaner():
 
     def contest(self, player1, player2, contest_num):
         """compare new and old model
-           Args: player1, player2 is white/balck player
+           Args: player1, player2 is neural network
            Return: one_won, two_won, draws
         """
-
         one_won, two_won, draws = 0, 0, 0
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=contest_num) as executor:
@@ -209,14 +204,20 @@ class Leaner():
         return one_won, two_won, draws
 
     def _contest(self, player1, player2, first_player, show):
-        # old model play with new model
+        # create MCTS
+        player1 = MCTS(player1, self.thread_pool_size, self.c_puct,
+            self.num_mcts_sims, self.c_virtual_loss, self.action_size)
+        player2 = MCTS(player2, self.thread_pool_size, self.c_puct,
+                    self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
+        # prepare
         players = [player2, None, player1]
         player_index = first_player
         gomoku = Gomoku(self.n, self.n_in_row, first_player)
         if show:
             self.gomoku_gui.reset_status()
 
+        # play
         while True:
             player = players[player_index + 1]
 
