@@ -191,7 +191,8 @@ class Leaner():
         one_won, two_won, draws = 0, 0, 0
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=contest_num) as executor:
-            futures = [executor.submit(self._contest, network1, network2, 1 if k % 2 else -1, k == 1) for k in range(1, contest_num + 1)]
+            futures = [executor.submit( \
+                self._contest, network1, network2, 1 if k <= contest_num // 2 else -1, k == 1) for k in range(1, contest_num + 1)]
             for f in futures:
                 winner = f.result()
                 if winner == 1:
