@@ -68,10 +68,10 @@ class Leaner():
             print("loading checkpoint...")
             self.nnet.load_model()
             self.load_samples()
-
-        # save torchscript
-        self.nnet.save_model()
-        self.nnet.save_model('models', "best_checkpoint")
+        else:
+            # save torchscript
+            self.nnet.save_model()
+            self.nnet.save_model('models', "best_checkpoint")
 
         for i in range(1, self.num_iters + 1):
             print("ITER :: " + str(i))
