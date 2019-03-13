@@ -183,7 +183,7 @@ class Leaner():
                 # b, last_action, cur_player, p, v
                 return [(x[0], x[1], x[2], x[3], x[2] * winner) for x in train_examples]
 
-    def contest(self, player1, player2, contest_num):
+    def contest(self, network1, network2, contest_num):
         """compare new and old model
            Args: player1, player2 is neural network
            Return: one_won, two_won, draws
@@ -191,7 +191,7 @@ class Leaner():
         one_won, two_won, draws = 0, 0, 0
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=contest_num) as executor:
-            futures = [executor.submit(self._contest, player1, player2, 1 if k % 2 else -1, k == 1) for k in range(1, contest_num + 1)]
+            futures = [executor.submit(self._contest, network1, network2, 1 if k % 2 else -1, k == 1) for k in range(1, contest_num + 1)]
             for f in futures:
                 winner = f.result()
                 if winner == 1:
@@ -203,11 +203,11 @@ class Leaner():
 
         return one_won, two_won, draws
 
-    def _contest(self, player1, player2, first_player, show):
+    def _contest(self, network1, network2, first_player, show):
         # create MCTS
-        player1 = MCTS(player1, self.thread_pool_size, self.c_puct,
+        player1 = MCTS(network1, self.thread_pool_size, self.c_puct,
             self.num_mcts_sims, self.c_virtual_loss, self.action_size)
-        player2 = MCTS(player2, self.thread_pool_size, self.c_puct,
+        player2 = MCTS(network2, self.thread_pool_size, self.c_puct,
                     self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
         # prepare
