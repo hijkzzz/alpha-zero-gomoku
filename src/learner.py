@@ -196,7 +196,7 @@ class Leaner():
         one_won, two_won, draws = 0, 0, 0
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=contest_num) as executor:
-            futures = [executor.submit(self._contest, player1, player2, 1 if k % 2 else -1) for k in range(1, contest_num + 1)]
+            futures = [executor.submit(self._contest, player1, player2, 1 if k % 2 else -1, k == 1) for k in range(1, contest_num + 1)]
             for f in futures:
                 winner = f.result()
                 if winner == 1:
@@ -208,13 +208,14 @@ class Leaner():
 
         return one_won, two_won, draws
 
-    def _contest(self, player1, player2, first_player):
+    def _contest(self, player1, player2, first_player, show):
         # old model play with new model
 
         players = [player2, None, player1]
         player_index = first_player
         gomoku = Gomoku(self.n, self.n_in_row, first_player)
-        self.gomoku_gui.reset_status()
+        if show:
+            self.gomoku_gui.reset_status()
 
         while True:
             player = players[player_index + 1]
@@ -225,7 +226,8 @@ class Leaner():
 
             # execute move
             gomoku.execute_move(best_move)
-            self.gomoku_gui.execute_move(player_index, best_move)
+            if show:
+                self.gomoku_gui.execute_move(player_index, best_move)
 
             # check game status
             ended, winner = gomoku.get_game_status()
