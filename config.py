@@ -13,7 +13,7 @@ config = {
     # neural_network
     'train_use_gpu' : True,                     # train neural network using cuda
     'lr': 0.001,                                # learning rate
-    'l2': 0.001,                               # L2
+    'l2': 0.0001,                               # L2
     'num_channels': 128,                        # convolution neural network channel size
     'epochs': 10,                               # train epochs
     'batch_size': 512,                          # batch size
@@ -22,7 +22,7 @@ config = {
     'num_iters': 100000,                        # train iterations
     'num_eps': 10,                              # self play times in per iter
     'parallel_play_size': 10,                   # self play in parallel
-    'explore_num': 0,                           # explore step in a game
+    'explore_num': 8,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.03,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
