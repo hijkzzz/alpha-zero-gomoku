@@ -105,9 +105,9 @@ class Leaner():
             # compare performance
             if i % self.check_freq == 0:
                 libtorch_current = NeuralNetwork('./models/checkpoint.pt',
-                                         self.libtorch_use_gpu, self.thread_pool_size * self.contest_num // 2)
+                                         self.libtorch_use_gpu, self.thread_pool_size * self.parallel_play_size // 2)
                 libtorch_best = NeuralNetwork('./models/best_checkpoint.pt',
-                                              self.libtorch_use_gpu, self.thread_pool_size * self.contest_num // 2)
+                                              self.libtorch_use_gpu, self.thread_pool_size * self.parallel_play_size // 2)
 
                 one_won, two_won, draws = self.contest(libtorch_current, libtorch_best, self.contest_num)
                 print("NEW/PREV WINS : %d / %d ; DRAWS : %d" % (one_won, two_won, draws))
@@ -190,7 +190,7 @@ class Leaner():
         """
         one_won, two_won, draws = 0, 0, 0
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=contest_num) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.parallel_play_size) as executor:
             futures = [executor.submit( \
                 self._contest, network1, network2, 1 if k <= contest_num // 2 else -1, k == 1) for k in range(1, contest_num + 1)]
             for f in futures:
