@@ -159,7 +159,7 @@ class NeuralNetWorkWrapper():
         """train neural network
         """
         times = self.epochs * (new_examples_size + batch_size - 1) // batch_size
-        for i in range(times):
+        for i in range(1, times + 1):
             self.neural_network.train()
 
             # sample
