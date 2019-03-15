@@ -144,33 +144,35 @@ class Leaner():
         while True:
             episode_step += 1
 
-            # prob
-            temp = self.temp if episode_step <= self.explore_num else 0
-            prob = np.array(list(mcts.get_action_probs(gomoku, temp)))
+            # get action prob
+            if episode_step <= self.explore_num:
+                prob = np.array(list(mcts.get_action_probs(gomoku, self.temp)))
+            else:
+                prob = np.array(list(mcts.get_action_probs(gomoku, 0)))
 
-            # dirichlet noise
-            legal_moves = list(gomoku.get_legal_moves())
-            noise = 0.25 * np.random.dirichlet(self.dirichlet_alpha * np.ones(np.count_nonzero(legal_moves)))
+                # dirichlet noise
+                legal_moves = list(gomoku.get_legal_moves())
+                noise = 0.25 * np.random.dirichlet(self.dirichlet_alpha * np.ones(np.count_nonzero(legal_moves)))
 
-            prob_noise = 0.75 * prob
-            j = 0
-            for i in range(len(prob_noise)):
-                if legal_moves[i] == 1:
-                    prob_noise[i] += noise[j]
-                    j += 1
-            prob_noise /= np.sum(prob_noise)
+                prob = 0.75 * prob
+                j = 0
+                for i in range(len(prob)):
+                    if legal_moves[i] == 1:
+                        prob[i] += noise[j]
+                        j += 1
+                prob /= np.sum(prob)
 
             # generate sample
             board = tuple_2d_to_numpy_2d(gomoku.get_board())
             last_action = gomoku.get_last_move()
             cur_player = gomoku.get_current_color()
 
-            sym = self.get_symmetries(board, prob_noise)
+            sym = self.get_symmetries(board, prob)
             for b, p in sym:
                 train_examples.append([b, last_action, cur_player, p])
 
             # execute move
-            action = np.random.choice(len(prob_noise), p=prob_noise)
+            action = np.random.choice(len(prob), p=prob)
 
             if show:
                 self.gomoku_gui.execute_move(cur_player, action)
