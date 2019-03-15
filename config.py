@@ -24,7 +24,7 @@ config = {
     'parallel_play_size': 10,                   # self play in parallel
     'explore_num': 10,                          # explore step in a game
     'temp': 1,                                  # temperature
-    'dirichlet_alpha': 0.03,                    # action noise in self play games
+    'dirichlet_alpha': 0.3,                     # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
     'contest_num': 10,                          # new/old model compare times
     'check_freq': 20,                           # test model frequency
