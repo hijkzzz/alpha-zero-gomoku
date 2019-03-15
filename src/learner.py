@@ -79,7 +79,7 @@ class Leaner():
             # self play in parallel
             libtorch = NeuralNetwork('./models/checkpoint.pt',
                                      self.libtorch_use_gpu, self.thread_pool_size * self.parallel_play_size)
-
+            new_examples_size = 0
             with concurrent.futures.ThreadPoolExecutor(max_workers=self.parallel_play_size) as executor:
                 futures = [executor.submit(self.self_play, 1 if k % 2 else -1, libtorch, k == 1) for k in range(1, self.num_eps + 1)]
                 for k, f in enumerate(futures):
@@ -88,6 +88,7 @@ class Leaner():
                     remain = min(len(futures) - k - 1, self.parallel_play_size)
                     libtorch.set_batch_size(max(remain * self.thread_pool_size, 1))
                     print("EPS: {}, STEPS: {}".format(k + 1, len(examples) // 8))
+                    new_examples_size += len(examples)
                     self.examples_buffer.extend(examples)
 
             # release gpu memory
@@ -98,7 +99,7 @@ class Leaner():
                 continue
 
             # train neural network
-            self.nnet.train(self.examples_buffer, self.batch_size)
+            self.nnet.train(self.examples_buffer, self.batch_size, new_examples_size)
             self.nnet.save_model()
             self.save_samples()
 

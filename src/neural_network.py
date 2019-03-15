@@ -155,11 +155,11 @@ class NeuralNetWorkWrapper():
         self.optim = Adam(self.neural_network.parameters(), lr=self.lr, weight_decay=self.l2)
         self.alpha_loss = AlphaLoss()
 
-    def train(self, example_buffer, batch_size):
+    def train(self, example_buffer, batch_size, new_examples_size):
         """train neural network
         """
-
-        for _ in range(self.epochs):
+        times = min(self.epochs, new_examples_size // batch_size)
+        for _ in range(times):
             self.neural_network.train()
 
             # sample
