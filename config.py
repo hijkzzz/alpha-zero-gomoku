@@ -5,9 +5,9 @@ config = {
 
     # mcts
     'libtorch_use_gpu' : True,                  # libtorch use cuda
-    'thread_pool_size': 4,                      # mcts threads number
+    'mcts_threads_num': 4,                      # mcts threads number
     'num_mcts_sims': 1600,                      # mcts simulation times
-    'c_puct': 6,                                # puct coeff
+    'c_puct': 5,                                # puct coeff
     'c_virtual_loss': 3,                        # virtual loss coeff
 
     # neural_network
@@ -21,8 +21,8 @@ config = {
     # train
     'num_iters': 100000,                        # train iterations
     'num_eps': 10,                              # self play times in per iter
-    'parallel_play_size': 10,                   # self play in parallel
-    'explore_num': 2,                           # explore step in a game
+    'train_threads_num': 4,                     # self play in parallel
+    'explore_num': 4,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.3,                     # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
