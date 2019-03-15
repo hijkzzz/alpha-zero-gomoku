@@ -158,8 +158,8 @@ class NeuralNetWorkWrapper():
     def train(self, example_buffer, batch_size, new_examples_size):
         """train neural network
         """
-        times = min(self.epochs, new_examples_size // batch_size)
-        for _ in range(times):
+        epochs = min(self.epochs, new_examples_size // batch_size + 1)
+        for _ in range(epochs):
             self.neural_network.train()
 
             # sample
