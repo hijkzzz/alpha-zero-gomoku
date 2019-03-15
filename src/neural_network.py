@@ -158,8 +158,8 @@ class NeuralNetWorkWrapper():
     def train(self, example_buffer, batch_size, new_examples_size):
         """train neural network
         """
-        epochs = min(self.epochs, 1.5 * new_examples_size // batch_size)
-        for _ in range(epochs):
+        epochs = min(self.epochs, new_examples_size // batch_size + 1)
+        for i in range(epochs):
             self.neural_network.train()
 
             # sample
@@ -190,7 +190,7 @@ class NeuralNetWorkWrapper():
                 np.sum(new_p * np.log(new_p + 1e-10), axis=1)
             )
 
-            print("LOSS: {}, ENTROPY: {}".format(loss.item(), entropy))
+            print("EPOCH: {}, LOSS: {}, ENTROPY: {}".format(i, loss.item(), entropy))
 
     def infer(self, feature_batch):
         """predict p and v by raw input
