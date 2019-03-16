@@ -82,7 +82,7 @@ class Leaner():
                                      self.libtorch_use_gpu, self.mcts_threads_num * self.train_threads_num)
             itr_examples = []
             with concurrent.futures.ThreadPoolExecutor(max_workers=self.train_threads_num) as executor:
-                futures = [executor.submit(self.self_play, 1 if k % 2 else -1, libtorch, k == 1) for k in range(1, self.num_eps + 1)]
+                futures = [executor.submit(self.self_play, 1 if itr % 2 else -1, libtorch, k == 1) for k in range(1, self.num_eps + 1)]
                 for k, f in enumerate(futures):
                     examples = f.result()
                     itr_examples += examples
