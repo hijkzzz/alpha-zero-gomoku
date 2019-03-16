@@ -21,7 +21,7 @@ config = {
     # train
     'num_iters': 100000,                        # train iterations
     'num_eps': 10,                              # self play times in per iter
-    'train_threads_num': 4,                     # self play in parallel
+    'train_threads_num': 5,                     # self play in parallel
     'explore_num': 4,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.3,                     # action noise in self play games
