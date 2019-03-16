@@ -16,7 +16,7 @@ config = {
     'l2': 0.0001,                               # L2
     'num_channels': 128,                        # convolution neural network channel size
     'num_layers' : 4,                           # residual layer number
-    'epochs': 1,                                # train epochs
+    'epochs': 1.2,                                # train epochs
     'batch_size': 512,                          # batch size
 
     # train
@@ -29,7 +29,7 @@ config = {
     'update_threshold': 0.55,                   # update model threshold
     'num_contest': 10,                          # new/old model compare times
     'check_freq': 20,                           # test model frequency
-    'examples_buffer_max_len': 10,             # max length of examples buffer
+    'examples_buffer_max_len': 10,              # max length of examples buffer
 
     # test
     'human_color': 1                            # human player's color
