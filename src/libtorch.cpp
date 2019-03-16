@@ -54,15 +54,15 @@ std::future<NeuralNetwork::return_type> NeuralNetwork::commit(Gomoku* gomoku) {
     std::swap(state0, state1);
   }
 
-  // torch::Tensor state2 =
-  //     torch::zeros({1, 1, n, n}, torch::dtype(torch::kFloat32));
+  torch::Tensor state2 =
+      torch::zeros({1, 1, n, n}, torch::dtype(torch::kFloat32));
 
-  // if (last_move != -1) {
-  //   state2[0][0][last_move / n][last_move % n] = 1;
-  // }
+  if (last_move != -1) {
+    state2[0][0][last_move / n][last_move % n] = 1;
+  }
 
-  torch::Tensor states = torch::cat({state0, state1}, 1);
-  // torch::Tensor states = torch::cat({state0, state1, state2}, 1);
+  // torch::Tensor states = torch::cat({state0, state1}, 1);
+  torch::Tensor states = torch::cat({state0, state1, state2}, 1);
 
   // emplace task
   std::promise<return_type> promise;

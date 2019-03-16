@@ -219,7 +219,7 @@ class NeuralNetWorkWrapper():
         state0 = (board_batch > 0).float()
         state1 = (board_batch < 0).float()
 
-        # state2 = torch.zeros((len(last_action_batch), 1, n, n)).float()
+        state2 = torch.zeros((len(last_action_batch), 1, n, n)).float()
 
         for i in range(len(board_batch)):
             if cur_player_batch[i] == -1:
@@ -227,13 +227,13 @@ class NeuralNetWorkWrapper():
                 state0[i].copy_(state1[i])
                 state1[i].copy_(temp)
 
-            # last_action = last_action_batch[i]
-            # if last_action != -1:
-            #     x, y = last_action // self.n, last_action % self.n
-            #     state2[i][0][x][y] = 1
+            last_action = last_action_batch[i]
+            if last_action != -1:
+                x, y = last_action // self.n, last_action % self.n
+                state2[i][0][x][y] = 1
 
-        # res =  torch.cat((state0, state1, state2), dim=1)
-        res = torch.cat((state0, state1), dim=1)
+        res =  torch.cat((state0, state1, state2), dim=1)
+        # res = torch.cat((state0, state1), dim=1)
         return res.cuda() if self.train_use_gpu else res
 
     def set_learning_rate(self, lr):
