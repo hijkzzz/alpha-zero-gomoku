@@ -97,12 +97,11 @@ class Leaner():
 
             # prepare train data
             self.examples_buffer.append(itr_examples)
-            epochs =  self.epochs * (len(itr_examples) // self.batch_size + 1)
-
-            # train neural network
             train_data = reduce(lambda a, b : a + b, self.examples_buffer)
             random.shuffle(train_data)
 
+            # train neural network
+            epochs =  self.epochs * (len(itr_examples) // self.batch_size + 1)
             self.nnet.train(train_data, self.batch_size, epochs)
             self.nnet.save_model()
             self.save_samples()
