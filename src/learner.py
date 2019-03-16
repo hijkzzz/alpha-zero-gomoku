@@ -7,6 +7,7 @@ import numpy as np
 import pickle
 import concurrent.futures
 import random
+from functools import reduce
 
 from neural_network import NeuralNetWorkWrapper
 from gomoku_gui import GomokuGUI
@@ -95,12 +96,14 @@ class Leaner():
             del libtorch
 
             # prepare train data
-            random.shuffle(itr_examples)
-            self.examples_buffer.extend(itr_examples)
+            self.examples_buffer.append(itr_examples)
             epochs =  self.epochs * (len(itr_examples) // self.batch_size + 1)
 
             # train neural network
-            self.nnet.train(self.examples_buffer, self.batch_size, epochs)
+            train_data = reduce(lambda a, b : a + b, self.examples_buffer)
+            random.shuffle(train_data)
+
+            self.nnet.train(train_data, self.batch_size, epochs)
             self.nnet.save_model()
             self.save_samples()
 
