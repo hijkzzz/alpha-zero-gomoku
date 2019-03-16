@@ -12,11 +12,11 @@ config = {
 
     # neural_network
     'train_use_gpu' : True,                     # train neural network using cuda
-    'lr': 0.001,                                # learning rate
+    'lr': 0.0005,                               # learning rate
     'l2': 0.0001,                               # L2
     'num_channels': 128,                        # convolution neural network channel size
     'epochs': 1,                                # train epochs
-    'batch_size': 512,                          # batch size
+    'batch_size': 256,                          # batch size
 
     # train
     'num_iters': 100000,                        # train iterations
