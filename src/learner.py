@@ -101,7 +101,7 @@ class Leaner():
             random.shuffle(train_data)
 
             # train neural network
-            epochs =  self.epochs * (len(itr_examples) // self.batch_size + 1)
+            epochs =  self.epochs * len(itr_examples) // self.batch_size + 1
             self.nnet.train(train_data, self.batch_size, epochs)
             self.nnet.save_model()
             self.save_samples()
