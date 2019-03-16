@@ -6,6 +6,7 @@ import math
 import numpy as np
 import pickle
 import concurrent.futures
+import random
 
 from neural_network import NeuralNetWorkWrapper
 from gomoku_gui import GomokuGUI
@@ -54,9 +55,9 @@ class Leaner():
 
         # neural network
         self.batch_size = config['batch_size']
+        self.epochs = config['epochs']
         self.train_use_gpu = config['train_use_gpu']
-
-        self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'], config['epochs'],
+        self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'],
                                          config['num_channels'], config['n'], self.action_size, self.train_use_gpu, self.libtorch_use_gpu)
 
     def learn(self):
@@ -73,38 +74,39 @@ class Leaner():
             self.nnet.save_model()
             self.nnet.save_model('models', "best_checkpoint")
 
-        for i in range(1, self.num_iters + 1):
-            print("ITER :: " + str(i))
+        for itr in range(1, self.num_iters + 1):
+            print("ITER :: {}".format(itr))
 
             # self play in parallel
             libtorch = NeuralNetwork('./models/checkpoint.pt',
                                      self.libtorch_use_gpu, self.mcts_threads_num * self.train_threads_num)
-            new_examples_size = 0
+            itr_examples = []
             with concurrent.futures.ThreadPoolExecutor(max_workers=self.train_threads_num) as executor:
                 futures = [executor.submit(self.self_play, 1 if k % 2 else -1, libtorch, k == 1) for k in range(1, self.num_eps + 1)]
                 for k, f in enumerate(futures):
                     examples = f.result()
+                    itr_examples += examples
+
                     # decrease libtorch batch size
-                    remain = min(len(futures) - k - 1, self.train_threads_num)
+                    remain = min(len(futures) - (k + 1), self.train_threads_num)
                     libtorch.set_batch_size(max(remain * self.mcts_threads_num, 1))
-                    print("EPS: {}, STEPS: {}".format(k + 1, len(examples) // 8))
-                    new_examples_size += len(examples)
-                    self.examples_buffer.extend(examples)
+                    print("EPS: {}, EXAMPLES: {}".format(k + 1, len(examples)))
 
             # release gpu memory
             del libtorch
 
-            # need more samples
-            if len(self.examples_buffer) < self.batch_size:
-                continue
+            # prepare train data
+            random.shuffle(itr_examples)
+            self.examples_buffer.extend(itr_examples)
+            epochs =  self.epochs * (len(itr_examples) // self.batch_size + 1)
 
             # train neural network
-            self.nnet.train(self.examples_buffer, self.batch_size, new_examples_size)
+            self.nnet.train(self.examples_buffer, self.batch_size, epochs)
             self.nnet.save_model()
             self.save_samples()
 
             # compare performance
-            if i % self.check_freq == 0:
+            if itr % self.check_freq == 0:
                 libtorch_current = NeuralNetwork('./models/checkpoint.pt',
                                          self.libtorch_use_gpu, self.mcts_threads_num * self.train_threads_num // 2)
                 libtorch_best = NeuralNetwork('./models/best_checkpoint.pt',

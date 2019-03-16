@@ -136,12 +136,11 @@ class NeuralNetWorkWrapper():
     """train and predict
     """
 
-    def __init__(self, lr, l2, epochs, num_channels, n, action_size, train_use_gpu=True, libtorch_use_gpu=True):
+    def __init__(self, lr, l2, num_channels, n, action_size, train_use_gpu=True, libtorch_use_gpu=True):
         """ init
         """
         self.lr = lr
         self.l2 = l2
-        self.epochs = epochs
         self.num_channels = num_channels
         self.n = n
 
@@ -155,11 +154,10 @@ class NeuralNetWorkWrapper():
         self.optim = Adam(self.neural_network.parameters(), lr=self.lr, weight_decay=self.l2)
         self.alpha_loss = AlphaLoss()
 
-    def train(self, example_buffer, batch_size, new_examples_size):
+    def train(self, example_buffer, batch_size, epochs):
         """train neural network
         """
-        times = self.epochs * (new_examples_size + batch_size - 1) // batch_size
-        for i in range(1, times + 1):
+        for epo in range(1, epochs + 1):
             self.neural_network.train()
 
             # sample
@@ -190,7 +188,7 @@ class NeuralNetWorkWrapper():
                 np.sum(new_p * np.log(new_p + 1e-10), axis=1)
             )
 
-            print("EPOCH: {}, LOSS: {}, ENTROPY: {}".format(i, loss.item(), entropy))
+            print("EPOCH: {}, LOSS: {}, ENTROPY: {}".format(epo, loss.item(), entropy))
 
     def infer(self, feature_batch):
         """predict p and v by raw input
