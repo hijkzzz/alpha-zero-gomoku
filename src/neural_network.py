@@ -60,9 +60,8 @@ class NeuralNetWork(nn.Module):
         super(NeuralNetWork, self).__init__()
 
         # residual block
-        self.res_list = [ResidualBlock(3, num_channels)]
-        for _ in range(num_layers - 1):
-            self.res_list.append(ResidualBlock(num_channels, num_channels))
+        res_list = [ResidualBlock(3, num_channels)] + [ResidualBlock(num_channels, num_channels) for _ in range(num_layers - 1)]
+        self.res_layers = nn.Sequential(*res_list)
 
         # policy head
         self.p_conv = nn.Conv2d(num_channels, 4, kernel_size=1, padding=0, bias=False)
@@ -82,9 +81,7 @@ class NeuralNetWork(nn.Module):
 
     def forward(self, inputs):
         # residual block
-        for res in self.res_list:
-            inputs = res(inputs)
-        out = inputs
+        out = self.res_layers(inputs)
 
         # policy head
         p = self.p_conv(out)
