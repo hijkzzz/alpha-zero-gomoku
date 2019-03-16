@@ -5,7 +5,7 @@ config = {
 
     # mcts
     'libtorch_use_gpu' : True,                  # libtorch use cuda
-    'mcts_threads_num': 4,                      # mcts threads number
+    'num_mcts_threads': 4,                      # mcts threads number
     'num_mcts_sims': 1600,                      # mcts simulation times
     'c_puct': 5,                                # puct coeff
     'c_virtual_loss': 3,                        # virtual loss coeff
@@ -15,21 +15,24 @@ config = {
     'lr': 0.001,                                # learning rate
     'l2': 0.0001,                               # L2
     'num_channels': 128,                        # convolution neural network channel size
+    'num_layers' : 4,                           # residual layer number
     'epochs': 1,                                # train epochs
     'batch_size': 512,                          # batch size
 
     # train
     'num_iters': 100000,                        # train iterations
     'num_eps': 10,                              # self play times in per iter
-    'train_threads_num': 5,                     # self play in parallel
-    'explore_num': 8,                           # explore step in a game
+    'num_train_threads': 5,                     # self play in parallel
+    'num_explore': 8,                           # explore step in a game
     'temp': 1,                                  # temperature
     'dirichlet_alpha': 0.03,                    # action noise in self play games
     'update_threshold': 0.55,                   # update model threshold
-    'contest_num': 10,                          # new/old model compare times
+    'num_contest': 10,                          # new/old model compare times
     'check_freq': 20,                           # test model frequency
     'examples_buffer_max_len': 50000,           # max length of examples buffer
 
     # test
     'human_color': 1                            # human player's color
 }
+
+config['action_size'] = config['n'] ** 2

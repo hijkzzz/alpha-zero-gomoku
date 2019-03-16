@@ -31,18 +31,18 @@ class Leaner():
         self.n = config['n']
         self.n_in_row = config['n_in_row']
         self.gomoku_gui = GomokuGUI(config['n'], config['human_color'])
-        self.action_size = self.n ** 2
+        self.action_size = config['action_size']
 
         # train
         self.num_iters = config['num_iters']
         self.num_eps = config['num_eps']
-        self.train_threads_num = config['train_threads_num']
+        self.num_train_threads = config['num_train_threads']
         self.check_freq = config['check_freq']
-        self.contest_num = config['contest_num']
+        self.num_contest = config['num_contest']
         self.dirichlet_alpha = config['dirichlet_alpha']
         self.temp = config['temp']
         self.update_threshold = config['update_threshold']
-        self.explore_num = config['explore_num']
+        self.num_explore = config['num_explore']
 
         self.examples_buffer = deque([], maxlen=config['examples_buffer_max_len'])
 
@@ -50,15 +50,14 @@ class Leaner():
         self.num_mcts_sims = config['num_mcts_sims']
         self.c_puct = config['c_puct']
         self.c_virtual_loss = config['c_virtual_loss']
-        self.mcts_threads_num = config['mcts_threads_num']
+        self.num_mcts_threads = config['num_mcts_threads']
         self.libtorch_use_gpu = config['libtorch_use_gpu']
 
         # neural network
         self.batch_size = config['batch_size']
         self.epochs = config['epochs']
-        self.train_use_gpu = config['train_use_gpu']
-        self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'],
-                                         config['num_channels'], config['n'], self.action_size, self.train_use_gpu, self.libtorch_use_gpu)
+        self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'], config['num_layers'],
+                                         config['num_channels'], config['n'], self.action_size, config['train_use_gpu'], self.libtorch_use_gpu)
 
     def learn(self):
         # train the model by self play
@@ -79,17 +78,17 @@ class Leaner():
 
             # self play in parallel
             libtorch = NeuralNetwork('./models/checkpoint.pt',
-                                     self.libtorch_use_gpu, self.mcts_threads_num * self.train_threads_num)
+                                     self.libtorch_use_gpu, self.num_mcts_threads * self.num_train_threads)
             itr_examples = []
-            with concurrent.futures.ThreadPoolExecutor(max_workers=self.train_threads_num) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=self.num_train_threads) as executor:
                 futures = [executor.submit(self.self_play, 1 if itr % 2 else -1, libtorch, k == 1) for k in range(1, self.num_eps + 1)]
                 for k, f in enumerate(futures):
                     examples = f.result()
                     itr_examples += examples
 
                     # decrease libtorch batch size
-                    remain = min(len(futures) - (k + 1), self.train_threads_num)
-                    libtorch.set_batch_size(max(remain * self.mcts_threads_num, 1))
+                    remain = min(len(futures) - (k + 1), self.num_train_threads)
+                    libtorch.set_batch_size(max(remain * self.num_mcts_threads, 1))
                     print("EPS: {}, EXAMPLES: {}".format(k + 1, len(examples)))
 
             # release gpu memory
@@ -108,11 +107,11 @@ class Leaner():
             # compare performance
             if itr % self.check_freq == 0:
                 libtorch_current = NeuralNetwork('./models/checkpoint.pt',
-                                         self.libtorch_use_gpu, self.mcts_threads_num * self.train_threads_num // 2)
+                                         self.libtorch_use_gpu, self.num_mcts_threads * self.num_train_threads // 2)
                 libtorch_best = NeuralNetwork('./models/best_checkpoint.pt',
-                                              self.libtorch_use_gpu, self.mcts_threads_num * self.train_threads_num // 2)
+                                              self.libtorch_use_gpu, self.num_mcts_threads * self.num_train_threads // 2)
 
-                one_won, two_won, draws = self.contest(libtorch_current, libtorch_best, self.contest_num)
+                one_won, two_won, draws = self.contest(libtorch_current, libtorch_best, self.num_contest)
                 print("NEW/PREV WINS : %d / %d ; DRAWS : %d" % (one_won, two_won, draws))
 
                 if one_won + two_won > 0 and float(one_won) / (one_won + two_won) > self.update_threshold:
@@ -137,7 +136,7 @@ class Leaner():
         """
         train_examples = []
         gomoku = Gomoku(self.n, self.n_in_row, first_color)
-        mcts = MCTS(libtorch, self.mcts_threads_num, self.c_puct,
+        mcts = MCTS(libtorch, self.num_mcts_threads, self.c_puct,
                     self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
         if show:
@@ -148,7 +147,7 @@ class Leaner():
             episode_step += 1
 
             # get action prob
-            if episode_step <= self.explore_num:
+            if episode_step <= self.num_explore:
                 prob = np.array(list(mcts.get_action_probs(gomoku, self.temp)))
             else:
                 prob = np.array(list(mcts.get_action_probs(gomoku, 0)))
@@ -188,16 +187,16 @@ class Leaner():
                 # b, last_action, cur_player, p, v
                 return [(x[0], x[1], x[2], x[3], x[2] * winner) for x in train_examples]
 
-    def contest(self, network1, network2, contest_num):
+    def contest(self, network1, network2, num_contest):
         """compare new and old model
            Args: player1, player2 is neural network
            Return: one_won, two_won, draws
         """
         one_won, two_won, draws = 0, 0, 0
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=self.train_threads_num) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.num_train_threads) as executor:
             futures = [executor.submit( \
-                self._contest, network1, network2, 1 if k <= contest_num // 2 else -1, k == 1) for k in range(1, contest_num + 1)]
+                self._contest, network1, network2, 1 if k <= num_contest // 2 else -1, k == 1) for k in range(1, num_contest + 1)]
             for f in futures:
                 winner = f.result()
                 if winner == 1:
@@ -211,9 +210,9 @@ class Leaner():
 
     def _contest(self, network1, network2, first_player, show):
         # create MCTS
-        player1 = MCTS(network1, self.mcts_threads_num, self.c_puct,
+        player1 = MCTS(network1, self.num_mcts_threads, self.c_puct,
             self.num_mcts_sims, self.c_virtual_loss, self.action_size)
-        player2 = MCTS(network2, self.mcts_threads_num, self.c_puct,
+        player2 = MCTS(network2, self.num_mcts_threads, self.c_puct,
                     self.num_mcts_sims, self.c_virtual_loss, self.action_size)
 
         # prepare
@@ -271,8 +270,8 @@ class Leaner():
 
         # load best model
         libtorch_best = NeuralNetwork('./models/best_checkpoint.pt',
-                                        self.libtorch_use_gpu, self.mcts_threads_num * 2)
-        mcts_best = MCTS(libtorch_best, self.mcts_threads_num * 2, self.c_puct,
+                                        self.libtorch_use_gpu, self.num_mcts_threads * 2)
+        mcts_best = MCTS(libtorch_best, self.num_mcts_threads * 2, self.c_puct,
                             self.num_mcts_sims * 4, self.c_virtual_loss, self.action_size)
 
         # create gomoku game
