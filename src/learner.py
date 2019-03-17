@@ -312,7 +312,7 @@ class Leaner():
             # next player
             player_index = -player_index
 
-        print("human win" if winner == human_color else "alpha win")
+        print("HUMAN WIN" if winner == human_color else "ALPHA ZERO WIN")
 
         t.join()
 

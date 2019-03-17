@@ -7,13 +7,8 @@ import learner
 import config
 
 if __name__ == "__main__":
-
-    # test tuple_2d_to_numpy_2d
-    # print(learner.tuple_2d_to_numpy_2d(((2, 3, 0.1, 0.5, 0), (2, 3, 0.1, 0.5, 0),
-                                        # (2, 3, 0.1, 0.5, 0), (2, 3, 0.1, 0.5, 0), (2, 3, 0.1, 0.5, 0))))
-
-    if len(sys.argv) < 2:
-        print("param error: train or play")
+    if len(sys.argv) < 2 or sys.argv[1] not in ["train", "play"]:
+        print("[USAGE] python leaner_test.py train|play")
         exit(1)
 
     alpha_zero = learner.Leaner(config.config)
@@ -21,7 +16,6 @@ if __name__ == "__main__":
     if sys.argv[1] == "train":
         alpha_zero.learn()
     elif sys.argv[1] == "play":
-        alpha_zero.play_with_human(human_first=True)
-    else:
-        print("param error: train or play")
-        exit(1)
+        for i in range(10):
+            print("GAME: {}".format(i + 1))
+            alpha_zero.play_with_human(human_first=i % 2)
