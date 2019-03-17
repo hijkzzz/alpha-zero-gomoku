@@ -36,6 +36,7 @@ python learner_test.py play  # play with human
 ```
 
 ## Pre-trained models
+> trained 12 hours on GTX1070
 > Link: https://pan.baidu.com/s/1c2Otxdl7VWFEXul-FyXaJA Password: e5y4
 
 ## GUI
