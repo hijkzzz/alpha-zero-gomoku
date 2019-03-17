@@ -2,7 +2,7 @@
 A multi-threaded implementation of AlphaZero
 
 ## Features
-* parallel MCTS with virtual loss/libtorch
+* parallel MCTS with virtual loss/libtorch(Tree Parallelization and Root Parallelization)
 * Gomoku and MCTS are written in C++
 * swig wrap python extension
 
@@ -36,7 +36,7 @@ python learner_test.py play  # play with human
 ```
 
 ## Pre-trained models
-> trained 12 hours on GTX1070
+> Trained 12 hours on GTX1070
 
 Link: https://pan.baidu.com/s/1c2Otxdl7VWFEXul-FyXaJA Password: e5y4
 
