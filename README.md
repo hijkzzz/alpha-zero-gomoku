@@ -35,6 +35,9 @@ python learner_test.py train # train model
 python learner_test.py play  # play with human
 ```
 
+## Pre-trained models
+> Link: https://pan.baidu.com/s/1c2Otxdl7VWFEXul-FyXaJA Password: e5y4
+
 ## GUI
 ![](https://github.com/hijkzzz/alpha-zero-gomoku/blob/master/assets/gomoku_gui.png)
 
