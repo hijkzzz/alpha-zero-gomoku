@@ -45,8 +45,8 @@ Link: https://pan.baidu.com/s/1c2Otxdl7VWFEXul-FyXaJA Password: e5y4
 ![](https://github.com/hijkzzz/alpha-zero-gomoku/blob/master/assets/gomoku_gui.png)
 
 ## Git Branchs
-* master(lock parallel MCTS, libtorch)
-* python(pure python, single thread)
+* master(Lock Parallel MCTS)
+* python(Single Thread)
 
 ## References
 1. Mastering the Game of Go without Human Knowledge
