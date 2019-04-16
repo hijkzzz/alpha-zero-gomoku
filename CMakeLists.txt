@@ -13,22 +13,22 @@ find_package(PythonLibs)
 include_directories(${PYTHON_INCLUDE_PATH})
 
 # option
-option(WRAP "wrap library" ON)
-option(TEST "unit test" OFF)
+option(WRAP_LIB "wrap library" ON)
+option(UNIT_TEST "unit test" OFF)
 
 # add source directory
 include_directories(./src)
 aux_source_directory(./src SOURCES)
 
 # swig wrap
-if(WRAP)
+if(WRAP_LIB)
     set_property(SOURCE ./src/library.i PROPERTY CPLUSPLUS ON)
     swig_add_library(library TYPE SHARED LANGUAGE python SOURCES ./src/library.i ${SOURCES})
     swig_link_libraries(library ${PYTHON_LIBRARIES} ${TORCH_LIBRARIES})
 endif()
 
 # unit test
-if(TEST)
+if(UNIT_TEST)
     add_library(test ${SOURCES})
     target_link_libraries(test ${TORCH_LIBRARIES})
 
