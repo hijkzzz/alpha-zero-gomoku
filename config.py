@@ -16,7 +16,7 @@ config = {
     'l2': 0.0001,                               # L2
     'num_channels': 128,                        # convolution neural network channel size
     'num_layers' : 4,                           # residual layer number
-    'epochs': 1.5,                             # train epochs
+    'epochs': 1.5,                              # train epochs
     'batch_size': 512,                          # batch size
 
     # train
