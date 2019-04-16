@@ -271,10 +271,8 @@ class Leaner():
         t.start()
 
         # load best model
-        libtorch_best = NeuralNetwork('./models/best_checkpoint.pt',
-                                        self.libtorch_use_gpu, self.num_mcts_threads * 2)
-        mcts_best = MCTS(libtorch_best, self.num_mcts_threads * 2, self.c_puct,
-                            self.num_mcts_sims * 4, self.c_virtual_loss, self.action_size)
+        libtorch_best = NeuralNetwork('./models/best_checkpoint.pt', self.libtorch_use_gpu, 16)
+        mcts_best = MCTS(libtorch_best, 16, self.c_puct, 16 * 800, self.c_virtual_loss, self.action_size)
 
         # create gomoku game
         human_color = self.gomoku_gui.get_human_color()
