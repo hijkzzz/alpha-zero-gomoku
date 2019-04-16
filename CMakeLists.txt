@@ -12,13 +12,13 @@ include(${SWIG_USE_FILE})
 find_package(PythonLibs)
 include_directories(${PYTHON_INCLUDE_PATH})
 
+# add directory
+include_directories(./src)
+aux_source_directory(./src SOURCES)
+
 # option
 option(WRAP_LIB "wrap library" ON)
 option(UNIT_TEST "unit test" OFF)
-
-# add source directory
-include_directories(./src)
-aux_source_directory(./src SOURCES)
 
 # swig wrap
 if(WRAP_LIB)
@@ -29,18 +29,18 @@ endif()
 
 # unit test
 if(UNIT_TEST)
-    add_library(test ${SOURCES})
-    target_link_libraries(test ${TORCH_LIBRARIES})
+    add_library(test_lib ${SOURCES})
+    target_link_libraries(test_lib ${TORCH_LIBRARIES})
 
     add_executable(thread_pool_test ./test/thread_pool_test.cpp)
-    target_link_libraries(thread_pool_test test)
+    target_link_libraries(thread_pool_test test_lib)
 
     add_executable(gomoku_test ./test/gomoku_test.cpp)
-    target_link_libraries(gomoku_test test)
+    target_link_libraries(gomoku_test test_lib)
 
     add_executable(libtorch_test ./test/libtorch_test.cpp)
-    target_link_libraries(libtorch_test test)
+    target_link_libraries(libtorch_test test_lib)
 
     add_executable(mcts_test ./test/mcts_test.cpp)
-    target_link_libraries(mcts_test test)
+    target_link_libraries(mcts_test test_lib)
 endif()
