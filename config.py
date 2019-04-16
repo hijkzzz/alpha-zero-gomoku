@@ -35,4 +35,5 @@ config = {
     'human_color': 1                            # human player's color
 }
 
+# action size
 config['action_size'] = config['n'] ** 2
