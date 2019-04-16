@@ -17,8 +17,8 @@ Edit config.py
 * PyTorch 1.0+
 * LibTorch 1.0+
 * MSVC14.00+/GCC4.8.2+
-* CMake 3.0+
-* SWIG 3.0+
+* CMake 3.8+
+* SWIG 3.0.12+
 
 ## Run
 ```
