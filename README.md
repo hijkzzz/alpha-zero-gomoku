@@ -16,7 +16,7 @@ Edit config.py
 * PyGame 1.9+
 * PyTorch 1.0+
 * LibTorch 1.0+
-* MSVC14.00+/GCC4.8.2+
+* MSVC15.0/GCC6.0+
 * CMake 3.8+
 * SWIG 3.0.12+
 
@@ -37,7 +37,7 @@ python learner_test.py play  # play with human
 ```
 
 ## Pre-trained models
-> Trained 2 days on GTX1070
+> Trained 3 days on GTX1070
 
 Link: https://pan.baidu.com/s/1c2Otxdl7VWFEXul-FyXaJA Password: e5y4
 

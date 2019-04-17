@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8.0)
 project(library)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 # find torch
 find_package(Torch REQUIRED)
