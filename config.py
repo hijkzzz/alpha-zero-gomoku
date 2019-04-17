@@ -29,7 +29,7 @@ config = {
     'update_threshold': 0.55,                   # update model threshold
     'num_contest': 10,                          # new/old model compare times
     'check_freq': 20,                           # test model frequency
-    'examples_buffer_max_len': 20,              # max length of examples buffer
+    'examples_buffer_max_len': 40,              # max length of examples buffer
 
     # test
     'human_color': 1                            # human player's color
