@@ -86,15 +86,15 @@ void TreeNode::expand(const std::vector<double> &action_priors) {
   {
     // get lock
     std::lock_guard<std::mutex> lock(this->lock);
-    unsigned int action_size = this->children.size();
 
     if (this->is_leaf) {
+      unsigned int action_size = this->children.size();
+
       for (unsigned int i = 0; i < action_size; i++) {
         // illegal action
         if (abs(action_priors[i] - 0) < FLT_EPSILON) {
           continue;
         }
-
         this->children[i] = new TreeNode(this, action_priors[i], action_size);
       }
 
