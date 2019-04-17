@@ -119,7 +119,7 @@ void TreeNode::backup(double value) {
 
   // update q_sa
   {
-    // std::lock_guard<std::mutex> lock(this->lock);
+    std::lock_guard<std::mutex> lock(this->lock);
     this->q_sa = (n_visited * this->q_sa + value) / (n_visited + 1);
   }
 }
