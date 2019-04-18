@@ -60,10 +60,12 @@ class Leaner():
         self.nnet = NeuralNetWorkWrapper(config['lr'], config['l2'], config['num_layers'],
                                          config['num_channels'], config['n'], self.action_size, config['train_use_gpu'], self.libtorch_use_gpu)
 
-    def learn(self):
-        # train the model by self play
+        # start gui
         t = threading.Thread(target=self.gomoku_gui.loop)
         t.start()
+
+    def learn(self):
+        # train the model by self play
 
         if path.exists(path.join('models', 'checkpoint.example')):
             print("loading checkpoint...")
@@ -276,9 +278,6 @@ class Leaner():
         return l
 
     def play_with_human(self, human_first=True, checkpoint_name="best_checkpoint"):
-        t = threading.Thread(target=self.gomoku_gui.loop)
-        t.start()
-
         # load best model
         libtorch_best = NeuralNetwork('./models/best_checkpoint.pt', self.libtorch_use_gpu, 12)
         mcts_best = MCTS(libtorch_best, self.num_mcts_threads * 3, \
