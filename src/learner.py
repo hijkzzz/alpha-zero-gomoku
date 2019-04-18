@@ -290,6 +290,8 @@ class Leaner():
         players = ["alpha", None, "human"] if human_color == 1 else ["human", None, "alpha"]
         player_index = human_color if human_first else -human_color
 
+        self.gomoku_gui.reset_status()
+
         while True:
             player = players[player_index + 1]
 
