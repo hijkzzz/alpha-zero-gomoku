@@ -163,9 +163,9 @@ class Leaner():
 
                 # dirichlet noise
                 legal_moves = list(gomoku.get_legal_moves())
-                noise = 0.25 * np.random.dirichlet(self.dirichlet_alpha * np.ones(np.count_nonzero(legal_moves)))
+                noise = 0.2 * np.random.dirichlet(self.dirichlet_alpha * np.ones(np.count_nonzero(legal_moves)))
 
-                prob = 0.75 * prob
+                prob = 0.8 * prob
                 j = 0
                 for i in range(len(prob)):
                     if legal_moves[i] == 1:
