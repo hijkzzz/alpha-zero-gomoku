@@ -12,8 +12,8 @@ class GomokuGUI():
         self.green = (0, 255, 0)
 
         # screen
-        self.width = 800 if n > 10 else 600
-        self.height = 800 if n > 10 else 600
+        self.width = 700 if n > 10 else 500
+        self.height = 700 if n > 10 else 500
 
         self.n = n
         self.grid_width = self.width / (self.n + 3)
@@ -79,7 +79,7 @@ class GomokuGUI():
             os.path.join(base_folder, '../assets/background.png')).convert()
 
         # font
-        self.font = pygame.font.SysFont('Arial', 18)
+        self.font = pygame.font.SysFont('Arial', 16)
 
         while self.is_running:
             # timer
@@ -152,7 +152,7 @@ class GomokuGUI():
                     pygame.draw.circle(self.screen, color, position,
                                        int(self.grid_width / 2.3))
                     # text
-                    position = (position[0] - 10, position[1] - 10)
+                    position = (position[0] - 8, position[1] - 8)
                     color = self.white if self.board[i][j] == -1 else self.black
                     text = self.font.render(str(self.number[i][j]), 3, color)
                     self.screen.blit(text, position)

@@ -137,9 +137,15 @@ class Leaner():
         in train_examples.
         """
         train_examples = []
-        gomoku = Gomoku(self.n, self.n_in_row, first_color)
-        mcts = MCTS(libtorch, self.num_mcts_threads, self.c_puct,
+
+        player1 = MCTS(libtorch, self.num_mcts_threads, self.c_puct,
                     self.num_mcts_sims, self.c_virtual_loss, self.action_size)
+        player2 = MCTS(libtorch, self.num_mcts_threads, self.c_puct,
+            self.num_mcts_sims, self.c_virtual_loss, self.action_size)
+        players = [player2, None, player1]
+        player_index = 1
+
+        gomoku = Gomoku(self.n, self.n_in_row, first_color)
 
         if show:
             self.gomoku_gui.reset_status()
@@ -147,12 +153,13 @@ class Leaner():
         episode_step = 0
         while True:
             episode_step += 1
+            player = players[player_index + 1]
 
             # get action prob
             if episode_step <= self.num_explore:
-                prob = np.array(list(mcts.get_action_probs(gomoku, self.temp)))
+                prob = np.array(list(player.get_action_probs(gomoku, self.temp)))
             else:
-                prob = np.array(list(mcts.get_action_probs(gomoku, 0)))
+                prob = np.array(list(player.get_action_probs(gomoku, 0)))
 
                 # dirichlet noise
                 legal_moves = list(gomoku.get_legal_moves())
@@ -181,7 +188,11 @@ class Leaner():
             if show:
                 self.gomoku_gui.execute_move(cur_player, action)
             gomoku.execute_move(action)
-            mcts.update_with_move(action)
+            player1.update_with_move(action)
+            player2.update_with_move(action)
+
+            # next player
+            player_index = -player_index
 
             # is ended
             ended, winner = gomoku.get_game_status()
