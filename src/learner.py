@@ -126,8 +126,6 @@ class Leaner():
                 del libtorch_current
                 del libtorch_best
 
-        t.join()
-
     def self_play(self, first_color, libtorch, show):
         """
         This function executes one episode of self-play, starting with player 1.
@@ -323,8 +321,6 @@ class Leaner():
             player_index = -player_index
 
         print("HUMAN WIN" if winner == human_color else "ALPHA ZERO WIN")
-
-        t.join()
 
     def load_samples(self, folder="models", filename="checkpoint.example"):
         """load self.examples_buffer
