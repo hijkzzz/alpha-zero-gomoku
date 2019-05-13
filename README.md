@@ -16,7 +16,7 @@ Edit config.py
 * PyGame 1.9+
 * PyTorch 1.0+
 * LibTorch 1.0+
-* MSVC15.0/GCC6.0+
+* MSVC14.0/GCC6.0+
 * CMake 3.8+
 * SWIG 3.0.12+
 
