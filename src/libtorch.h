@@ -2,11 +2,12 @@
 
 #include <torch/script.h>  // One-stop header.
 
-#include <string>
-#include <memory>
-#include <vector>
 #include <future>
+#include <memory>
+#include <queue>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include <gomoku.h>
 
