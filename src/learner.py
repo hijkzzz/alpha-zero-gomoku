@@ -278,7 +278,7 @@ class Leaner():
                     newB = np.fliplr(newB)
                     newPi = np.fliplr(newPi)
                     newAction = np.fliplr(last_action_board)
-                l += [(newB, newPi.ravel(), np.argmax(newAction))]
+                l += [(newB, newPi.ravel(), np.argmax(newAction) if last_action != -1 else -1)]
         return l
 
     def play_with_human(self, human_first=True, checkpoint_name="best_checkpoint"):
