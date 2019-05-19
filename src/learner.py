@@ -103,7 +103,7 @@ class Leaner():
             random.shuffle(train_data)
 
             # train neural network
-            epochs =  self.epochs * (len(itr_examples) + self.batch_size - 1) // self.batch_size
+            epochs = self.epochs * (len(itr_examples) + self.batch_size - 1) // self.batch_size
             self.nnet.train(train_data, self.batch_size, int(epochs))
             self.nnet.save_model()
             self.save_samples()
@@ -166,9 +166,9 @@ class Leaner():
             last_action = gomoku.get_last_move()
             cur_player = gomoku.get_current_color()
 
-            sym = self.get_symmetries(board, prob)
-            for b, p in sym:
-                train_examples.append([b, last_action, cur_player, p])
+            sym = self.get_symmetries(board, prob, last_action)
+            for b, p, a in sym:
+                train_examples.append([b, a, cur_player, p])
 
             # dirichlet noise
             legal_moves = list(gomoku.get_legal_moves())
@@ -208,7 +208,7 @@ class Leaner():
         one_won, two_won, draws = 0, 0, 0
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.num_train_threads) as executor:
-            futures = [executor.submit( \
+            futures = [executor.submit(\
                 self._contest, network1, network2, 1 if k <= num_contest // 2 else -1, k == 1) for k in range(1, num_contest + 1)]
             for f in futures:
                 winner = f.result()
@@ -260,21 +260,25 @@ class Leaner():
             # next player
             player_index = -player_index
 
-    def get_symmetries(self, board, pi):
+    def get_symmetries(self, board, pi, last_action):
         # mirror, rotational
         assert(len(pi) == self.action_size)  # 1 for pass
 
         pi_board = np.reshape(pi, (self.n, self.n))
+        last_action_board = np.zeros((self.n, self.n))
+        last_action_board[last_action // self.n][last_action % self.n] = 1
         l = []
 
         for i in range(1, 5):
             for j in [True, False]:
                 newB = np.rot90(board, i)
                 newPi = np.rot90(pi_board, i)
+                newAction = np.rot90(last_action_board, i)
                 if j:
                     newB = np.fliplr(newB)
                     newPi = np.fliplr(newPi)
-                l += [(newB, newPi.ravel())]
+                    newAction = np.fliplr(last_action_board)
+                l += [(newB, newPi.ravel(), np.argmax(newAction))]
         return l
 
     def play_with_human(self, human_first=True, checkpoint_name="best_checkpoint"):
