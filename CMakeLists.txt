@@ -1,9 +1,13 @@
 cmake_minimum_required(VERSION 3.8.0)
 project(library)
 
+# option
+option(WRAP_LIB "wrap library" ON)
+option(UNIT_TEST "unit test" OFF)
+
 # gcc
-if(UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -march=native -O3 -pthread")
+if(CMAKE_COMPILER_IS_GNUCC)
+    set(CMAKE_CXX_STANDARD 14)
 endif()
 
 # find torch
@@ -17,15 +21,11 @@ include(${SWIG_USE_FILE})
 find_package(PythonLibs)
 include_directories(${PYTHON_INCLUDE_PATH})
 
-# add directory
+# add sources
 include_directories(./src)
 aux_source_directory(./src SOURCES)
 
-# option
-option(WRAP_LIB "wrap library" ON)
-option(UNIT_TEST "unit test" OFF)
-
-# swig wrap
+# swig
 if(WRAP_LIB)
     set_property(SOURCE ./src/library.i PROPERTY CPLUSPLUS ON)
     swig_add_library(library TYPE SHARED LANGUAGE python SOURCES ./src/library.i ${SOURCES})
