@@ -9,12 +9,12 @@ import concurrent.futures
 import random
 from functools import reduce
 
-from neural_network import NeuralNetWorkWrapper
-from gomoku_gui import GomokuGUI
-
 import sys
 sys.path.append('../build')
 from library import MCTS, Gomoku, NeuralNetwork
+
+from neural_network import NeuralNetWorkWrapper
+from gomoku_gui import GomokuGUI
 
 def tuple_2d_to_numpy_2d(tuple_2d):
     # help function
