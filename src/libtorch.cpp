@@ -8,7 +8,7 @@ using namespace std::chrono_literals;
 
 NeuralNetwork::NeuralNetwork(std::string model_path, bool use_gpu,
                              unsigned int batch_size)
-    : module(torch::jit::load(model_path.c_str())),
+    : module(std::make_shared<torch::jit::script::Module>(torch::jit::load(model_path.c_str()))),
       use_gpu(use_gpu),
       batch_size(batch_size),
       running(true),
