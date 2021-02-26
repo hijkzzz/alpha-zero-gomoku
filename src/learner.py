@@ -277,7 +277,7 @@ class Leaner():
                 if j:
                     newB = np.fliplr(newB)
                     newPi = np.fliplr(newPi)
-                    newAction = np.fliplr(last_action_board)
+                    newAction = np.fliplr(newAction)
                 l += [(newB, newPi.ravel(), np.argmax(newAction) if last_action != -1 else -1)]
         return l
 
