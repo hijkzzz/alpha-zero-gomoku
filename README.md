@@ -11,15 +11,15 @@ A multi-threaded implementation of AlphaZero
 ## Args
 Edit config.py
 
-## Environment
+## Packages
 
-* Python 3.6+
-* PyGame 1.9+
-* PyTorch 1.0+
-* LibTorch 1.0+
+* Python 3.7
+* PyGame 1.9
+* PyTorch 1.1
+* LibTorch 1.1
 * MSVC14.0/GCC6.0+
 * CMake 3.8+
-* SWIG 3.0.12+
+* SWIG 3.0.12
 
 ## Run
 ```
