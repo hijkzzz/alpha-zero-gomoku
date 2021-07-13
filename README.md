@@ -16,7 +16,7 @@ Edit config.py
 * Python 3.7
 * PyGame 1.9
 * PyTorch 1.2
-* [LibTorch 1.2] (https://download.pytorch.org/libtorch/cu100/libtorch-shared-with-deps-1.2.0.zip)
+* [LibTorch 1.2](https://download.pytorch.org/libtorch/cu100/libtorch-shared-with-deps-1.2.0.zip)
 * [SWIG 3.0.12](https://sourceforge.net/projects/swig/files/)
 * CMake 3.8+
 * MSVC14.0/GCC6.0+
