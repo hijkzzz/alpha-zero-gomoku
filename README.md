@@ -5,7 +5,7 @@ A multi-threaded implementation of AlphaZero
 * Easy Free-style Gomoku
 * Tree/Root Parallelization with Virtual Loss and LibTorch
 * Gomoku and MCTS are written in C++
-* SWIG C++ for Python extension
+* SWIG for Python C++ extension
 * Update 2019.7.10: supporting Ubuntu and Windows
 
 ## Args
