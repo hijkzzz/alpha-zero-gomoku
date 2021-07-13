@@ -2,11 +2,11 @@
 A multi-threaded implementation of AlphaZero
 
 ## Features
-* Free-style Gomoku
-* Tree/Root Parallelization with Virtual Loss/LibTorch
+* Easy Free-style Gomoku
+* Tree/Root Parallelization with Virtual Loss and LibTorch
 * Gomoku and MCTS are written in C++
-* SWIG wrap C++ extension
-* Update 2019.7.10: support Ubuntu and Windows
+* SWIG C++ extension for Python
+* Update 2019.7.10: supporting Ubuntu and Windows
 
 ## Args
 Edit config.py
@@ -15,11 +15,11 @@ Edit config.py
 
 * Python 3.7
 * PyGame 1.9
-* PyTorch 1.1
-* LibTorch 1.1
-* MSVC14.0/GCC6.0+
+* PyTorch 1.2
+* [LibTorch 1.2] (https://download.pytorch.org/libtorch/cu100/libtorch-shared-with-deps-1.2.0.zip)
+* [SWIG 3.0.12](https://sourceforge.net/projects/swig/files/)
 * CMake 3.8+
-* SWIG 3.0.12
+* MSVC14.0/GCC6.0+
 
 ## Run
 ```
@@ -41,6 +41,9 @@ python learner_test.py play  # play with human
 > Trained 2 days on GTX1070
 
 Link: https://pan.baidu.com/s/1c2Otxdl7VWFEXul-FyXaJA Password: e5y4
+
+>says 啊哦，你来晚了，分享的文件已经被取消了，下次要早点哟。.
+
 
 ## GUI
 ![](https://github.com/hijkzzz/alpha-zero-gomoku/blob/master/assets/gomoku_gui.png)
