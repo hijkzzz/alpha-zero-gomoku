@@ -12,24 +12,24 @@ A multi-threaded implementation of AlphaZero
 Edit config.py
 
 ## Packages
-
-* Python 3.7
-* PyGame 1.9
-* PyTorch 1.2
-* [LibTorch 1.2](https://download.pytorch.org/libtorch/cu100/libtorch-shared-with-deps-1.2.0.zip)
-* [SWIG 3.0.12](https://sourceforge.net/projects/swig/files/)
+* Python 3.6+
+* PyGame 1.9+
+* CUDA 10+
+* [PyTorch 1.1+](https://pytorch.org/get-started/locally/)
+* [LibTorch 1.1+ (Pre-cxx11 ABI)](https://pytorch.org/get-started/locally/)
+* [SWIG 3.0.12+](https://sourceforge.net/projects/swig/files/)
 * CMake 3.8+
-* MSVC14.0/GCC6.0+
+* MSVC14.0+ / GCC6.0+
+
+Update 2022/4/4: This project compiles successfully CUDA 11.6/ PyTorch 1.10/ LibTorch 1.10(Pre-cxx11 ABI) / SWIG 4.0.2
 
 ## Run
 ```
-# Add LibTorch/SWIG to environment variable $PATH
-
 # Compile Python extension
 mkdir build
 cd build
-cmake .. -DCMAKE_PREFIX_PATH=path/to/libtorch -DCMAKE_BUILD_TYPE=Release
-cmake --build
+cmake .. -DCMAKE_PREFIX_PATH=path/to/libtorch -DPYTHON_EXECUTABLE=path/to/python -DCMAKE_BUILD_TYPE=Release
+make -j10
 
 # Run
 cd ../test
