@@ -21,7 +21,7 @@ Edit config.py
 * CMake 3.8+
 * MSVC14.0+ / GCC6.0+
 
-Update 2022/4/4: This project compiles successfully CUDA 11.6/ PyTorch 1.10/ LibTorch 1.10(Pre-cxx11 ABI) / SWIG 4.0.2
+Update 2022/4/4: This project compiles successfully with CUDA 11.6/ PyTorch 1.10/ LibTorch 1.10(Pre-cxx11 ABI) / SWIG 4.0.2
 
 ## Run
 ```
