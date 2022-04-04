@@ -3,10 +3,11 @@ A multi-threaded implementation of AlphaZero
 
 ## Features
 * Easy Free-style Gomoku
-* Tree/Root Parallelization with Virtual Loss and LibTorch
-* Gomoku and MCTS are written in C++
+* Multi-threading Tree/Root Parallelization with Virtual Loss and LibTorch
+* Gomoku, MCTS and Network Infer are written in C++
 * SWIG for Python C++ extension
-* Update 2019.7.10: supporting Ubuntu and Windows
+* Update 2019.7.10: Supporting Ubuntu and Windows
+* Update 2022.4.4: Re-compile with CUDA 11.6/PyTorch 1.10/LibTorch 1.10(Pre-cxx11 ABI)/SWIG 4.0.2
 
 ## Args
 Edit config.py
@@ -20,8 +21,6 @@ Edit config.py
 * [SWIG 3.0.12+](https://sourceforge.net/projects/swig/files/)
 * CMake 3.8+
 * MSVC14.0+ / GCC6.0+
-
-Update 2022/4/4: This project compiles successfully with CUDA 11.6/ PyTorch 1.10/ LibTorch 1.10(Pre-cxx11 ABI) / SWIG 4.0.2
 
 ## Run
 ```
