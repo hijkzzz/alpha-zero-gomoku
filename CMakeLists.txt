@@ -18,7 +18,7 @@ find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
 
 # find python
-find_package(PythonLibs)
+find_package(PythonLibs 3.6 REQUIRED)
 include_directories(${PYTHON_INCLUDE_PATH})
 
 # add sources
