@@ -78,6 +78,8 @@ std::future<NeuralNetwork::return_type> NeuralNetwork::commit(Gomoku* gomoku) {
   return ret;
 }
 
+// TODO: use lock-free queue
+// https://github.com/cameron314/concurrentqueue
 void NeuralNetwork::infer() {
   // get inputs
   std::vector<torch::Tensor> states;
@@ -90,11 +92,13 @@ void NeuralNetwork::infer() {
       std::unique_lock<std::mutex> lock(this->lock);
       if (this->cv.wait_for(lock, 1ms,
                             [this] { return this->tasks.size() > 0; })) {
-        auto task = std::move(this->tasks.front());
-        states.emplace_back(std::move(task.first));
-        promises.emplace_back(std::move(task.second));
+        while (states.size() < this->batch_size && this->tasks.size() > 0){
+          auto task = std::move(this->tasks.front());
+          states.emplace_back(std::move(task.first));
+          promises.emplace_back(std::move(task.second));
 
-        this->tasks.pop();
+          this->tasks.pop();
+        }
 
       } else {
         // timeout
