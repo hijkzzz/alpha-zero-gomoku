@@ -5,7 +5,7 @@ import random
 
 import torch
 import torch.nn as nn
-from torch.optim import Adam
+from torch.optim import AdamW
 from torch.autograd import Variable
 import torch.nn.functional as F
 
@@ -146,7 +146,7 @@ class NeuralNetWorkWrapper():
         if self.train_use_gpu:
             self.neural_network.cuda()
 
-        self.optim = Adam(self.neural_network.parameters(), lr=self.lr, weight_decay=self.l2)
+        self.optim = AdamW(self.neural_network.parameters(), lr=self.lr, weight_decay=self.l2)
         self.alpha_loss = AlphaLoss()
 
     def train(self, example_buffer, batch_size, epochs):
