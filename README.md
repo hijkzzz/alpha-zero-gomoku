@@ -37,7 +37,7 @@ python learner_test.py play  # play with human
 ```
 
 ## Pre-trained models
-> Trained 2 days on Titan X
+> Trained 2 days on GTX TITAN X (similar to GTX1070)
 
 See GitHub Release: https://github.com/hijkzzz/alpha-zero-gomoku/releases
 
