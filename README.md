@@ -37,11 +37,8 @@ python learner_test.py play  # play with human
 ```
 
 ## Pre-trained models
-> Trained 2 days on GTX1070
-
-Link: https://pan.baidu.com/s/1c2Otxdl7VWFEXul-FyXaJA Password: e5y4
-
->says 啊哦，你来晚了，分享的文件已经被取消了，下次要早点哟。.
+> Trained 2 days on Titan X
+See GitHub Release: https://github.com/hijkzzz/alpha-zero-gomoku/releases
 
 
 ## GUI
